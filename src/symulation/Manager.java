@@ -65,7 +65,7 @@ public class Manager {
 	         
 	         
 	         
-	         painter = new Painter(numberOfQueues, 0, new WindowFrame(), images,this);
+	         painter = new Painter(numberOfQueues, 0, images,this);
 	         timerClass=new Timing(numberOfQueues, this,painter);
 	         
 	         queues=new Queue [numberOfQueues];

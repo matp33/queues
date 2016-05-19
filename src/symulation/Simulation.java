@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import events.ClientsArrive;
 import otherFunctions.ClientAction;
 import otherFunctions.Pair;
 import visualComponents.Client;
@@ -191,12 +189,12 @@ public class Simulation {
 //        timerClass.startSimulation();
 //    }  
    
-//    for (int i=0; i<timerClass.listOfEvents.size();i++){
-//    	System.out.println(" time: "+timerClass.listOfEvents.get(i).getTime()+
-//    			" action "+timerClass.listOfEvents.get(i).getAction());
-//    }
+    for (int i=0; i<listOfEvents.size();i++){
+    	System.out.println(" time: "+listOfEvents.get(i).getTime()+
+    			" action "+listOfEvents.get(i).getAction());
+    }
 
-
+    System.out.println("done");
 
     }
 
@@ -254,7 +252,7 @@ public class Simulation {
       
 		double timeToQueue=Client.calculateTimeToGetToQueue(dimInQueue, dimWaitPlace);
 		double totalTime=timeToQueue+//timeToWaitPlace+ // TODO add it
-				ClientsArrive.timeDelay;
+				Client.waitRoomDelay/1000;
 		
       System.out.println("event "+eventTime+" ppl "+peopleInQueue); //TODO problem with ppl in queue
 		

@@ -1,10 +1,8 @@
 
 package tests;
 
-import events.ClientsArrive;
 import symulation.Manager;
-import symulation.Painter;
-import symulation.WindowFrame;
+import visualComponents.Client;
 
 
 public class RegularTests {
@@ -50,7 +48,7 @@ public class RegularTests {
                     
                     for (int i=0; i<numberOfClients;i++){
                         arrivals[i][0]=i*(double)arrivalDelay/1000;
-                        departures[i][0]=i*(double)arrivalDelay/1000+1+ClientsArrive.timeDelay*i;
+                        departures[i][0]=i*(double)arrivalDelay/1000+1+Client.waitRoomDelay/1000*5*i;
                         departures[i][1]=1;
                         arrivals[i][1]=1;
                         System.out.println("---- "+arrivals[i][0]);
@@ -74,7 +72,6 @@ public class RegularTests {
     
     public static void test1ClientPerQueue(int numberOfQueues){
     	double time = 1.5;
-    	double startTime=0;
     	Manager manager = new Manager (numberOfQueues);
     	double [][] arrivals = new double [numberOfQueues][2];
     	double [][] departs = new double [numberOfQueues][2];
@@ -125,7 +122,7 @@ public class RegularTests {
             for (int i=0; i<arrivingClients;i++){
                 arrivals[i][0]=6+i*(double)arrivalDelay/1000;
                 departures[i+2][0]=8+(5*i+1)*(double)arrivalDelay/1000+delay/1000+
-                                    ClientsArrive.timeDelay;
+                                    Client.waitRoomDelay/1000;
                 departures[i+2][1]=queueNumber-1;
                 arrivals[i][1]=queueNumber-1;
             }

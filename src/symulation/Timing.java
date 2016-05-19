@@ -7,8 +7,6 @@ import java.util.TimerTask;
 
 import otherFunctions.ClientAction;
 import visualComponents.Client;
-import events.ClientsArrive;
-import events.QueueUpdate;
 
 public class Timing {
 	private double time;
@@ -101,12 +99,15 @@ public class Timing {
 	                	@Override
 	                	public void run(){
 	                		
-	     	                       int action=(Integer)listOfEvents.get(0).getAction();	     	                       
-	     	                       Client client=(Client)listOfEvents.get(0).getClient();	     	                       
-	     	                       listOfEvents.remove(0);
-	     	                       System.out.println(listOfEvents.get(0).getTime()+"action "+
-	     	                    		  listOfEvents.get(0).getAction()+"abc"+client.abc);
-	     	                       // TODO error is here for sure
+	                		ClientAction<Double,Integer,Client> c=listOfEvents.get(0);
+	                		listOfEvents.remove(0);
+	                		
+	     	                       int action=c.getAction();	     	                       
+	     	                       Client client=c.getClient();	     	                       
+	     	                       
+	     	                       if (client!=null)
+//	     	                       System.out.println(c.getTime()+"action "+
+//	     	                    		  action+"abc"+client.abc);
 	     	                       	                       
 	     	                       switch (action){
 	     	                           case Simulation.ARRIVAL:	   
@@ -118,7 +119,7 @@ public class Timing {
 	     	                                client.moveToQueue();
 	     								    break;
 	     	                           case Simulation.DEPARTURE:
-	     	                        	    System.out.println("exit "+client.abc);
+//	     	                        	    System.out.println("exit "+client.abc);
 	     	                                client.moveToExit();
 	     	                                break;
 	     	                           case Simulation.PAUSE:

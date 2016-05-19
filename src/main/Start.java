@@ -14,7 +14,7 @@ public class Start {
             try {
             try{
 //            	RegularTests.test1ClientPerQueue(6);
-            	RegularTests.test(7, 5);
+            	RegularTests.test(7, 24);
 //            	new Painter(1,10.0,new WindowFrame());
 
             }

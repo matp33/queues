@@ -14,8 +14,6 @@ public class Sprite {
     private final int SPRITE_DIMENSION_VERTICAL;
     private final int numberOfRows;
     private final int numberOfColumns;
-    private String name;
-
     /**
      * 
      * @param width A single sprite width
@@ -27,7 +25,6 @@ public class Sprite {
     public Sprite (int width,int height, String spriteFileName)
                                                             throws IOException{
     	
-    	name=spriteFileName;
     	System.out.println(spriteFileName +" wi "+width +" he "+height);
         spriteFile=ImageIO.read(new File("./src/images"+spriteFileName));
         numberOfColumns=spriteFile.getWidth()/width;
