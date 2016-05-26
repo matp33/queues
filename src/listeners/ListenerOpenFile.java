@@ -19,7 +19,7 @@ private JFileChooser fileChoosingWindow = new JFileChooser();
 private static final String TXT_FILES_DIR = "./src/txtFiles";
 protected Manager manager;
 
-    public ListenerOpenFile ( Manager s, int numbOfQueues){
+    public ListenerOpenFile ( Manager s){
     	JFileChooser fileChooser=new JFileChooser();
     	File txtFilesDirectory = new File(TXT_FILES_DIR);
         fileChooser.setCurrentDirectory(txtFilesDirectory);
@@ -83,20 +83,14 @@ protected Manager manager;
          arrivals=timeTable.arrivals; // TODO reconsider it; we taking 2 times arrivals and departures from timeTable
          departures=timeTable.departures;
          
-             if(manager.isQueueNumberSame(maximum)==false){             	
-                 int numberOfQueues=maximum;
-                 manager.restartSimulation(numberOfQueues);
-                 manager.doChange(maximum);
+             if(manager.isQueueNumberSame(maximum)==false){  
+             manager.doChange(maximum);
              }
-             
-             else{
-                 manager.restartSimulation();
-             }
-             
-             manager.saveTimeTable(arrivals, departures);
+                          
+         manager.saveTimeTable(arrivals, departures);
              
          try{                       
-        	 manager.doSimulation(0);
+        	 manager.restart(0);
          }
          catch (InterruptedException ex){
              ex.printStackTrace();

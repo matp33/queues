@@ -65,16 +65,13 @@ public class RegularTests {
                 }
 
     }
-    /**
-     * Testuje przesuwanie
-     * 
-     */
-    
+        
     public static void test1ClientPerQueue(int numberOfQueues){
     	double time = 1.5;
     	Manager manager = new Manager (numberOfQueues);
     	double [][] arrivals = new double [numberOfQueues][2];
     	double [][] departs = new double [numberOfQueues][2];
+    	
     	
     	for (int i=0; i<numberOfQueues; i++){
     		arrivals[i][0]=time;
@@ -82,6 +79,7 @@ public class RegularTests {
     		departs[i][0]=time+1;
     		departs[i][1]=i;
     	}
+    	
     	manager.saveTimeTable(arrivals, departs);
     	
     	try{

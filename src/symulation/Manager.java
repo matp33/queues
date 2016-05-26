@@ -1,6 +1,7 @@
 package symulation;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,6 +18,7 @@ import otherFunctions.TimeTable;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.Indicator;
+import visualComponents.OutsideWorld;
 import visualComponents.Queue;
 
 public class Manager {
@@ -33,7 +35,7 @@ public class Manager {
 	private File logsDirectory=new File("./src/logs/log.txt");
 	private static final String lOG_HEADER="Queue no.\ttime predicted\tarrival time";
 
-	 
+	public OutsideWorld outside;
 	public Queue[] queues; 
 	public Indicator waitingRoomIndicator;
 	public Door door;
@@ -70,8 +72,7 @@ public class Manager {
 	         
 	         queues=new Queue [numberOfQueues];
 				 for (int i=0;i<numberOfQueues;i++){
-		            queues[i]=new Queue (queueSprite,painter,i);
-		            
+		            queues[i]=new Queue (queueSprite,painter,i);		            
 		         }
 	         
          } 
@@ -80,9 +81,15 @@ public class Manager {
  			e1.printStackTrace();
  		}
 		
-		 
+		 outside = new OutsideWorld();
 		 waitingRoomIndicator=new Indicator(painter);
-			door=new Door(doorSprite,20,painter);
+		 Dimension d=painter.getDoorPosition();
+		 int i=0;
+		 while (painter.getTillPosition(i).width<d.width){
+			 i++;
+		 }
+		 System.out.println("IIIIIIIIIII"+i);
+		 door=new Door(doorSprite,20,painter,i);
 		 door.start();
          
          
@@ -104,34 +111,51 @@ public class Manager {
 	    
 	}
 	
-//	 public boolean removeClient (Client client, int queueNumber){
-//	        
-////	      symulacja.kolejki[nrKolejki].klienci.remove(nrKlienta);
-//	      boolean b=queues[queueNumber].getClientsExiting().remove(client);
-//	      painter.removeObject(client);	      
-//	      painter.paintClient(client);      
-//	      return b;
-//	      
-//	}  
-	
 	public void saveTimeTable(double [][] arrivals, double [][] departures){
         timeTable.arrivals=arrivals;
         timeTable.departures=departures;
     }
+	
+	public void restart(double time) throws InterruptedException{
+		
+		clean();
+		doSimulation(time);
+	}
+	
+	public void clean(){
+		//TODO its copypasted
+		painter.clean();
+		queues=new Queue [numberOfQueues];
+		 for (int i=0;i<numberOfQueues;i++){
+           queues[i]=new Queue (queueSprite,painter,i);           
+        }
+		 Dimension d=painter.getDoorPosition();
+		 int i=0;
+		 while (painter.getTillPosition(i).width<d.width){
+			 i++;
+		 }
+		 door=new Door(doorSprite,20,painter,i);
+		 
+		 door.start();
+	}
 
     public void doSimulation () throws InterruptedException{
         doSimulation(0.0);
     }
 
     public void doSimulation (double time) throws InterruptedException{
+    	Client.nr=0;
     	waitingRoomIndicator.clear();
+    	
         painter.setButtonRestartToActive();
         timerClass.setTime(time);
         simulation.prepareSimulation(time,timeTable.arrivals,timeTable.departures);
+        System.out.println("hI");
         timerClass.setEventsList(listOfEvents);
         timerClass.setRunning(true);
         
         resume(false);
+//        System.out.println("resume");
     }
     
     public void resume(boolean fromZero){
@@ -208,18 +232,16 @@ public class Manager {
     	return timerClass.getTime();
     }
     
-    public void doChange(int numberOfQueues){        
+    public void doChange(int numberOfQueues){
+    	this.numberOfQueues=numberOfQueues;
     	painter.initiate(numberOfQueues,true);
-        painter.repaint();        
+       
     }
     
     public void displayMessage (String text){
         JOptionPane.showMessageDialog(painter, text);
     }
 
-    public void notifyWorld (int positionType){
-    	
-    }
     
     public void finishSimulation(boolean skipMsg){
     	painter.setButtonStopActiveness(false);
@@ -259,16 +281,23 @@ public class Manager {
     public boolean isAnyClientThere(){
         for (int i=0; i< queues.length;i++){
             if (!queues[i].getClientsList().isEmpty()){
-//            	System.out.println("!"+i);
+//            	System.out.println("1");
                 return true;
             }
             if (!queues[i].getClientsArriving().isEmpty()){
 //            	System.out.println("2");
                 return true;
             }
-            if (!queues[i].getClientsExiting().isEmpty()){
-//            	System.out.println("3");
+//            System.out.println("@@"+door.getObserversSize());
+            if (door.getObserversSize()!=0){
+            	Client c=(Client)door.getFirstObserver();
+//            	System.out.println("3"+c.id);
                 return true;
+            }
+            
+            if (outside.getObserversSize()!=0){
+//            	System.out.println("4");
+            	return true;
             }
         }
         

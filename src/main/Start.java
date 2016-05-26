@@ -1,20 +1,18 @@
 package main;
 
-import java.io.IOException;
-
 import tests.RegularTests;
 
 public class Start {
 
-	public static void main(String[] args) throws InterruptedException, IOException, Exception{ 
+	public static void main(String[] args) throws InterruptedException { 
 	      		
     	
     	
         if (args.length > 0) {
-            try {
+            
             try{
-//            	RegularTests.test1ClientPerQueue(6);
-            	RegularTests.test(7, 24);
+            	RegularTests.test1ClientPerQueue(3);
+//            	RegularTests.test(6,12);
 //            	new Painter(1,10.0,new WindowFrame());
 
             }
@@ -22,10 +20,7 @@ public class Start {
                 ex.printStackTrace();
             }             
 
-            } catch (NumberFormatException e) {
-//            System.err.println("Liczba kas powinna byc calkowita. "+e);
-            //System.exit(1);
-}
+          
 }
 
         if (args.length>1 || args.length==0){
