@@ -42,6 +42,7 @@ public class Queue extends AnimatedAndObservable{
             clientsArriving=new ArrayList<Client>();
             clientsExiting=new ArrayList<Client>();
             position=painter.getTillPosition(queueNumber);
+            startDrawingMe();
 
         }
 

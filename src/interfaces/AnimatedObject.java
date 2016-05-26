@@ -34,7 +34,6 @@ public abstract class AnimatedObject extends JComponent {
 			BufferedImage b=sprite.getSprite(0, 0);
 			size=new Dimension(b.getWidth(), b.getHeight());
 			this.painter=painter;
-			painter.addObject(this);
 			position=new Dimension();
 			initializePosition();
 //			this.spriteWidth=spriteWidth;
@@ -76,6 +75,10 @@ public abstract class AnimatedObject extends JComponent {
 	
 	public Dimension getSize(){
 		return size;
+	}
+	
+	public void startDrawingMe(){
+		painter.addObject(this); 
 	}
 	
 	@Override

@@ -72,7 +72,7 @@ public class Manager {
 	         
 	         queues=new Queue [numberOfQueues];
 				 for (int i=0;i<numberOfQueues;i++){
-		            queues[i]=new Queue (queueSprite,painter,i);		            
+		            queues[i]=new Queue (queueSprite,painter,i);
 		         }
 	         
          } 
@@ -127,15 +127,16 @@ public class Manager {
 		painter.clean();
 		queues=new Queue [numberOfQueues];
 		 for (int i=0;i<numberOfQueues;i++){
-           queues[i]=new Queue (queueSprite,painter,i);           
+           queues[i]=new Queue (queueSprite,painter,i);
+           
+           
         }
 		 Dimension d=painter.getDoorPosition();
 		 int i=0;
 		 while (painter.getTillPosition(i).width<d.width){
 			 i++;
 		 }
-		 door=new Door(doorSprite,20,painter,i);
-		 
+		 door=new Door(doorSprite,20,painter,i);		 
 		 door.start();
 	}
 

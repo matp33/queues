@@ -107,16 +107,21 @@ public class Timing {
 		            int action=c.getAction();	     	                       
 		            Client client=c.getClient();	     	                       
 		            
-		            if (client!=null) 
-		            System.out.println(c.getTime()+"action "+
-		         		  action+"abc"+client.id);
+		            if (client!=null) {
+		            	
+		            	System.out.println(c.getTime()+"action "+
+				         		  action+"abc"+client.id);
+		            }
+		            
 		            	                 
 		            switch (action){
 		                case Simulation.ARRIVAL:	   
 //		                     	    System.out.println("arrival");
+		                	 client.startDrawingMe();
 		             	     client.moveToWaitingRoom();
 		                     break;
 		                case Simulation.APPEAR_IN_POSITION:		
+		                	client.startDrawingMe();
 //		                     	   System.out.println("appear");
 		                     client.moveToQueue();
 							 break;

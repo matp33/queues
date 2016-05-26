@@ -255,7 +255,7 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
     }
     
     public void calculateExitTrajectory(){ //TODO temporary fix; remove moveToExit method from movement class
-//    	System.out.println("moved not to exit "+id+" position type "+positionType);
+    	System.out.println("moved not to exit "+id+" position type "+positionType);
     	Dimension destination=painter.calculateClientCoordinates(clientNumber, getQueueNumber(), 
    			    positionType);  
 
@@ -298,10 +298,11 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
             }
             
             if (getPositionType()==Client.POSITION_EXITING  ){ 
-            	System.out.println("id opening "+id);
-                manager.openDoor(); 
+            	System.out.println("id opening "+id+manager.door.isFirst(this));
+            	if (manager.door.isFirst(this))
+                manager.openDoor();
             }
-            
+            // Opening client 3, but moving outside: 1, 1 should open not 3
             
             stopMoving();
         }
@@ -499,11 +500,7 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
         painter.paintClient(this);
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(currentAnimation.getSprite(),x,y,null); 
-//        if(nrKlienta<okienko.maksLudzi){               
-        g2d.drawString(""+id+" "+positionType, x+getSize().width, y+getSize().height);
-//        g2d.drawRect(x, y, clientDimensions.width, clientDimensions.height);
-//        g2d.drawString("" + positionType,x+clientDimensions.width, y+clientDimensions.height);
-//        }
+        g2d.drawString(""+id, x+getSize().width, y+getSize().height);
               
     }
 	

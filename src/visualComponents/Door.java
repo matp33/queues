@@ -28,27 +28,23 @@ public class Door extends AnimatedAndObservable  {
 	
 	private boolean isNotified;
 	
-	
-	
-		public Door(Sprite sprite, int frameDelay, Painter painter, int queue){
-			super(sprite,painter);
-				
-			state=STATE_NEUTRAL;
-			observers = new ArrayList <Observer>();
-			isNotified=false;
-			this.queue=queue;
+	public Door(Sprite sprite, int frameDelay, Painter painter, int queue){
+		super(sprite,painter);
 			
-		}
+		state=STATE_NEUTRAL;
+		observers = new ArrayList <Observer>();
+		isNotified=false;
+		this.queue=queue;
+		startDrawingMe();
+		
+	}
 	
 	protected void initializePosition (){
 		position=painter.getDoorPosition();		
 	}
-	
-
-	
-	
-	
+		
 	public void doOpening(){	
+		
 		isNotified=false;
 		state=STATE_OPENING;
 		currentAnimation.normalDirection();
@@ -84,9 +80,7 @@ public class Door extends AnimatedAndObservable  {
 			doClosing();
 		}
 	}
-	
-	
-	
+		
 	private void scheduleTask(){
 		
 		if (timer!=null){
@@ -96,22 +90,15 @@ public class Door extends AnimatedAndObservable  {
 		TimerTask tt = new TimerTask(){			
 			public void run(){		
 				
-				currentAnimation.updateFrame();	
-//				Dimension d= painter.getDoorPosition();
-//				painter.door.repaint();
-				
+				currentAnimation.updateFrame();
 				if (canClientEnter() && isNotified==false){
-					notifyClients();
-					
+					notifyClients();					
 					isNotified=true;
 				}
 				
-//				if (currentAnimation.isInitialFrame()){
-//					isNotified=false;
-//				}
-				
 				if ((state==STATE_OPENING && currentAnimation.isFinalFrame())
 						|| (state==STATE_CLOSING && currentAnimation.isInitialFrame())){
+					System.out.println("!!!opening "+state);
 					timer.cancel();
 					timer.purge();
 					if (state==STATE_OPENING){
@@ -127,16 +114,11 @@ public class Door extends AnimatedAndObservable  {
 	}
 	
 	public void start(){
-        initializePosition();   
+        initializePosition(); 
 	}
 	
-//	public BufferedImage getImage(){
-//		return currentAnimation.getSprite();
-//	}
-
-
 	public boolean canClientEnter(){
-		if (currentAnimation.getCurrentFrame()==2 && state == STATE_OPENING ){
+		if (currentAnimation.getCurrentFrame()>=2 && state == STATE_OPENING ){
 			return true;
 		}
 		else{
@@ -147,21 +129,23 @@ public class Door extends AnimatedAndObservable  {
 	 public void notifyClients(){ 
 		 
 	     	Client c1=(Client)observers.get(0);
-	     	System.out.println("out: "+c1.id);
 	     	c1.moveOutside();
-	     	
-//	     	if (!c1.isMoving()){
-	     		for (int i=0; i<observers.size();i++){
-	     			Client c=(Client)observers.get(i);
-	     			if (c.getClientNumber()>0){
-		     			c.setClientNumber(c.getClientNumber()-1);
-		     			c.calculateExitTrajectory();
-		     			System.out.println("D"+c.id);
+	     	if (!observers.isEmpty()){
+	     		Client c=(Client)observers.get(0);
+	     		int dir = chooseLeftOrRight(c);
+	     		c.setClientNumber(c.getClientNumber()-1);
+     			c.calculateExitTrajectory();
+     			
+	     		for (int i=1; i<observers.size();i++){
+	     			Client c2=(Client)observers.get(i);
+	     			
+	     			if (c2.getClientNumber()>0 && chooseLeftOrRight(c2)==dir){ 	     				
+		     			c2.setClientNumber(c2.getClientNumber()-1);
+		     			c2.calculateExitTrajectory();
 	     			}
 	     		}
-//	     	}
-	     	
-	     	
+	     		
+	     	}
 	     	
 	     	
      }
@@ -193,8 +177,8 @@ public class Door extends AnimatedAndObservable  {
         		if ( observers.get(i) instanceof Client){
         			Client cd = (Client) observers.get(i);
 
-        			System.out.println("client "+c.id+"trajjectory "+c.getTrajectory().size()+" vs client "+cd.id+"tra"+
-        					cd.getTrajectory().size());
+//        			System.out.println("client "+c.id+"trajjectory "+c.getTrajectory().size()+" vs client "+cd.id+"tra"+
+//        					cd.getTrajectory().size());
         				if (c.getTrajectory().size()<cd.getTrajectory().size()){
 //        					System.out.println("adding client "+c.id+ "+ to place "+i+" !!! "+cd.getTrajectory().size());
         					observers.add(i, c);
@@ -294,6 +278,14 @@ public class Door extends AnimatedAndObservable  {
 		else{
 			return -1; //left
 		}
+	}
+	
+	public boolean isFirst (Observer o){
+		for (int i=0; i<observers.size();i++){
+			Client c = (Client) observers.get(i);
+			System.out.println("#ID"+c.id);
+		}
+		return observers.get(0)==o;
 	}
 
 	
