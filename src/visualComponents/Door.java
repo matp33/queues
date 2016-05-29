@@ -61,6 +61,7 @@ public class Door extends AnimatedAndObservable  {
 	
 	public void stopOpening(){		
 		timer.cancel();
+		timer=null;
 		currentAnimation.stop();
 	}
 	
@@ -85,6 +86,8 @@ public class Door extends AnimatedAndObservable  {
 		
 		if (timer!=null){
 			timer.cancel();
+			timer.purge();
+			timer=null;
 		}
 		
 		TimerTask tt = new TimerTask(){			
@@ -98,9 +101,9 @@ public class Door extends AnimatedAndObservable  {
 				
 				if ((state==STATE_OPENING && currentAnimation.isFinalFrame())
 						|| (state==STATE_CLOSING && currentAnimation.isInitialFrame())){
-					System.out.println("!!!opening "+state);
 					timer.cancel();
 					timer.purge();
+					timer=null;
 					if (state==STATE_OPENING){
 						doClosing();
 					}
@@ -130,18 +133,20 @@ public class Door extends AnimatedAndObservable  {
 		 
 	     	Client c1=(Client)observers.get(0);
 	     	c1.moveOutside();
+	     	
 	     	if (!observers.isEmpty()){
 	     		Client c=(Client)observers.get(0);
 	     		int dir = chooseLeftOrRight(c);
 	     		c.setClientNumber(c.getClientNumber()-1);
-     			c.calculateExitTrajectory();
+     			c.calculateTrajectory();
+//     			System.out.println("cid "+c.id+" dir "+dir);
      			
 	     		for (int i=1; i<observers.size();i++){
 	     			Client c2=(Client)observers.get(i);
 	     			
 	     			if (c2.getClientNumber()>0 && chooseLeftOrRight(c2)==dir){ 	     				
 		     			c2.setClientNumber(c2.getClientNumber()-1);
-		     			c2.calculateExitTrajectory();
+		     			c2.calculateTrajectory();
 	     			}
 	     		}
 	     		
@@ -170,6 +175,11 @@ public class Door extends AnimatedAndObservable  {
     		 observers.add(client);
     		 return;
     	 }
+//    	 Client cu = (Client) client;
+//    	 if (cu.id==12 || cu.id==10){    		 
+//    		 observers.add(0,client);
+//    		 return;
+//    	 }
     	 
     	 if (client instanceof Client){
     		 Client c=(Client)client;
@@ -177,10 +187,10 @@ public class Door extends AnimatedAndObservable  {
         		if ( observers.get(i) instanceof Client){
         			Client cd = (Client) observers.get(i);
 
-//        			System.out.println("client "+c.id+"trajjectory "+c.getTrajectory().size()+" vs client "+cd.id+"tra"+
-//        					cd.getTrajectory().size());
+        			System.out.println("client "+c.id+"trajjectory "+c.getTrajectory().size()+" vs client "+cd.id+"tra"+
+        					cd.getTrajectory().size());
         				if (c.getTrajectory().size()<cd.getTrajectory().size()){
-//        					System.out.println("adding client "+c.id+ "+ to place "+i+" !!! "+cd.getTrajectory().size());
+        					System.out.println("adding client "+c.id+ "+ to place "+i);
         					observers.add(i, c);
         					return;
         				}
@@ -189,7 +199,7 @@ public class Door extends AnimatedAndObservable  {
         	 }
     	 }
     	 Client c = (Client )client;
-    	 System.out.println("adding client "+c.id+ "+ as last ");
+//    	 System.out.println("adding client "+c.id+ "+ as last ");
     	 observers.add(client);
     	 
 		
@@ -200,53 +210,16 @@ public class Door extends AnimatedAndObservable  {
      }
 
 	public void sortObservers() {
-//		Collections.sort(observers, new Comparator <Observer> (){
-//			@Override
-//			public int compare (Observer c1, Observer c2){
-//				if (c1 instanceof Client && c2 instanceof Client){
-//					Client c=(Client)c1;
-//					Client d=(Client)c2;
-//					int i1=chooseLeftOrRight(c);
-//					int i2=chooseLeftOrRight(c);
-//					
-//					
-//					if (i2==i1){
-//						if(c.getTrajectory().size()<d.getTrajectory().size()){
-//		                    return -1;
-//		                }
-//		                if (c.getTrajectory().size()>d.getTrajectory().size()){
-//		                    return 1;
-//		                }
-//		                else{
-//		                    return 0;
-//		                } 
-//					}
-//					else{
-//						if (i1<i2){ // 1 is left, 2 is right means c1<c2
-//							return -1;
-//						}
-//						if (i2<i1){
-//							return 1;
-//						}
-//						return 0;
-//					}
-//				}
-//				else{
-//					return 0;
-//				}
-//				 
-//			}
-//		});
-		
-//		System.out.println("1 sort");
+
 		int iLeft=0;
 		int iRight=0;
 		for (int i=1; i<observers.size();i++){
+			
 			if (observers.get(i) instanceof Client){
 				Client c = (Client)observers.get(i);
 				int j=chooseLeftOrRight(c);
 				if (j==1){
-					iRight++; // yes I intentionally skipped value =0  for left and right because 0 means client is first to leave
+					iRight++; 
 					c.setClientNumber(iRight);
 				}
 				if (j==-1){
@@ -283,7 +256,6 @@ public class Door extends AnimatedAndObservable  {
 	public boolean isFirst (Observer o){
 		for (int i=0; i<observers.size();i++){
 			Client c = (Client) observers.get(i);
-			System.out.println("#ID"+c.id);
 		}
 		return observers.get(0)==o;
 	}

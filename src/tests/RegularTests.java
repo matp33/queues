@@ -79,6 +79,12 @@ public class RegularTests {
     		departs[i][0]=time+1;
     		departs[i][1]=i;
     	}
+//    	for (int i=4; i<6; i++){
+//    		arrivals[i-4][0]=time;
+//    		arrivals[i-4][1]=i;
+//    		departs[i-4][0]=time+1;
+//    		departs[i-4][1]=i;
+//    	}
     	
     	manager.saveTimeTable(arrivals, departs);
     	

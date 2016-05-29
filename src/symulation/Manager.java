@@ -1,5 +1,7 @@
 package symulation;
 
+import interfaces.AnimatedObject;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -138,6 +140,7 @@ public class Manager {
 		 }
 		 door=new Door(doorSprite,20,painter,i);		 
 		 door.start();
+		 System.out.println("!!!!!!!!!!!!!!!!!!!!!! "+i);
 	}
 
     public void doSimulation () throws InterruptedException{
@@ -235,6 +238,7 @@ public class Manager {
     
     public void doChange(int numberOfQueues){
     	this.numberOfQueues=numberOfQueues;
+    	simulation.setNumberOfQueues(numberOfQueues);
     	painter.initiate(numberOfQueues,true);
        
     }
@@ -254,6 +258,7 @@ public class Manager {
     	painter.repaint(painter.getMovementArea());
 //	    System.out.println("!!!!!! "+simulation.painter.getMovementArea());
 	    painter.setButtonRestartToActive();
+	    painter.setButtonStopActiveness(true);
     }
     
     public int displayWindowWithPanel(Component panel, String title){
@@ -323,6 +328,10 @@ public class Manager {
     
     public void saveEventsList(List<ClientAction<Double,Integer,Client>> e){
     	listOfEvents = e;
+    }
+    
+    public List <AnimatedObject> getAllObjects(){
+    	return painter.getAllObjects();
     }
 	
 }

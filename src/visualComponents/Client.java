@@ -67,6 +67,7 @@ public static int nr;
 public final int id; 
 
 private boolean isWaiting;
+//private boolean red; // TODO remove it
 
 public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter,
     				double destinationTime,Manager manager) {
@@ -99,7 +100,7 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
         
         this.painter=painter;
         this.clientNumber=clientNumber;
-        movement=new ClientMovement(this);
+        movement=new ClientMovement(this,manager.getAllObjects());
 //        positionType=Client.POSITION_WAITING_ROOM;
         trajectory=new ArrayList <Dimension>();
         currentAnimation=moveUp;
@@ -107,6 +108,7 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
         this.queue=queue;
         delayWaited=0;
         observers=new ArrayList <Observer>();
+//        red = false;
                 
     }
     
@@ -230,11 +232,14 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
 
     public void moveToExit(){
     	
+//    	if (id==12){
+//    		manager.pause();
+//    	}
     	queue.getClientsList().remove(this);
     	
 //    	System.out.println("Exit "+id);
     	setPositionType(Client.POSITION_EXITING);
-    	calculateExitTrajectory();
+    	calculateTrajectory();
     	setObjectObserved(manager.door);
                 
         notifyClients();    
@@ -243,26 +248,33 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
     }
     
     public void moveOutside(){
+//    	red=true;
+//    	System.out.println("outside: "+id);
     	setPositionType(Client.POSITION_OUTSIDE);
     	setObjectObserved(manager.outside);
     	calculateTrajectory();
     }
 
     public void calculateTrajectory(){
+    	
        Dimension destination=painter.calculateClientCoordinates(getClientNumber(), getQueueNumber(), positionType);
+       
        trajectory=movement.moveClient(destination);  
+//       System.out.println("outside desti"+trajectory);
        resume();
     }
     
-    public void calculateExitTrajectory(){ //TODO temporary fix; remove moveToExit method from movement class
-    	System.out.println("moved not to exit "+id+" position type "+positionType);
-    	Dimension destination=painter.calculateClientCoordinates(clientNumber, getQueueNumber(), 
-   			    positionType);  
-
-		trajectory=movement.moveToExit(destination,painter.getTillPosition(getQueueNumber()),
-		                        painter.getTillDimensions(), getSize().width);		
-		resume();
-    }
+//    public void calculateExitTrajectory(){ //TODO temporary fix; remove moveToExit method from movement class
+////    	System.out.println("exit trajectory :"+getQueueNumber());
+//    	Dimension destination=painter.calculateClientCoordinates(clientNumber, getQueueNumber(), 
+//   			    positionType);  
+//    	
+//
+//		trajectory=movement.moveToExit(destination,painter.getTillPosition(getQueueNumber()),
+//		                        painter.getTillDimensions(), getSize().width);		
+////		System.out.println("exit trajectory :"+destination+" destination "+trajectory);
+//		resume();
+//    }
 
 
     private void move(){
@@ -292,13 +304,11 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
             }
             
             if (getPositionType()==Client.POSITION_OUTSIDE ){    
-            	System.out.println("id "+id+"outside");
                 painter.removeObject(this);
                 objectObservedByMe.removeObserver(this);
             }
             
             if (getPositionType()==Client.POSITION_EXITING  ){ 
-            	System.out.println("id opening "+id+manager.door.isFirst(this));
             	if (manager.door.isFirst(this))
                 manager.openDoor();
             }
@@ -442,7 +452,6 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
 	
 	public void setObjectObserved (Observable o){
 		if (objectObservedByMe!=null){
-			System.out.println("#"+id);
 			objectObservedByMe.removeObserver(this);
 		}
 		
@@ -499,7 +508,11 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
     	int y = position.height;
         painter.paintClient(this);
         Graphics2D g2d = (Graphics2D) g;
+//        if (red){
+//        	g2d.setColor(Color.red);
+//        }
         g2d.drawImage(currentAnimation.getSprite(),x,y,null); 
+//        if (!trajectory.isEmpty())
         g2d.drawString(""+id, x+getSize().width, y+getSize().height);
               
     }

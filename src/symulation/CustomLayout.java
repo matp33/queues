@@ -127,10 +127,10 @@ public class CustomLayout {
        if ( position==Client.POSITION_GOING_TO_QUEUE || position==Client.POSITION_WAITING_IN_QUEUE ){
 
             if (clientNumber<maximumClientsInQueueVisible){
-                y=tillsPositionY+spaceVertically+clientsHeight*(clientNumber+1);
+                y=tillsPositionY+tillsHeight+clientsHeight*(clientNumber);
             }
             else{
-                y=tillsPositionY+spaceVertically+clientsHeight*(maximumClientsInQueueVisible);
+                y=tillsPositionY+tillsHeight+clientsHeight*(maximumClientsInQueueVisible);
             }
             
             x=(int)((queueNumber+1)*(spaceBetweenObjectsHorizontally+tillsWidth)-0.5*(tillsWidth
@@ -152,8 +152,9 @@ public class CustomLayout {
     	   
     	   int direction=1;
     	   if (isQueueLeftToDoors(queueNumber)){
+    		   System.out.println("left: "+queueNumber);
     		   direction=-1;
-    	   }
+    	   }	
     	   
     	   Dimension d= calculateDoorPosition();
            y=d.height+20;

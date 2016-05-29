@@ -38,7 +38,7 @@ public class Simulation {
 		this.painter=painter;
 		this.manager=manager;
 		this.numberOfQueues=numberOfQueues;
-		queueEvents=new ArrayList <Pair<Double,Integer>>();
+		
                 
     }
 
@@ -47,7 +47,7 @@ public class Simulation {
    
 //    timerClass.isRunning=true;
     
-
+    	queueEvents=new ArrayList <Pair<Double,Integer>>();
     
     
     int peopleInQueue []=new int [numberOfQueues];
@@ -87,6 +87,7 @@ public class Simulation {
         	
         	if (!queueEvents.isEmpty() && currentTime>=(Double)queueEvents.get(0).getObject1()){
 
+        		System.out.println("OOOO"+arriveIndex);
         		int queueNumber=(int)queueEvents.get(0).getObject2();
         		peopleInQueue[queueNumber]--;        		   
         		queueEvents.remove(0);     
@@ -330,7 +331,9 @@ public class Simulation {
 	    return new Pair <Dimension,Integer> (calculatedPosition,positionType);
 	}
 
-	
+	public void setNumberOfQueues(int numberOfQueues){
+		this.numberOfQueues=numberOfQueues;
+	}
 
     
 

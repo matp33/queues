@@ -83,6 +83,12 @@ public class Animation {
     }
 
     public BufferedImage getSprite(){
+    	if (currentFrame < 0){
+    		return framesList.get(numberOfFrames-1).getFrame();
+    	}
+    	if (currentFrame > numberOfFrames-1){
+    		return framesList.get(0).getFrame();
+    	}
         return framesList.get(currentFrame).getFrame();
     }
 
