@@ -11,16 +11,14 @@ import visualComponents.Client;
 public class Timing {
 	private double time;
 	public Timer timer;
-	public List<Thread> threadsWaiting;
 	private List<ClientAction<Double,Integer,Client>> listOfEvents;
 
-	private List <Timer> eventTimers;
-	public Object lock;
 	public int threadsNumber;
 	private boolean isRunning;
 	private static final int TIMER_TIME_DELAY=10;
 	private Manager manager;
 	private Painter painter;
+	private Thread t;
 
 	public Timing( int numberOfQueues,Manager manager,Painter painter) {
 //		simulation=s;
@@ -28,15 +26,8 @@ public class Timing {
 		this.manager=manager;
 		threadsNumber=0;
 		listOfEvents=new ArrayList <ClientAction<Double,Integer,Client>> ();
-
-		eventTimers = new ArrayList <Timer>();
-//		queues=new Queue [numberOfQueues];
-
-		
-		lock=new Object();		
+				
 	}
-
-	
 
 	public void startSimulation(){		    
 	    
@@ -47,13 +38,13 @@ public class Timing {
 	}
 	
 	public void stopSimulation(){
+		
 		timer.cancel();
 	    timer.purge();
 	    timer=null;
 	    isRunning=false;
-	    while (!eventTimers.isEmpty()){
-	    	eventTimers.get(0).cancel();
-	    	eventTimers.remove(0);
+	    synchronized(listOfEvents){
+	    	listOfEvents.notify();
 	    }
 	    
 	}
@@ -66,6 +57,13 @@ public class Timing {
 	        public void run(){
 	        	
 //	        	System.out.println(listOfEvents.size()+"/"+manager.isAnyClientThere());
+	        	
+	        	synchronized(listOfEvents){
+	        		if (!listOfEvents.isEmpty() && getTime()>=listOfEvents.get(0).getTime()){
+	        			listOfEvents.notify();
+	        		}
+	        	}
+	        	
 	            if (listOfEvents.isEmpty() && manager.isAnyClientThere()==false){
 	                manager.finishSimulation(false);
 	                this.cancel();
@@ -81,79 +79,89 @@ public class Timing {
 
 	private void startThreadForEvents() {
 		
+		Runnable r = new Runnable (){
+			@Override
+			public void run (){
+				while (!listOfEvents.isEmpty() && isRunning==true){
+					
+					ClientAction<Double,Integer,Client> c=listOfEvents.get(0);
+					double time=c.getTime();
+					
+					synchronized (listOfEvents){
+						while (isRunning() && getTime()<time){
+							try {
+								listOfEvents.wait();
+							} 
+							catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					if (!isRunning){
+						System.out.println("returned");
+						return;
+					}
+					
+		    		listOfEvents.remove(0);
+		    		
+		            int action=c.getAction();	     	                       
+		            Client client=c.getClient();	     	                       
+		            
+		            if (client!=null) {
+		            	
+		            	System.out.println(c.getTime()+"action "+
+				         		  action+"abc"+client.id);
+		            }
+		            
+		            	                 
+		            switch (action){
+		                case Simulation.ARRIVAL:	   
+//		                     	    System.out.println("arrival");
+		                	 client.startDrawingMe();
+		             	     client.moveToWaitingRoom();
+		                     break;
+		                case Simulation.APPEAR_IN_POSITION:		
+		                	client.startDrawingMe();
+//		                     	   System.out.println("appear");
+		                     client.moveToQueue();
+							 break;
+		                case Simulation.DEPARTURE:
+//		                     	    System.out.println("exit "+client.abc);
+		                     client.moveToExit();
+		                     break;
+		                case Simulation.PAUSE:
+		                     manager.pause();
+		                     boolean b=manager.askQuestion(Simulation.NO_MORE_ARRIVALS,
+		                     		Simulation.TITLE_NO_MORE_ARRIVALS);
+		                     if (b==false){
+		                         manager.finishSimulation(true);	     	                                    
+		                     }
+		                     else{
+		                     	manager.resume(false);  
+		                     	return;		     	                                
+		                     }	     	                                                              
+		                     break; 	
+		            	}
+		                                        
+//		                    System.out.println("delete 1; left: "+listOfEvents.size());
+
+				}	
+			}
+		};
+		
+		System.out.println("calle"+listOfEvents.size());
 		isRunning=true;
 		double[] eventsTimes = new double [listOfEvents.size()];
 		
 		for (int i=0; i<listOfEvents.size();i++){  			
-			eventsTimes[i]=listOfEvents.get(i).getTime();	
-//			if (listOfEvents.get(i).getClient()!=null)
-//			System.out.println("!"+listOfEvents.get(i).getAction()+"A"+listOfEvents.get(i).getTime()+"T"+
-//					listOfEvents.get(i).getClient().abc);
+			eventsTimes[i]=listOfEvents.get(i).getTime();
+			if (listOfEvents.get(i).getClient()!=null)
+			System.out.println("!"+listOfEvents.get(i).getClient().id);
 		}
 		
-	            
-	            for (int i=0; i<eventsTimes.length;i++){                 
-	               	                
-	                
-	                TimerTask ti = new TimerTask (){
-	                	@Override
-	                	public void run(){
-	                		
-	                		ClientAction<Double,Integer,Client> c=listOfEvents.get(0);
-	                		listOfEvents.remove(0);
-	                		
-	     	                       int action=c.getAction();	     	                       
-	     	                       Client client=c.getClient();	     	                       
-	     	                       
-	     	                       if (client!=null)
-//	     	                       System.out.println(c.getTime()+"action "+
-//	     	                    		  action+"abc"+client.abc);
-	     	                       	                       
-	     	                       switch (action){
-	     	                           case Simulation.ARRIVAL:	   
-//	     	                        	    System.out.println("arrival");
-	     	                        	    client.moveToWaitingRoom();
-	     	                                break;
-	     	                           case Simulation.APPEAR_IN_POSITION:		
-//	     	                        	   System.out.println("appear");
-	     	                                client.moveToQueue();
-	     								    break;
-	     	                           case Simulation.DEPARTURE:
-//	     	                        	    System.out.println("exit "+client.abc);
-	     	                                client.moveToExit();
-	     	                                break;
-	     	                           case Simulation.PAUSE:
-	     	                                manager.pause();
-	     	                                boolean b=manager.askQuestion(Simulation.NO_MORE_ARRIVALS,
-	     	                                		Simulation.TITLE_NO_MORE_ARRIVALS);
-	     	                                if (b==false){
-	     	                                    manager.finishSimulation(true);	     	                                    
-	     	                                }
-	     	                                else{
-	     	                                	manager.resume(false);  
-	     	                                	return;		     	                                
-	     	                                }	     	                                                              
-	     	                                break; 	
-	     	                       }
-	     	                       
-	     	                       eventTimers.remove(this);
-	     	                       
-//	     	                       System.out.println("delete 1; left: "+listOfEvents.size());
-	     	
-	     	                }
-//	     	                }
-	     	                
-	                	
-	                };
-	                Timer t = new Timer();
-	                
-	                double delay=Math.max(eventsTimes[i]-getTime(),0+i*0.01);	                
-	                t.schedule(ti, (int)(delay*1000));
-	                eventTimers.add(t);
-	                
-	
-	            }
-	
+		t=new Thread(r);
+		t.start();
+		
     }
 	    
 	

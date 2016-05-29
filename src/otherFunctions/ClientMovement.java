@@ -168,9 +168,6 @@ private Client client;
     public List <Dimension> moveAsQuadraticFunction (Dimension coordinates){
 
         int horizontalStep;
-
-        // jesli y= docelowemu to idz po prostej do gory
-        // tak samo jesli x= docelowy
         
 
             if (client.getPosition().width<coordinates.width){

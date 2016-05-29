@@ -42,6 +42,7 @@ public class Queue extends AnimatedAndObservable{
             clientsArriving=new ArrayList<Client>();
             clientsExiting=new ArrayList<Client>();
             position=painter.getTillPosition(queueNumber);
+            startDrawingMe();
 
         }
 
@@ -58,27 +59,17 @@ public class Queue extends AnimatedAndObservable{
             else{
             	c.setObjectObserved(this);
             }
-            
-            
-            
-//            if (positionType<Client.POSITION_WAITING_IN_QUEUE){            	
-            	getClientsArriving().add(c);
-//            }
-//            if (positionType==Client.POSITION_WAITING_IN_QUEUE){
-//            	getClientsList().add(c);  
-//            	System.out.println("#"+getClientsList().size());
-//            }           
+                       	
+        	getClientsArriving().add(c);        
                 
             return c;
         }
         
-        public List<Client> getClientsArriving() {
-			
+        public List<Client> getClientsArriving() {			
 			return clientsArriving;
 		}
         
-        public void setClientsArriving(List <Client> clientsArriving) {
-			
+        public void setClientsArriving(List <Client> clientsArriving) {			
 			this.clientsArriving=clientsArriving;
 		}
         
@@ -96,10 +87,9 @@ public class Queue extends AnimatedAndObservable{
         
         public boolean isLast(Client client) {
         	if (getClientsList().isEmpty() ){
-//        		System.out.println("empty");
         		return true;
         	}
-//        	System.out.println("last "+getClientsList().size());
+        	else
 			return getClientsList().get(getClientsList().size()-1)==client;
 		}
 
@@ -148,7 +138,7 @@ public class Queue extends AnimatedAndObservable{
         	return c.getClientNumber()+1>maxClients;//clients number goes from 0, so we add +1
         }
         
-        public boolean isClientFirstOutOfSight(Client c){
+        public boolean isClientLastVisible(Client c){
         	return c.getClientNumber()+1==maxClients;  
         }
         

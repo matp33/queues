@@ -38,7 +38,7 @@ public class ListenerFromTheStart implements ActionListener{
             "<html><font color='red'>Please enter a proper number<br>" +   
             "according to symulation time.</font></html>";
 
-    public ListenerFromTheStart(Manager manager, int numberOfQueues){
+    public ListenerFromTheStart(Manager manager){
         
         isErrorFound=false;
         this.manager=manager;
@@ -125,16 +125,16 @@ public class ListenerFromTheStart implements ActionListener{
             if (manager.isTimeTableNotEmpty()){
 
                 manager.pause();
-                manager.restartSimulation();
+//                manager.restartSimulation();
 //                manager.simulation=s;
 //                manager.initiate(manager.getNumberOfQueues());
                 
                 try{
                     if (btnFromStart.isSelected()){
-                        manager.doSimulation();
+                        manager.restart(0.0);
                     }
                     else{
-                        manager.doSimulation(d);
+                        manager.restart(d);
                     }
                 }
                 catch (InterruptedException ex){

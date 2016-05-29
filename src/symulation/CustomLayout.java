@@ -151,7 +151,7 @@ public class CustomLayout {
        if (position==Client.POSITION_EXITING){
     	   
     	   int direction=1;
-    	   if (queueNumber>=numberOfQueues/2){
+    	   if (isQueueLeftToDoors(queueNumber)){
     		   direction=-1;
     	   }
     	   
@@ -169,6 +169,10 @@ public class CustomLayout {
        return new Dimension (x,y);
 
    }
+   
+   private boolean isQueueLeftToDoors (int queueNumber){
+	   return calculateTillsPosition(queueNumber).width<calculateDoorPosition().width;
+   }
 
    public Dimension calculateTillsPosition(int tillNumber){
         return new Dimension(spaceBetweenObjectsHorizontally+tillNumber*(tillsWidth+
@@ -182,12 +186,11 @@ public class CustomLayout {
 	   return new Dimension (a.width+clientsWidth,a.height+clientsHeight);
    }
 
-
-  
-
    public Dimension calculateDoorPosition(){
        return new Dimension(windowWidth/2, doorsPositionY);
    }
+   
+   
 
     // ************************************* Getters ******************************** //
 
@@ -219,5 +222,8 @@ public class CustomLayout {
 		return new Dimension (d.width+clientsWidth, d.height+clientsHeight);
 	}
 
+	public void setNumberOfQueues(int number){
+		numberOfQueues=number;
+	}
 
 }

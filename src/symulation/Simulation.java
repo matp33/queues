@@ -77,8 +77,8 @@ public class Simulation {
     List<ClientAction<Double,Integer,Client>> listOfEvents = new ArrayList <ClientAction<Double,Integer,Client>>();
     while ((arriveIndex<arrivals.length || departIndex<departures.length)){   	
     	              
-        if (arriveIndex<arrivals.length && departIndex<departures.length &&
-                arrivals[arriveIndex][0]<departures[departIndex][0]){
+        if (departIndex>=departures.length ||(arriveIndex<arrivals.length  &&
+                arrivals[arriveIndex][0]<departures[departIndex][0])){
 
         	
         	currentTime=arrivals[arriveIndex][0];
@@ -140,13 +140,14 @@ public class Simulation {
 	            if (arriveIndex==arrivals.length-1 && currentTime>initialTime){
 	                clientAction=new ClientAction<Double, Integer, Client>(currentTime,
 	                				PAUSE,null);
-//	                System.out.println("pause "+currentTime);
+	                System.out.println("pause "+currentTime);
 	                listOfEvents.add(clientAction);
 	            }
             
             peopleInQueue[queueNumber]++;
             arriveIndex++;
 //            System.out.println("after "+client.clientNumber);
+            continue;
             
         }
         
@@ -190,8 +191,9 @@ public class Simulation {
 //    }  
    
     for (int i=0; i<listOfEvents.size();i++){
+    	if (listOfEvents.get(i).getClient()!=null)
     	System.out.println(" time: "+listOfEvents.get(i).getTime()+
-    			" action "+listOfEvents.get(i).getAction());
+    			" action "+listOfEvents.get(i).getAction()+" id "+listOfEvents.get(i).getClient().id);
     }
 
     System.out.println("done");

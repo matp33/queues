@@ -18,8 +18,8 @@ import symulation.Manager;
 public class ListenerExtraction extends ListenerOpenFile{
 	private String title = "Choosing queue number.";
 
-    public ListenerExtraction (Manager m, int queuesNmb){
-        super(m,queuesNmb);
+    public ListenerExtraction (Manager m){
+        super(m);
     }
     
     @Override 

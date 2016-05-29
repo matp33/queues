@@ -2,20 +2,15 @@ package visualComponents;
 
 
 import interfaces.AnimatedAndObservable;
-import interfaces.AnimatedObject;
-import interfaces.Observable;
 import interfaces.Observer;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import animations.Sprite;
+import symulation.Manager;
 import symulation.Painter;
 
 public class Door extends AnimatedAndObservable  {
@@ -25,6 +20,7 @@ public class Door extends AnimatedAndObservable  {
 	private Timer timer;
 	private final int delay=10;
 	private List <Observer> observers;
+	private int queue;
 	
 	public static int STATE_CLOSING=-1;
 	public static int STATE_NEUTRAL=0; // nothing
@@ -32,31 +28,23 @@ public class Door extends AnimatedAndObservable  {
 	
 	private boolean isNotified;
 	
-	
-	
-		public Door(Sprite sprite, int frameDelay, Painter painter){
-			super(sprite,painter);
-				
-			state=STATE_NEUTRAL;
-			observers = new ArrayList <Observer>();
-			isNotified=false;
+	public Door(Sprite sprite, int frameDelay, Painter painter, int queue){
+		super(sprite,painter);
 			
-		}
-	
-	protected void initializePosition (){
-		System.out.println("1"+position);
-		System.out.println("2"+painter);
-		position=painter.getDoorPosition();		
+		state=STATE_NEUTRAL;
+		observers = new ArrayList <Observer>();
+		isNotified=false;
+		this.queue=queue;
+		startDrawingMe();
+		
 	}
 	
-//	protected void changeAnimation(){			
-//		currentAnimation.start();
-//        currentAnimation.updateFrame();
-//	}
-	
-	
-	
+	protected void initializePosition (){
+		position=painter.getDoorPosition();		
+	}
+		
 	public void doOpening(){	
+		
 		isNotified=false;
 		state=STATE_OPENING;
 		currentAnimation.normalDirection();
@@ -92,9 +80,7 @@ public class Door extends AnimatedAndObservable  {
 			doClosing();
 		}
 	}
-	
-	
-	
+		
 	private void scheduleTask(){
 		
 		if (timer!=null){
@@ -104,22 +90,15 @@ public class Door extends AnimatedAndObservable  {
 		TimerTask tt = new TimerTask(){			
 			public void run(){		
 				
-				currentAnimation.updateFrame();	
-//				Dimension d= painter.getDoorPosition();
-//				painter.door.repaint();
-				
+				currentAnimation.updateFrame();
 				if (canClientEnter() && isNotified==false){
-					notifyClients();
-					
+					notifyClients();					
 					isNotified=true;
 				}
 				
-//				if (currentAnimation.isInitialFrame()){
-//					isNotified=false;
-//				}
-				
 				if ((state==STATE_OPENING && currentAnimation.isFinalFrame())
 						|| (state==STATE_CLOSING && currentAnimation.isInitialFrame())){
+					System.out.println("!!!opening "+state);
 					timer.cancel();
 					timer.purge();
 					if (state==STATE_OPENING){
@@ -135,16 +114,11 @@ public class Door extends AnimatedAndObservable  {
 	}
 	
 	public void start(){
-        initializePosition();   
+        initializePosition(); 
 	}
 	
-//	public BufferedImage getImage(){
-//		return currentAnimation.getSprite();
-//	}
-
-
 	public boolean canClientEnter(){
-		if (currentAnimation.getCurrentFrame()==3 && state == STATE_OPENING ){
+		if (currentAnimation.getCurrentFrame()>=2 && state == STATE_OPENING ){
 			return true;
 		}
 		else{
@@ -156,34 +130,164 @@ public class Door extends AnimatedAndObservable  {
 		 
 	     	Client c1=(Client)observers.get(0);
 	     	c1.moveOutside();
-//	     	if (!c1.isMoving()){
+	     	if (!observers.isEmpty()){
+	     		Client c=(Client)observers.get(0);
+	     		int dir = chooseLeftOrRight(c);
+	     		c.setClientNumber(c.getClientNumber()-1);
+     			c.calculateExitTrajectory();
+     			
 	     		for (int i=1; i<observers.size();i++){
-	     			Client c=(Client)observers.get(i);
-	     			if (c.getClientNumber()>0){
-		     			c.setClientNumber(c.getClientNumber()-1);
-		     			c.calculateExitTrajectory();
+	     			Client c2=(Client)observers.get(i);
+	     			
+	     			if (c2.getClientNumber()>0 && chooseLeftOrRight(c2)==dir){ 	     				
+		     			c2.setClientNumber(c2.getClientNumber()-1);
+		     			c2.calculateExitTrajectory();
 	     			}
-	     			if (!c.isMoving())	c.resume();
 	     		}
-//	     	}
+	     		
+	     	}
 	     	
-	     	observers.remove(0);
 	     	
      }
 	     
      public void removeObserver(Observer client){
+    	 Client c=(Client )client;
+//    	 System.out.println("removing "+c.id);
      	observers.remove(client);        	
      }
      
      public void addObserver(Observer client){
-     	observers.add(client);
+    	findPlaceForClient(client);
+    	Client c=(Client )client;
+//    	System.out.println("added"+c.id);
+//     	observers.add(client);
+     	sortObservers();
      }
      
-     public int getObserversSize(){
+     private void findPlaceForClient(Observer client) {
+    	 
+    	 if (observers.isEmpty()){
+    		 observers.add(client);
+    		 return;
+    	 }
+    	 
+    	 if (client instanceof Client){
+    		 Client c=(Client)client;
+        	 for (int i=0; i<observers.size();i++){
+        		if ( observers.get(i) instanceof Client){
+        			Client cd = (Client) observers.get(i);
+
+//        			System.out.println("client "+c.id+"trajjectory "+c.getTrajectory().size()+" vs client "+cd.id+"tra"+
+//        					cd.getTrajectory().size());
+        				if (c.getTrajectory().size()<cd.getTrajectory().size()){
+//        					System.out.println("adding client "+c.id+ "+ to place "+i+" !!! "+cd.getTrajectory().size());
+        					observers.add(i, c);
+        					return;
+        				}
+        			
+        		}
+        	 }
+    	 }
+    	 Client c = (Client )client;
+    	 System.out.println("adding client "+c.id+ "+ as last ");
+    	 observers.add(client);
+    	 
+		
+	}
+
+	public int getObserversSize(){
     	 return observers.size();
      }
+
+	public void sortObservers() {
+//		Collections.sort(observers, new Comparator <Observer> (){
+//			@Override
+//			public int compare (Observer c1, Observer c2){
+//				if (c1 instanceof Client && c2 instanceof Client){
+//					Client c=(Client)c1;
+//					Client d=(Client)c2;
+//					int i1=chooseLeftOrRight(c);
+//					int i2=chooseLeftOrRight(c);
+//					
+//					
+//					if (i2==i1){
+//						if(c.getTrajectory().size()<d.getTrajectory().size()){
+//		                    return -1;
+//		                }
+//		                if (c.getTrajectory().size()>d.getTrajectory().size()){
+//		                    return 1;
+//		                }
+//		                else{
+//		                    return 0;
+//		                } 
+//					}
+//					else{
+//						if (i1<i2){ // 1 is left, 2 is right means c1<c2
+//							return -1;
+//						}
+//						if (i2<i1){
+//							return 1;
+//						}
+//						return 0;
+//					}
+//				}
+//				else{
+//					return 0;
+//				}
+//				 
+//			}
+//		});
+		
+//		System.out.println("1 sort");
+		int iLeft=0;
+		int iRight=0;
+		for (int i=1; i<observers.size();i++){
+			if (observers.get(i) instanceof Client){
+				Client c = (Client)observers.get(i);
+				int j=chooseLeftOrRight(c);
+				if (j==1){
+					iRight++; // yes I intentionally skipped value =0  for left and right because 0 means client is first to leave
+					c.setClientNumber(iRight);
+				}
+				if (j==-1){
+					iLeft++;
+					c.setClientNumber(iLeft);
+				}
+				c.calculateTrajectory();
+
+				
+				
+			}
+		}
+		
+		
+	}
 	
+	public Observer getFirstObserver (){
+		if (!observers.isEmpty())
+			return observers.get(0);
+		else{
+			return null;
+		}
+	}
 	
+	public int chooseLeftOrRight(Client c){
+		if (c.getQueueNumber()>=queue){
+			return 1; //right
+		}
+		else{
+			return -1; //left
+		}
+	}
+	
+	public boolean isFirst (Observer o){
+		for (int i=0; i<observers.size();i++){
+			Client c = (Client) observers.get(i);
+			System.out.println("#ID"+c.id);
+		}
+		return observers.get(0)==o;
+	}
+
 	
 
 }
