@@ -68,8 +68,7 @@ public class Door extends AnimatedAndObservable  {
 	public void interrupt(){		
 		if (state!=STATE_NEUTRAL){		
 			stopOpening();
-		}
-		
+		}		
 	}
 	
 	public void resume(){
@@ -87,7 +86,7 @@ public class Door extends AnimatedAndObservable  {
 		if (timer!=null){
 			timer.cancel();
 			timer.purge();
-			timer=null;
+//			timer=null;
 		}
 		
 		TimerTask tt = new TimerTask(){			
@@ -103,7 +102,7 @@ public class Door extends AnimatedAndObservable  {
 						|| (state==STATE_CLOSING && currentAnimation.isInitialFrame())){
 					timer.cancel();
 					timer.purge();
-					timer=null;
+//					timer=null;
 					if (state==STATE_OPENING){
 						doClosing();
 					}

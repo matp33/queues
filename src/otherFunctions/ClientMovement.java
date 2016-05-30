@@ -5,7 +5,9 @@ package otherFunctions;
 import interfaces.AnimatedObject;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +27,6 @@ private List <AnimatedObject> objects;
 
     public List <Dimension> moveClient (Dimension coordinates){
 
-    int horizontalStep;
-    int verticalStep;
     
     int newXCoord=client.getPosition().width;
     int newYCoord=client.getPosition().height;
@@ -36,59 +36,74 @@ private List <AnimatedObject> objects;
     int minOfRangeY = Math.min(newYCoord, coordinates.height);
     int maxOfRangeY = Math.max(newYCoord, coordinates.height);
     
+    int rectangleWidth=maxOfRangeX-minOfRangeX;
+    int rectangleHeight=maxOfRangeY-minOfRangeY;
+    
     List <AnimatedObject> objectsOnTheWay = new ArrayList <AnimatedObject>();
+    Rectangle clientTrajectory = new Rectangle(minOfRangeX, minOfRangeY, rectangleWidth, rectangleHeight);
+    Direction movingDirection = chooseWhichWayToGo(new Dimension (newXCoord, newYCoord), coordinates);
+    int i=client.id;
     
     for (AnimatedObject object: objects){
     	if (object instanceof Queue){
     		Queue q = (Queue)object;
-    		int xpos=q.getPosition().width+q.getSize().width;
-    		int ypos=q.getPosition().height-q.getSize().height; // we draw up meaning coord gets subtracted
-    		if (xpos<maxOfRangeX && xpos>minOfRangeX && ypos<maxOfRangeY && ypos>minOfRangeY){
-    			objectsOnTheWay.add(object);
-    		}
+    		Rectangle queueArea = new Rectangle (q.getPosition().width, q.getPosition().height, q.getSize().width,
+    				q.getSize().height);
+    			if (queueArea.intersects(clientTrajectory)){
+    				objectsOnTheWay.add(object);
+    			}
+
     	}
-    }
-
-    if (client.getPosition().width<coordinates.width) horizontalStep=Client.stepSize;  
-    else horizontalStep=-1*Client.stepSize;    
-
-    if (client.getPosition().height<coordinates.height) verticalStep=Client.stepSize;    
-    else verticalStep=-1*Client.stepSize;
+    }    
     
     List <Dimension> newCoords = new ArrayList <Dimension> ();    
     int counter=1;           
+    int horizontalStep;
+    int verticalStep;
     
     //  ******************************** zigzag movement *****************************************
     
         while (Math.abs(newXCoord-coordinates.width)>=Client.stepSize ||
                                 Math.abs(newYCoord-coordinates.height)>=Client.stepSize){
+        	
+        	horizontalStep = movingDirection.getHorizontalDirection();
+        	verticalStep = movingDirection.getVerticalDirection();
+        	
         	boolean b=false;
         	boolean c=false;
-        	Dimension stepX = new Dimension (newXCoord+horizontalStep,newYCoord);
-        	Dimension stepY = new Dimension (newXCoord, newYCoord + verticalStep);
+        	Point stepX = new Point (newXCoord+horizontalStep,newYCoord);
+        	Point stepY = new Point (newXCoord, newYCoord + verticalStep);
+        	Rectangle recx = new Rectangle(stepX, client.getSize());
+        	Rectangle recy = new Rectangle(stepY, client.getSize());        	        	
         	
         	for (AnimatedObject obj: objectsOnTheWay){ 
         		Rectangle objectArea = new Rectangle(obj.getPosition().width, obj.getPosition().height,
         				obj.getSize().width,obj.getSize().height);
-        		
-        		while (isInsideRectangle(stepX,objectArea)){        			
+        		    	
+        		while (objectArea.intersects(recx) ){  
         			newYCoord+=verticalStep;
         			newCoords.add(new Dimension (newXCoord,newYCoord));
-        			stepX = new Dimension (stepX.width,newYCoord);
+        			stepX = new Point (stepX.x,newYCoord);
+        			recx.setLocation(stepX);
         			b=true;
         		}
         		
-        		while (isInsideRectangle (stepY,objectArea)){
+        		while (objectArea.intersects(recy)){
         			newXCoord+=horizontalStep;
 	    			newCoords.add(new Dimension (newXCoord,newYCoord));
 	    			c=true;
-	    			stepY = new Dimension (newXCoord, stepY.height);
-//	    			stepX = new Dimension (newXCoord+horizontalStep,newYCoord);
+	    			stepY = new Point (newXCoord, stepY.y);
+	    			recy.setLocation(stepY);
         		}
-        		
+        		        		
         	}
+        	
         	if (b==true) counter=0;
         	if (c==true) counter=Client.zigzagLength;
+        	if (b==true || c== true){
+        		movingDirection=chooseWhichWayToGo(new Dimension(newXCoord,newYCoord), coordinates);
+        		continue;
+        	}
 
             if (counter<Client.zigzagLength && Math.abs(newXCoord-coordinates.width)>=Client.stepSize){
                 newXCoord+=horizontalStep;                
@@ -105,21 +120,20 @@ private List <AnimatedObject> objects;
             counter++;
                                     
         }
-
+        
+    horizontalStep=movingDirection.getHorizontalDirection();
+    verticalStep=movingDirection.getVerticalDirection();
+                
     while (Math.abs(newXCoord-coordinates.width)!=0){
         newXCoord+=horizontalStep/Client.stepSize;
         newCoords.add(new Dimension(newXCoord,newYCoord));
-
     }
+    
     while (Math.abs(newYCoord-coordinates.height)!=0){
         newYCoord+=verticalStep/Client.stepSize;
         newCoords.add(new Dimension(newXCoord,newYCoord));
     }
 
-//    for (int i=0; i<newCoords.size();i++){
-//    	System.out.println(newCoords.size()+"rozmiar "+newCoords.get(i));
-//    }
-//    System.out.println(newCoords.size()+"rozmiar "+newCoords);
     return newCoords;
 
     }
@@ -264,11 +278,18 @@ private List <AnimatedObject> objects;
 
     }
     
-    public boolean isInsideRectangle (Dimension coords, Rectangle rectangle){
-    	boolean b1=(coords.width<rectangle.getWidth()+rectangle.getX() && coords.width>rectangle.getX());
-		boolean b2=(coords.height<rectangle.getHeight()+rectangle.getY() && coords.height>rectangle.getY());
-    	return (coords.width<rectangle.getWidth()+rectangle.getX() && coords.width>rectangle.getX()) &&
-    	(coords.height<rectangle.getHeight()+rectangle.getY() && coords.height>rectangle.getY());   
-    }
+    public Direction chooseWhichWayToGo (Dimension start, Dimension end){
+    	
+    	int horizontalDirection;
+    	int verticalDirection;
+    	if (start.width<end.width) horizontalDirection=Client.stepSize;  
+        else horizontalDirection=-1*Client.stepSize;    
 
+        if (start.height<end.height) verticalDirection=Client.stepSize;    
+        else verticalDirection=-1*Client.stepSize;
+        
+        return new Direction (verticalDirection, horizontalDirection);
+        
+    }
+    
 }
