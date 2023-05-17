@@ -4,6 +4,8 @@ package tests;
 import symulation.Manager;
 import visualComponents.Client;
 
+import java.util.Random;
+
 
 public class RegularTests {
 
@@ -37,24 +39,21 @@ public class RegularTests {
 
     public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients){
              Manager manager= new Manager(numberOfQueues);
-//                new Okno_frame(okno);
-//                okno.zapytaj("start?");
 
-                try{//
+                try{
                     Thread.sleep(500);
-//                    okno.symulacja.startujCzas();
                     double [][] arrivals= new double [numberOfClients][2];
                     double [][] departures = new double [numberOfClients][2];
                     
                     for (int i=0; i<numberOfClients;i++){
+                        int queueNumber = new Random().nextInt(numberOfQueues);
                         arrivals[i][0]=i*(double)arrivalDelay/1000;
-                        departures[i][0]=i*(double)arrivalDelay/1000+1+Client.waitRoomDelay/1000*5*i;
-                        departures[i][1]=1;
-                        arrivals[i][1]=1;
+                        departures[i][0]=i*(double)arrivalDelay/1000+5;
+                        departures[i][1]=queueNumber;
+                        arrivals[i][1]= queueNumber;
                         System.out.println("---- "+arrivals[i][0]);
 //                        System.out.println("---- "+departures[i][0]);
                     }
-                    
                     manager.saveTimeTable(arrivals, departures);
                     manager.clean();
                     manager.doSimulation();

@@ -1,23 +1,25 @@
 package otherFunctions;
 
 
-public class ClientAction <Time,Action,Client> {
-    private Time time;
-    private Action action;
+import visualComponents.Client;
+
+public class ClientAction {
+    private double time;
+    private int action;
     private Client client;
    
 
-    public ClientAction (Time time, Action action,Client queueNumber){
+    public ClientAction (double time, int action,Client queueNumber){
         this.time=time;
         this.action=action;
         this.client=queueNumber;
     }
 
-    public Time getTime(){
+    public double getTime(){
         return time;
     }
 
-    public Action getAction (){
+    public int getAction (){
         return action;
     }
     public Client getClient(){

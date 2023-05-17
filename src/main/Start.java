@@ -12,7 +12,7 @@ public class Start {
             
             try{
 //            	RegularTests.test1ClientPerQueue(8);
-            	RegularTests.testMultipleClientsWithMultipleQueues(6,12);
+            	RegularTests.testMultipleClientsWithMultipleQueues(3,8);
 //            	new Painter(1,10.0,new WindowFrame());
 
             }

@@ -47,7 +47,7 @@ public class Manager {
 	private Sprite clientSprite;
 	private Sprite doorSprite;
 	private Sprite queueSprite;
-	private List<ClientAction<Double,Integer,Client>> listOfEvents;
+	private List<ClientAction> listOfEvents;
 	
 	public Manager(int numberOfQueues){
 		
@@ -147,10 +147,12 @@ public class Manager {
 	}
 
     public void doSimulation () throws InterruptedException{
+		clean();
         doSimulation(0.0);
     }
 
-    public void doSimulation (double time) throws InterruptedException{
+
+	public void doSimulation (double time) throws InterruptedException{
     	Client.nr=0;
     	waitingRoomIndicator.clear();
     	
@@ -329,7 +331,7 @@ public class Manager {
     	return queues[queueNumber];
     }
     
-    public void saveEventsList(List<ClientAction<Double,Integer,Client>> e){
+    public void saveEventsList(List<ClientAction> e){
     	listOfEvents = e;
     }
     

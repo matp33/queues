@@ -11,7 +11,7 @@ import visualComponents.Client;
 public class Timing {
 	private double time;
 	public Timer timer;
-	private List<ClientAction<Double,Integer,Client>> listOfEvents;
+	private List<ClientAction> listOfEvents;
 
 	public int threadsNumber;
 	private boolean isRunning;
@@ -25,7 +25,7 @@ public class Timing {
 		this.painter=painter;
 		this.manager=manager;
 		threadsNumber=0;
-		listOfEvents=new ArrayList <ClientAction<Double,Integer,Client>> ();
+		listOfEvents=new ArrayList <ClientAction> ();
 				
 	}
 
@@ -84,7 +84,7 @@ public class Timing {
 			public void run (){
 				while (!listOfEvents.isEmpty() && isRunning==true){
 					
-					ClientAction<Double,Integer,Client> c=listOfEvents.get(0);
+					ClientAction c=listOfEvents.get(0);
 					double time=c.getTime();
 					
 					synchronized (listOfEvents){
@@ -184,7 +184,7 @@ public class Timing {
 	}
 
 	
-	public void setEventsList(List<ClientAction<Double,Integer,Client>> listOfEvents){
+	public void setEventsList(List<ClientAction> listOfEvents){
 		this.listOfEvents=listOfEvents;
 		
 	}

@@ -4,7 +4,6 @@ package symulation;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import otherFunctions.ClientAction;
 import otherFunctions.Pair;
@@ -53,15 +52,11 @@ public class Simulation {
     int peopleInQueue []=new int [numberOfQueues];
 //    System.out.println("queue numbers "+numberOfQueues);
 
-        for (int i=0;i<numberOfQueues;i++){
-            peopleInQueue[i]=0;
-        }
 
-    ClientAction<Double, Integer, Client> clientAction; 
+    ClientAction clientAction;
    
     int departIndex=0;
-    double currentTime=0;
-   
+
     while(departIndex<departures.length){
     	if (departures[departIndex][0]<initialTime){
     		departIndex++;
@@ -74,27 +69,27 @@ public class Simulation {
     
     //departures[i] describe same client
 
-    List<ClientAction<Double,Integer,Client>> listOfEvents = new ArrayList <ClientAction<Double,Integer,Client>>();
+    List<ClientAction> listOfEvents = new ArrayList<>();
     while ((arriveIndex<arrivals.length || departIndex<departures.length)){   	
-    	              
+
+		// departIndex>=departures.length ??? why is this needed
         if (departIndex>=departures.length ||(arriveIndex<arrivals.length  &&
                 arrivals[arriveIndex][0]<departures[departIndex][0])){
 
+
+			double arrivalTime=arrivals[arriveIndex][0];
+
         	
-        	currentTime=arrivals[arriveIndex][0];
         	
-        	
-        	
-        	if (!queueEvents.isEmpty() && currentTime>=(Double)queueEvents.get(0).getObject1()){
+        	if (!queueEvents.isEmpty() && arrivalTime>=(Double)queueEvents.get(0).getObject1()){
 
         		System.out.println("OOOO"+arriveIndex);
         		int queueNumber=(int)queueEvents.get(0).getObject2();
         		peopleInQueue[queueNumber]--;        		   
         		queueEvents.remove(0);     
-//        		System.out.println("decrease "+currentTime);
         	}
         	
-        	double arrivalTime=currentTime;
+
             
             int queueNumber=(int)arrivals[arriveIndex][1]; 
             int action;
@@ -135,13 +130,12 @@ public class Simulation {
             }
             
             client.saveInformation(dim,type);
-            clientAction=new ClientAction<Double, Integer, Client>(time,action, client);
+            clientAction=new ClientAction(time,action, client);
             listOfEvents.add(clientAction); 
                         
-	            if (arriveIndex==arrivals.length-1 && currentTime>initialTime){
-	                clientAction=new ClientAction<Double, Integer, Client>(currentTime,
+	            if (arriveIndex==arrivals.length-1 && arrivalTime>initialTime){
+	                clientAction=new ClientAction(arrivalTime,
 	                				PAUSE,null);
-	                System.out.println("pause "+currentTime);
 	                listOfEvents.add(clientAction);
 	            }
             
@@ -155,9 +149,9 @@ public class Simulation {
         if ( arriveIndex>=arrivals.length || (departIndex<departures.length &&
                                     departures[departIndex][0]<=arrivals[arriveIndex][0]) ){ 	
         	
-            currentTime=departures[departIndex][0];
+            double departureTime=departures[departIndex][0];
             int queueNumber=(int)departures[departIndex][1];
-            Client c=findFirstClient(queueNumber,departIndex, listOfEvents);
+            Client c=findFirstClient(departIndex, listOfEvents);
             int delay=0;
             if (c!=null){
             	delay=calculateTotalDelay(c.getQueueNumber(), listOfEvents, departIndex);
@@ -167,8 +161,8 @@ public class Simulation {
             // TODO check if delay is calculated right
             
             
-            queueEvents.add(new Pair<Double,Integer>(currentTime+(double)delay/1000, queueNumber));
-            clientAction=new ClientAction<Double, Integer, Client>(currentTime, DEPARTURE, 
+            queueEvents.add(new Pair<>(departureTime + (double) delay / 1000, queueNumber));
+            clientAction=new ClientAction(departureTime, DEPARTURE,
             			c);
             listOfEvents.add(clientAction);   
               
@@ -202,7 +196,7 @@ public class Simulation {
     }
 
 
-    private Client findFirstClient(int queueNumber, int index, List<ClientAction<Double, Integer, Client>> 
+    private Client findFirstClient(int index, List<ClientAction>
     								events) {
     	
     	// TODO test it now
@@ -223,24 +217,19 @@ public class Simulation {
 		return null;
 	}
 
-	private void sortEvents(List <ClientAction<Double,Integer,Client>> listOfEvents){
-    	Collections.sort(listOfEvents, new Comparator <ClientAction<Double,Integer,Client>> (){
-            @Override
-            public int compare(ClientAction<Double,Integer,Client> m1, 
-            				   ClientAction<Double,Integer,Client> m2){
+	private void sortEvents(List <ClientAction> listOfEvents){
+    	Collections.sort(listOfEvents, (m1, m2) -> {
 
-                if(m1.getTime()<m2.getTime()){
-                    return -1;
-                }
-                if (m1.getTime()>m2.getTime()){
-                    return 1;
-                }
-                else{
-                    return 0;
-                }         
+			if (m1.getTime() < m2.getTime()) {
+				return -1;
+			}
+			if (m1.getTime() > m2.getTime()) {
+				return 1;
+			} else {
+				return 0;
+			}
 
-            }
-        });
+		});
     }
     
     private Pair <Double,Integer> calculateAppearTime(int queueNumber, double eventTime, double initialTime,
@@ -269,10 +258,10 @@ public class Simulation {
 			time=initialTime;
 			action=APPEAR_IN_POSITION;
 		}
-		return new Pair <Double,Integer>(time,action);
+		return new Pair<>(time, action);
     }
 
-    private int calculateTotalDelay(int queueNumber, List<ClientAction<Double, Integer, Client>> events,
+    private int calculateTotalDelay(int queueNumber, List<ClientAction> events,
     				int desiredIndex) {
     	
     	int totalDelay=0;
