@@ -27,6 +27,8 @@ public class Door extends AnimatedAndObservable  {
 	public static int STATE_OPENING=1;
 	
 	private boolean isNotified;
+
+	private TimerTask currentAnimationTask;
 	
 	public Door(Sprite sprite, int frameDelay, Painter painter, int queue){
 		super(sprite,painter);
@@ -36,6 +38,7 @@ public class Door extends AnimatedAndObservable  {
 		isNotified=false;
 		this.queue=queue;
 		startDrawingMe();
+		timer = new Timer();
 		
 	}
 	
@@ -59,9 +62,10 @@ public class Door extends AnimatedAndObservable  {
 		scheduleTask();	
 	}
 	
-	public void stopOpening(){		
-		timer.cancel();
-		timer=null;
+	public void stopOpening(){
+		if (currentAnimationTask != null){
+			currentAnimationTask.cancel();
+		}
 		currentAnimation.stop();
 	}
 	
@@ -83,13 +87,12 @@ public class Door extends AnimatedAndObservable  {
 		
 	private void scheduleTask(){
 		
-		if (timer!=null){
-			timer.cancel();
-			timer.purge();
+		if (currentAnimationTask!=null){
+			currentAnimationTask.cancel();
 //			timer=null;
 		}
 		
-		TimerTask tt = new TimerTask(){			
+		currentAnimationTask = new TimerTask(){
 			public void run(){		
 				
 				currentAnimation.updateFrame();
@@ -100,8 +103,8 @@ public class Door extends AnimatedAndObservable  {
 				
 				if ((state==STATE_OPENING && currentAnimation.isFinalFrame())
 						|| (state==STATE_CLOSING && currentAnimation.isInitialFrame())){
-					timer.cancel();
-					timer.purge();
+					currentAnimationTask.cancel();
+					currentAnimationTask = null;
 //					timer=null;
 					if (state==STATE_OPENING){
 						doClosing();
@@ -110,8 +113,7 @@ public class Door extends AnimatedAndObservable  {
 			}			
 		};
 		
-		timer=new Timer();
-		timer.schedule(tt, 0,delay);
+		timer.schedule(currentAnimationTask, 0,delay);
 				
 	}
 	

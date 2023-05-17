@@ -41,6 +41,7 @@ private Queue queue;
 private Timer timer;
 private Timer timerDelay; // timer for moving inside queue connected to clients having some delays
 
+private TimerTask movingTask;
 private Animation currentAnimation,moveLeft,moveRight,moveDown,moveUp;
 private Observable objectObservedByMe;
 private Dimension position;
@@ -108,6 +109,8 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
         this.queue=queue;
         delayWaited=0;
         observers=new ArrayList <Observer>();
+		timer=new Timer();
+		timerDelay=new Timer();
 //        red = false;
                 
     }
@@ -127,7 +130,7 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
     		return;
     	}
     	
-    	timerDelay=new Timer();
+
         TimerTask tt=new TimerTask(){
             @Override
             public void run(){
@@ -175,8 +178,8 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
     		return;
     	}
     	isMoving=true;
-        timer=new Timer();
-        TimerTask tt=new TimerTask(){
+
+        movingTask = new TimerTask(){
             @Override
             public void run(){
                 move();
@@ -184,7 +187,7 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
         };
 
         
-        timer.scheduleAtFixedRate(tt, 0, (int)(1000*movementDelay));
+        timer.scheduleAtFixedRate(movingTask, 0, (int)(1000*movementDelay));
         if (isWaiting){
 //        	System.out.println("client "+clientNumber+" delay >0 "+delayWaited);
         	updateMyNumber();
@@ -199,6 +202,7 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
     		delayWaited+=(int)(manager.getTime()*1000)-delayStartTime; // no negative values allowed
 //    		System.out.println("delay wait: "+delayWaited+"abc"+abc);
     		timerDelay.cancel();
+			timer.cancel();
     	}
     	    	
     	stopMoving();    	
@@ -207,7 +211,9 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
     
     public void stopMoving(){ // this is when sprite stops by itself i.e. trajectory size = 0
     	    	
-    	if (timer!=null) timer.cancel();
+    	if (movingTask!=null){
+			movingTask.cancel();
+		}
     	isMoving=false;
     	currentAnimation.setLastFrame();
     	if (objectObservedByMe!=null){
@@ -519,7 +525,6 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
 	
 	
 	private void createDelayTimer(int delay){
-		timerDelay = new Timer();
 		TimerTask tt = new TimerTask (){
 			@Override
 			public void run(){
@@ -532,7 +537,6 @@ public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter
 	}
 	
 	public void createDelay(double delay){
-		timerDelay = new Timer();
 		TimerTask tt = new TimerTask (){
 			@Override
 			public void run(){

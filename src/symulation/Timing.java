@@ -97,6 +97,9 @@ public class Timing {
 							}
 						}
 					}
+					System.out.print("###### ");
+					Thread.getAllStackTraces().keySet().stream().map(Thread::getName).sorted().peek(s-> System.out.print(", ")).forEach(System.out::print);
+					System.out.println();
 					if (!isRunning){
 						System.out.println("returned");
 						return;
