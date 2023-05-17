@@ -34,7 +34,7 @@ public class Manager {
 	private Timing timerClass;
 	
 	private PrintWriter printWriter;
-	private File logsDirectory=new File("./src/logs/log.txt");
+	private File logsFile =new File("./src/logs/log.txt");
 	private static final String lOG_HEADER="Queue no.\ttime predicted\tarrival time";
 
 	public OutsideWorld outside;
@@ -100,7 +100,10 @@ public class Manager {
 		 simulation=new Simulation(numberOfQueues,painter,this); //simulation starts here
 		 
 	     try{
-	         printWriter=new PrintWriter(logsDirectory,"UTF-8");
+			 if (!logsFile.getParentFile().exists()){
+				 logsFile.getParentFile().mkdirs();
+			 }
+	         printWriter=new PrintWriter(logsFile,"UTF-8");
 	         printWriter.println(lOG_HEADER);
 	     }
 	     catch (FileNotFoundException fg){

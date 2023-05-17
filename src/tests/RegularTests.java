@@ -35,7 +35,7 @@ public class RegularTests {
     
     }
 
-    public static void test(int numberOfQueues, int numberOfClients){
+    public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients){
              Manager manager= new Manager(numberOfQueues);
 //                new Okno_frame(okno);
 //                okno.zapytaj("start?");
@@ -56,6 +56,7 @@ public class RegularTests {
                     }
                     
                     manager.saveTimeTable(arrivals, departures);
+                    manager.clean();
                     manager.doSimulation();
 
 
