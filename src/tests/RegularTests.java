@@ -40,7 +40,7 @@ public class RegularTests {
 //                new Okno_frame(okno);
 //                okno.zapytaj("start?");
 
-                try{
+                try{//
                     Thread.sleep(500);
 //                    okno.symulacja.startujCzas();
                     double [][] arrivals= new double [numberOfClients][2];
