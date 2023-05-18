@@ -1,5 +1,6 @@
 package symulation;
 
+import constants.ClientPositionType;
 import interfaces.AnimatedObject;
 
 import java.awt.BorderLayout;
@@ -197,7 +198,7 @@ public class Painter extends JPanel {
 
 
 
-    public Dimension calculateClientCoordinates(int clientNumber, int queueNumber, int position){
+    public Dimension calculateClientCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
         return layout.calculateClientsCoordinates(clientNumber, queueNumber, position);
     }
 

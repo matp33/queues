@@ -28,10 +28,8 @@ public class Animation {
                 throw new Exception ("Delay must be positive integer. Current delay is not positive.");
             }
             this.framesList.add(new Frame (frames[i],delay));
-//            obecnyFrame=0;
         }
 
-        this.numberOfFrames=0;
         this.currentFrame=0;
         this.animationDirection=1;
         this.numberOfFrames=this.framesList.size();

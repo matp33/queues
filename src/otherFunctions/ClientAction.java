@@ -1,15 +1,16 @@
 package otherFunctions;
 
 
+import constants.SimulationEventType;
 import visualComponents.Client;
 
 public class ClientAction {
     private double time;
-    private int action;
+    private SimulationEventType  action;
     private Client client;
    
 
-    public ClientAction (double time, int action,Client queueNumber){
+    public ClientAction (double time, SimulationEventType action, Client queueNumber){
         this.time=time;
         this.action=action;
         this.client=queueNumber;
@@ -19,7 +20,7 @@ public class ClientAction {
         return time;
     }
 
-    public int getAction (){
+    public SimulationEventType getAction (){
         return action;
     }
     public Client getClient(){

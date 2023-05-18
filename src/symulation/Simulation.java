@@ -6,18 +6,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import constants.ClientPositionType;
+import constants.SimulationEventType;
 import otherFunctions.ClientAction;
 import otherFunctions.Pair;
 import visualComponents.Client;
 
 public class Simulation {
     
-	public static final int QUEUE_UPDATE_DONE=0;
-	public static final int APPEAR_IN_POSITION=1; // TODO REMOVE IT
-	public static final int lAST_CLIENT_CHANGED_PLACE=15;  
-    public static final int ARRIVAL=2;    
-    public static final int DEPARTURE=3;
-    public static final int PAUSE=4;
     public static final int FINISH=5;
     
     public static final String NO_MORE_ARRIVALS="No more clients will arive. Do you want to continue?";
@@ -43,7 +40,7 @@ public class Simulation {
     }
 
     public void prepareSimulation(double initialTime,double [][] arrivals,
-                          double [][] departures) throws InterruptedException, IOException {
+                          double [][] departures) throws Exception {
    
 //    timerClass.isRunning=true;
     
@@ -93,20 +90,20 @@ public class Simulation {
 
             
             int queueNumber=(int)arrivals[arriveIndex][1]; 
-            int action;
+            SimulationEventType action;
             double time;
 //            System.out.println("current time "+currentTime +" in queue "+peopleInQueue[queueNumber]);
             
             	if (arrivalTime<=initialTime){
-            		action=APPEAR_IN_POSITION;
+            		action=SimulationEventType.APPEAR_IN_POSITION;
             		time=initialTime;
             	}
             	else{
-            		Pair <Double,Integer> result=calculateAppearTime(queueNumber, arrivalTime,initialTime,
+            		Pair <Double,SimulationEventType> result=calculateAppearTime(queueNumber, arrivalTime,initialTime,
 							 peopleInQueue[queueNumber]);
-            		time=(Double)result.getObject1();
+            		time=result.getObject1();
             		
-            		action=(Integer)result.getObject2();
+            		action=result.getObject2();
             	}
             	
             	
@@ -117,17 +114,17 @@ public class Simulation {
             		manager.getQueue(queueNumber),peopleInQueue[queueNumber],painter,
             		arrivalTime,manager);                        
 	        Dimension dim;
-	        Integer type;
-            if (action==ARRIVAL){ 
-            	type=Client.POSITION_ARRIVAL; // TODO client should appear in type = "Arrival"
+			ClientPositionType type;
+            if (action== SimulationEventType.ARRIVAL){
+            	type=ClientPositionType.ARRIVAL; // TODO client should appear in type = "Arrival"
             	dim=painter.calculateClientCoordinates(0, 0, type);
             	
             }
             else{
-            	Pair <Dimension, Integer> pair= calculatePosition(queueNumber,arrivalTime,initialTime,
+            	Pair <Dimension, ClientPositionType> pair= calculatePosition(queueNumber,arrivalTime,initialTime,
 						peopleInQueue[queueNumber]);
-            	dim=(Dimension)pair.getObject1();
-                type=(Integer)pair.getObject2();
+            	dim= pair.getObject1();
+                type=pair.getObject2();
             }
             
             client.saveInformation(dim,type);
@@ -137,7 +134,7 @@ public class Simulation {
                         
 	            if (arriveIndex==arrivals.length-1 && arrivalTime>initialTime){
 	                clientAction=new ClientAction(arrivalTime,
-	                				PAUSE,null);
+							SimulationEventType.PAUSE,null);
 	                listOfEvents.add(clientAction);
 	            }
             
@@ -164,14 +161,12 @@ public class Simulation {
             
             
             queueEvents.add(new Pair<>(departureTime + (double) delay / 1000, queueNumber));
-            clientAction=new ClientAction(departureTime, DEPARTURE,
+            clientAction=new ClientAction(departureTime, SimulationEventType.DEPARTURE,
             			c);
             listOfEvents.add(clientAction);   
               
             departIndex++;
             
-            // TODO ClientAction<Double, Integer, Integer, Double> is freaking long, and I use it 123213
-            // times in the code, meaning a lot of job to refactor it, so find a simpler solution
             // Solution: don't create new client action, instead just replace the values
             
             // TODO Check pattern: prototype
@@ -206,7 +201,7 @@ public class Simulation {
 		for (int i=0; i<events.size();i++){
 			Client c=events.get(i).getClient();
 					
-			if (c!=null && (events.get(i).getAction()==ARRIVAL || events.get(i).getAction()==APPEAR_IN_POSITION)
+			if (c!=null && (events.get(i).getAction()==SimulationEventType.ARRIVAL || events.get(i).getAction()==SimulationEventType.APPEAR_IN_POSITION)
 //					&& c.queueNumber==queueNumber
 					){
 				j++;
@@ -234,12 +229,12 @@ public class Simulation {
 		});
     }
     
-    private Pair <Double,Integer> calculateAppearTime(int queueNumber, double eventTime, double initialTime,
+    private Pair <Double,SimulationEventType> calculateAppearTime(int queueNumber, double eventTime, double initialTime,
     													int peopleInQueue){
     				
-		Dimension dimWaitPlace=painter.calculateClientCoordinates(0, 0, Client.POSITION_WAITING_ROOM);
-		Dimension dimInQueue=painter.calculateClientCoordinates(peopleInQueue, queueNumber, 
-															    Client.POSITION_GOING_TO_QUEUE);
+		Dimension dimWaitPlace=painter.calculateClientCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
+		Dimension dimInQueue=painter.calculateClientCoordinates(peopleInQueue, queueNumber,
+				ClientPositionType.GOING_TO_QUEUE);
                            	
 //		System.out.println(queues[queueNumber].
 //				findNumberOfLastClient()+"in queue");
@@ -249,16 +244,16 @@ public class Simulation {
 				Client.waitRoomDelay/1000;
 		
       System.out.println("event "+eventTime+" ppl "+peopleInQueue); //TODO problem with ppl in queue
-		
-		int action;
+
+		SimulationEventType action;
 		double time;
 		if (totalTime<=eventTime-initialTime){
-			action=ARRIVAL;	
+			action= SimulationEventType.ARRIVAL;
 			time=eventTime-totalTime;
 		}
 		else{
 			time=initialTime;
-			action=APPEAR_IN_POSITION;
+			action=SimulationEventType.APPEAR_IN_POSITION;
 		}
 		return new Pair<>(time, action);
     }
@@ -288,38 +283,38 @@ public class Simulation {
 		
 	}
 
-	public Pair <Dimension,Integer> calculatePosition(int queueNumber, double arrivalTime,
+	public Pair <Dimension,ClientPositionType> calculatePosition(int queueNumber, double arrivalTime,
 					double initialTime, int peopleInQueue){
 	
 		// TODO this is too similar method to calculateAppearTime check it
 		
 		
-		Dimension dimInitial=painter.calculateClientCoordinates(0, 0, Client.POSITION_ARRIVAL);
+		Dimension dimInitial=painter.calculateClientCoordinates(0, 0, ClientPositionType.ARRIVAL);
 		Dimension dimInQueue=painter.calculateClientCoordinates(peopleInQueue,
-                             queueNumber, Client.POSITION_GOING_TO_QUEUE);
+                             queueNumber, ClientPositionType.GOING_TO_QUEUE);
         Dimension calculatedPosition = Client.calculateCoordinates(dimInQueue, dimInitial,
         								arrivalTime);
         
         	if (calculatedPosition.equals(dimInQueue)){
 //        		System.out.println("same"+arrivalTime+"?"+queueNumber);
-        		return new Pair <Dimension, Integer>(calculatedPosition,Client.POSITION_WAITING_IN_QUEUE);
+        		return new Pair <>(calculatedPosition,ClientPositionType.WAITING_IN_QUEUE);
         	}
 		
 	    if (arrivalTime<0){
 	    	arrivalTime=0;
 	    }  	    	    
 	    
-	    int positionType=0;
+	    ClientPositionType positionType;
 	    
 	    if (arrivalTime<=initialTime){
-	    	positionType=Client.POSITION_WAITING_IN_QUEUE;
+	    	positionType=ClientPositionType.WAITING_IN_QUEUE;
 	    	calculatedPosition=dimInQueue;	
 	    }
 	    else{
-	    	positionType=Client.POSITION_GOING_TO_QUEUE;	 
+	    	positionType=ClientPositionType.GOING_TO_QUEUE;
 	    }
 //	    System.out.println(calculatedPosition+"time "+arrivalTime);
-	    return new Pair <Dimension,Integer> (calculatedPosition,positionType);
+	    return new Pair<>(calculatedPosition, positionType);
 	}
 
 	public void setNumberOfQueues(int numberOfQueues){

@@ -1,5 +1,6 @@
 package visualComponents;
 
+import constants.ClientPositionType;
 import interfaces.AnimatedAndObservable;
 import interfaces.Observable;
 import interfaces.Observer;
@@ -27,7 +28,7 @@ public class Client extends AnimatedAndObservable implements Observer {
 private double destinationTime;	
 private double timeSupposed=0;	
 private int clientNumber;
-private int positionType;
+private ClientPositionType positionType;
 private int delayWaited;
 private int delayStartTime;
 
@@ -52,12 +53,6 @@ public final int queueDelay; // delay before client moves when he sees that anot
 private static final int frameTime=20; // so many steps before animation changes to next
 
 
-public static final int POSITION_ARRIVAL=-1;
-public static final int POSITION_WAITING_ROOM=0;
-public static final int POSITION_GOING_TO_QUEUE=1;
-public static final int POSITION_WAITING_IN_QUEUE=2;
-public static final int POSITION_EXITING=3;
-public static final int POSITION_OUTSIDE=4;
 
 public static final int stepSize=2;
 public static final int zigzagLength=20; // for zigzag: denotes how many steps are done in each direction
@@ -73,30 +68,22 @@ private boolean isWaiting;
 private SpriteManager spriteManager;
 
 public Client(Queue queue,int clientNumber, Painter painter,
-    				double destinationTime,Manager manager) throws IOException {
+    				double destinationTime,Manager manager) throws Exception {
 
 		super(SpriteType.CLIENT,painter);
-spriteManager = new SpriteManager();
+		spriteManager = new SpriteManager();
 		nr++;
 		id=nr;
 		this.manager=manager;
 		this.queueDelay=createDelay();
     	this.destinationTime=destinationTime;
-        try {
-			Sprite spriteClient = spriteManager.getSprite(SpriteType.CLIENT);
+		Sprite spriteClient = spriteManager.getSprite(SpriteType.CLIENT);
 
-			moveDown=new Animation(spriteClient.getSprite(0),frameTime);
-            moveUp=new Animation(spriteClient.getSprite(3),frameTime);
-            moveLeft=new Animation(spriteClient.getSprite(1),frameTime);
-            moveRight=new Animation(spriteClient.getSprite(2),frameTime);
-        }
-        catch (IOException ioe){
-            ioe.printStackTrace();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        
+		moveDown=new Animation(spriteClient.getSprite(0),frameTime);
+		moveUp=new Animation(spriteClient.getSprite(3),frameTime);
+		moveLeft=new Animation(spriteClient.getSprite(1),frameTime);
+		moveRight=new Animation(spriteClient.getSprite(2),frameTime);
+
         isWaiting=false;
         isMoving=false;
         isSavedInLog=false;
@@ -128,7 +115,7 @@ spriteManager = new SpriteManager();
     	
 //    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
     	
-    	if (getPositionType()>=POSITION_EXITING){
+    	if (getPositionType().ordinal()>= ClientPositionType.EXITING.ordinal()){
     		return;
     	}
     	
@@ -139,7 +126,7 @@ spriteManager = new SpriteManager();
             	isWaiting=false;
             	delayWaited=0; 
             	decrease();
-	            	if (getPositionType()>POSITION_WAITING_ROOM){            		
+	            	if (getPositionType().ordinal()>ClientPositionType.WAITING_ROOM.ordinal()){
 	            		calculateTrajectory();    
 	            	}            	
             	notifyClients();    
@@ -164,7 +151,7 @@ spriteManager = new SpriteManager();
 
 	protected void decrease() {
 		if ((
-				getPositionType()==POSITION_WAITING_IN_QUEUE && queue.isClientLastVisible(this))){
+				getPositionType()==ClientPositionType.WAITING_IN_QUEUE && queue.isClientLastVisible(this))){
 			queue.decreaseNumber();
 			
 		}
@@ -226,14 +213,14 @@ spriteManager = new SpriteManager();
 
     public void moveToWaitingRoom(){  
     	createDelayTimer(waitRoomDelay);
-    	setPositionType(POSITION_WAITING_ROOM);
+    	setPositionType(ClientPositionType.WAITING_ROOM);
         calculateTrajectory();
         timeSupposed=manager.getTime()+trajectory.size()*movementDelay+ waitRoomDelay;
     }
 
     public void moveToQueue(){     
     	queue.addClient(this);
-    	setPositionType(POSITION_GOING_TO_QUEUE);
+    	setPositionType(ClientPositionType.GOING_TO_QUEUE);
         calculateTrajectory();
         timeSupposed+=trajectory.size()*movementDelay;        
     }
@@ -246,7 +233,7 @@ spriteManager = new SpriteManager();
     	queue.getClientsList().remove(this);
     	
 //    	System.out.println("Exit "+id);
-    	setPositionType(Client.POSITION_EXITING);
+    	setPositionType(ClientPositionType.EXITING);
     	calculateTrajectory();
     	setObjectObserved(manager.door);
                 
@@ -258,7 +245,7 @@ spriteManager = new SpriteManager();
     public void moveOutside(){
 //    	red=true;
 //    	System.out.println("outside: "+id);
-    	setPositionType(Client.POSITION_OUTSIDE);
+    	setPositionType(ClientPositionType.OUTSIDE_VIEW);
     	setObjectObserved(manager.outside);
     	calculateTrajectory();
     }
@@ -302,7 +289,7 @@ spriteManager = new SpriteManager();
         		return;
         	} // TODO if get time == destinationTime jump to queue 
         	
-            if (getPositionType()==Client.POSITION_GOING_TO_QUEUE &&  isSavedInLog==false){
+            if (getPositionType()==ClientPositionType.GOING_TO_QUEUE &&  isSavedInLog==false){
   
                 queue.getClientsArriving().remove(this);
                 queue.getClientsList().add(this); 
@@ -311,12 +298,12 @@ spriteManager = new SpriteManager();
                 
             }
             
-            if (getPositionType()==Client.POSITION_OUTSIDE ){    
+            if (getPositionType()==ClientPositionType.OUTSIDE_VIEW ){
                 painter.removeObject(this);
                 objectObservedByMe.removeObserver(this);
             }
             
-            if (getPositionType()==Client.POSITION_EXITING  ){ 
+            if (getPositionType()==ClientPositionType.EXITING  ){
             	if (manager.door.isFirst(this))
                 manager.openDoor();
             }
@@ -328,12 +315,12 @@ spriteManager = new SpriteManager();
         if (!trajectory.isEmpty()){
 
         	
-            if (getPositionType()==Client.POSITION_WAITING_ROOM && isMoving()==false){ 
-            	setPositionType(Client.POSITION_GOING_TO_QUEUE);
+            if (getPositionType()==ClientPositionType.WAITING_ROOM && isMoving()==false){
+            	setPositionType(ClientPositionType.GOING_TO_QUEUE);
             }
             
-            if (getPositionType()==Client.POSITION_ARRIVAL && isMoving()==false){ 
-            	setPositionType(Client.POSITION_WAITING_ROOM);
+            if (getPositionType()==ClientPositionType.ARRIVAL && isMoving()==false){
+            	setPositionType(ClientPositionType.WAITING_ROOM);
             }
             
 
@@ -397,7 +384,7 @@ spriteManager = new SpriteManager();
 		return queueDelay;
 	}
 
-	public void saveInformation(Dimension dim, Integer type) {
+	public void saveInformation(Dimension dim, ClientPositionType type) {
 		position=dim;
 		setPositionType(type);		
 	}
@@ -407,7 +394,7 @@ spriteManager = new SpriteManager();
         queue.getClientsArriving().remove(this);
         isSavedInLog=true;
         manager.saveEvent(getQueueNumber(),timeSupposed,manager.getTime());
-        setPositionType(Client.POSITION_WAITING_IN_QUEUE);
+        setPositionType(ClientPositionType.WAITING_IN_QUEUE);
 	}
 	
 	public Dimension getPosition(){
@@ -419,11 +406,11 @@ spriteManager = new SpriteManager();
 	}
 
 
-	public int getPositionType() {
+	public ClientPositionType getPositionType() {
 		return positionType;
 	}
 	
-	private void setPositionType(int positionType) {
+	private void setPositionType(ClientPositionType positionType) {
 		this.positionType = positionType;
 	}
 
@@ -500,7 +487,7 @@ spriteManager = new SpriteManager();
 
 	@Override
 	protected void initializePosition() {
-		position=painter.calculateClientCoordinates(clientNumber, 0, POSITION_ARRIVAL);		
+		position=painter.calculateClientCoordinates(clientNumber, 0, ClientPositionType.ARRIVAL);
 	}
 
 	

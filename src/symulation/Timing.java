@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import constants.SimulationEventType;
 import otherFunctions.ClientAction;
 import visualComponents.Client;
 
@@ -106,8 +107,8 @@ public class Timing {
 					}
 					
 		    		listOfEvents.remove(0);
-		    		
-		            int action=c.getAction();	     	                       
+
+					SimulationEventType action=c.getAction();
 		            Client client=c.getClient();	     	                       
 		            
 		            if (client!=null) {
@@ -118,21 +119,21 @@ public class Timing {
 		            
 		            	                 
 		            switch (action){
-		                case Simulation.ARRIVAL:	   
+		                case ARRIVAL:
 //		                     	    System.out.println("arrival");
 							client.moveToWaitingRoom();
 							client.startDrawingMe();
 		                     break;
-		                case Simulation.APPEAR_IN_POSITION:
+		                case APPEAR_IN_POSITION:
 							client.moveToQueue();
 							client.startDrawingMe();
 //		                     	   System.out.println("appear");
 							 break;
-		                case Simulation.DEPARTURE:
+		                case DEPARTURE:
 //		                     	    System.out.println("exit "+client.abc);
 		                     client.moveToExit();
 		                     break;
-		                case Simulation.PAUSE:
+		                case PAUSE:
 		                     manager.pause();
 		                     boolean b=manager.askQuestion(Simulation.NO_MORE_ARRIVALS,
 		                     		Simulation.TITLE_NO_MORE_ARRIVALS);

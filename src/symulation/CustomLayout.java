@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import javax.swing.JPanel;
 
+import constants.ClientPositionType;
 import sprites.SpriteManager;
 import sprites.SpriteType;
 import visualComponents.Client;
@@ -126,11 +127,11 @@ public class CustomLayout {
     
    // ************************* Calculating methods ************************** //
 
-   public Dimension calculateClientsCoordinates(int clientNumber, int queueNumber, int position){
+   public Dimension calculateClientsCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
        int x=0;
        int y=0;
 
-       if ( position==Client.POSITION_GOING_TO_QUEUE || position==Client.POSITION_WAITING_IN_QUEUE ){
+       if ( position==ClientPositionType.GOING_TO_QUEUE || position==ClientPositionType.WAITING_IN_QUEUE ){
 
             if (clientNumber<maximumClientsInQueueVisible){
                 y=tillsPositionY+tillsHeight+clientsHeight*(clientNumber);
@@ -144,17 +145,17 @@ public class CustomLayout {
 
         }
 
-       if (position==Client.POSITION_ARRIVAL){
+       if (position==ClientPositionType.ARRIVAL){
             x=(buttonsPanel.getWidth()+clientsWidth)/2; 
             y=buttonsPanel.getLocation().y;
        }
 
-       if ( position==Client.POSITION_WAITING_ROOM){
+       if ( position==ClientPositionType.WAITING_ROOM){
     	    x=(buttonsPanel.getWidth()-clientsWidth)/2;
         	y=buttonsPanel.getLocation().y-clientsHeight;           
        }
 
-       if (position==Client.POSITION_EXITING){
+       if (position==ClientPositionType.EXITING){
     	   
     	   int direction=1;
     	   if (isQueueLeftToDoors(queueNumber)){
@@ -167,7 +168,7 @@ public class CustomLayout {
            x=d.width+clientNumber*clientsWidth*direction;
        }
        
-       if (position == Client.POSITION_OUTSIDE){
+       if (position == ClientPositionType.OUTSIDE_VIEW){
     	   Dimension d= calculateDoorPosition();
     	   y=d.height;
     	   x=d.width;
@@ -188,7 +189,7 @@ public class CustomLayout {
    
    public Dimension calculateQueueIndicator(int queueNumber){
 	   Dimension a = calculateClientsCoordinates(maximumClientsInQueueVisible, 
-		   	   queueNumber, Client.POSITION_GOING_TO_QUEUE);
+		   	   queueNumber, ClientPositionType.GOING_TO_QUEUE);
 	   
 	   return new Dimension (a.width+clientsWidth,a.height+clientsHeight);
    }
@@ -225,7 +226,7 @@ public class CustomLayout {
 
 	public Dimension calculateWaitingRoomIndicatorPosition() {
 		Dimension d = calculateClientsCoordinates(0, 0,
-                Client.POSITION_WAITING_ROOM);
+                ClientPositionType.WAITING_ROOM);
 		return new Dimension (d.width+clientsWidth, d.height+clientsHeight);
 	}
 

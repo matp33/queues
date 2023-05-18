@@ -101,7 +101,7 @@ public class Manager {
         timeTable.departures=departures;
     }
 	
-	public void restart(double time) throws InterruptedException, IOException {
+	public void restart(double time) throws Exception {
 		
 		clean();
 		doSimulation(time);
@@ -126,13 +126,13 @@ public class Manager {
 		 System.out.println("!!!!!!!!!!!!!!!!!!!!!! "+i);
 	}
 
-    public void doSimulation () throws InterruptedException, IOException {
+    public void doSimulation () throws Exception {
 		clean();
         doSimulation(0.0);
     }
 
 
-	public void doSimulation (double time) throws InterruptedException, IOException {
+	public void doSimulation (double time) throws Exception {
     	Client.nr=0;
     	waitingRoomIndicator.clear();
     	

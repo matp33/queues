@@ -96,7 +96,7 @@ protected Manager manager;
          try{                       
         	 manager.restart(0);
          }
-         catch (InterruptedException ex){
+         catch (Exception ex){
              ex.printStackTrace();
          }
     }

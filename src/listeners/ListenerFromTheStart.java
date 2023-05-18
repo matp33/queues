@@ -135,7 +135,7 @@ public class ListenerFromTheStart implements ActionListener{
                         manager.restart(d);
                     }
                 }
-                catch (InterruptedException | IOException ex){
+                catch (Exception ex){
                     ex.printStackTrace();
                 }
 
