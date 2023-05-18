@@ -34,14 +34,14 @@ public class Queue extends AnimatedAndObservable{
             setClientsList(new ArrayList <Client>());
             this.queueNumber=queueNumber;
 
-            Dimension d=painter.calculateQueueIndicator(queueNumber);
+            Dimension d=painter.calculateQueueIndicatorPosition(queueNumber);
 //            Dimension clientDimensions=Client.clientDimensions;
             x=d.width;
             y=d.height;
            
             clientsArriving=new ArrayList<Client>();
             clientsExiting=new ArrayList<Client>();
-            position=painter.getTillPosition(queueNumber);
+            position=painter.getCashRegisterPosition(queueNumber);
             startDrawingMe();
 
         }

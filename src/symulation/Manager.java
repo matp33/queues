@@ -4,7 +4,6 @@ import interfaces.AnimatedObject;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -67,7 +66,7 @@ public class Manager {
 		 waitingRoomIndicator=new Indicator(painter);
 		 Dimension d=painter.getDoorPosition();
 		 int i=0;
-		 while (painter.getTillPosition(i).width<d.width){
+		 while (painter.getCashRegisterPosition(i).width<d.width){
 			 i++;
 		 }
 		 System.out.println("IIIIIIIIIII"+i);
@@ -118,7 +117,7 @@ public class Manager {
         }
 		 Dimension d=painter.getDoorPosition();
 		 int i=0;
-		 while (painter.getTillPosition(i).width<d.width){
+		 while (painter.getCashRegisterPosition(i).width<d.width){
 			 i++;
 		 }
 		 door=new Door(20,painter,i);

@@ -110,14 +110,7 @@ public class Timing {
 
 					SimulationEventType action=c.getAction();
 		            Client client=c.getClient();	     	                       
-		            
-		            if (client!=null) {
-		            	
-		            	System.out.println(c.getTime()+"action "+
-				         		  action+"abc"+client.id);
-		            }
-		            
-		            	                 
+
 		            switch (action){
 		                case ARRIVAL:
 //		                     	    System.out.println("arrival");

@@ -13,38 +13,27 @@ import javax.swing.JPanel;
 import constants.ClientPositionType;
 import sprites.SpriteManager;
 import sprites.SpriteType;
-import visualComponents.Client;
 
 public class CustomLayout {
 
-//    private final JButton mainButton; // from this button we put all others to the left
-    
     private final int minimumWindowHeight=700;
-    private final int freeSpaceForScreen=10; 		// for the window to not hide even partially
-    private final int freeSpaceScreenVertically=50; 
-    private final int spaceVertically=10; 			// 1st objects start at this height
+    private final int horizontalPadding =10;
+    private final int verticalPadding =50;
+    private final int verticalMarginBetweenObjects =10;
     private final JPanel buttonsPanel;
-    
-    // variables //
-    private boolean isScaled;         
-    private double queueProportions;           		// background image original proportions
-    
-    private int spaceBetweenObjectsHorizontally;
+    private double queueProportions;
+    private int spaceBetweenCashRegisters;
     private int clientsWidth;
     private int clientsHeight;
     private int windowWidth;      
     private int windowHeight;      
-    private int tillsWidth;      
-    private int tillsHeight;       
-    private int doorsHeight;
+    private int cashRegisterWidth;
+    private int cashRegisterHeight;
+    private int doorHeight;
     
-    private int tillsPositionY;
-    private int doorsPositionY;
-    
-    private int numberOfQueues;
-    
-    
-    private int maximumClientsInQueueVisible;
+    private int cashRegisterYPosition;
+    private int doorPositionY;
+    private int maximumNumberOfClientsInQueue;
 
     private SpriteManager spriteManager;
 
@@ -52,32 +41,32 @@ public class CustomLayout {
     	
 
         spriteManager = new SpriteManager();
-     this.numberOfQueues=numberOfQueues;	
-     this.buttonsPanel=buttonsPanel;
-     BufferedImage imgCashRegister=spriteManager.getSprite(SpriteType.QUEUE).getSprite(0, 0);
-     BufferedImage imgBackground=spriteManager.getSprite(SpriteType.BACKGROUND).getSprite(0, 0);
-     BufferedImage imgDoor= spriteManager.getSprite(SpriteType.DOOR).getSprite(0, 0);
-     BufferedImage imgClient = spriteManager.getSprite(SpriteType.CLIENT).getSprite(0, 0);
+        this.buttonsPanel=buttonsPanel;
+        BufferedImage imgCashRegister=spriteManager.getSprite(SpriteType.QUEUE).getSprite(0, 0);
+        BufferedImage imgBackground=spriteManager.getSprite(SpriteType.BACKGROUND).getSprite(0, 0);
+        BufferedImage imgDoor= spriteManager.getSprite(SpriteType.DOOR).getSprite(0, 0);
+        BufferedImage imgClient = spriteManager.getSprite(SpriteType.CLIENT).getSprite(0, 0);
 
-     doorsHeight=imgDoor.getHeight();
+        doorHeight =imgDoor.getHeight();
 
-     clientsWidth=imgClient.getWidth();
-     clientsHeight=imgClient.getHeight();
+        clientsWidth=imgClient.getWidth();
+        clientsHeight=imgClient.getHeight();
 
-     tillsWidth=imgCashRegister.getWidth();
-     tillsHeight=imgCashRegister.getHeight();
+        cashRegisterWidth =imgCashRegister.getWidth();
+        cashRegisterHeight =imgCashRegister.getHeight();
 
-     int backgroundWidth=imgBackground.getWidth();
-     int backgroundHeight=imgBackground.getHeight();
+        int backgroundWidth=imgBackground.getWidth();
+        int backgroundHeight=imgBackground.getHeight();
 
-     queueProportions=(double)backgroundWidth/(double)backgroundHeight;
-    
-     calculateWindowSize(numberOfQueues);     
-     calculateRelativePosition();
+        queueProportions=(double)backgroundWidth/(double)backgroundHeight;
+
+        calculateWindowSize(numberOfQueues);
+        doorPositionY = verticalMarginBetweenObjects;
+        cashRegisterYPosition = doorPositionY + doorHeight + verticalMarginBetweenObjects;
     
     }
     
-    public void calculateWindowSize(int numberOfQueues){
+    public void calculateWindowSize(int numberOfCashRegisters){
     	 
     	int minimumWindowWidth=(int)(minimumWindowHeight*queueProportions);
     	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -89,133 +78,111 @@ public class CustomLayout {
             maximumWindowWidth=(int)(SCREEN_WIDTH);
         }
         else{
-            maximumWindowWidth=(int)((SCREEN_HEIGHT-freeSpaceScreenVertically)*queueProportions);
+            maximumWindowWidth=(int)((SCREEN_HEIGHT- verticalPadding)*queueProportions);
 //            System.out.println("2");
         }
 
-        if (numberOfQueues*tillsWidth<=minimumWindowWidth){
+        if (numberOfCashRegisters* cashRegisterWidth <=minimumWindowWidth){
            windowWidth=minimumWindowWidth;
-           windowHeight=(int)(windowWidth/queueProportions-freeSpaceScreenVertically);
-           spaceBetweenObjectsHorizontally=(int)(minimumWindowWidth-numberOfQueues*tillsWidth)/(numberOfQueues+1);
+           windowHeight=(int)(windowWidth/queueProportions- verticalPadding);
+           spaceBetweenCashRegisters = (minimumWindowWidth-numberOfCashRegisters* cashRegisterWidth) /(numberOfCashRegisters+1);
         }
         
         else{
 
-            if (numberOfQueues*tillsWidth<=maximumWindowWidth){
-               spaceBetweenObjectsHorizontally=(int)((maximumWindowWidth-
-                       numberOfQueues*tillsWidth-freeSpaceForScreen)/(numberOfQueues+1));
+            if (numberOfCashRegisters* cashRegisterWidth <=maximumWindowWidth){
+               spaceBetweenCashRegisters = (maximumWindowWidth-
+                       numberOfCashRegisters* cashRegisterWidth - horizontalPadding)/(numberOfCashRegisters+1);
             }
             else{
-                spaceBetweenObjectsHorizontally=10;
-                tillsWidth=(int)(maximumWindowWidth-freeSpaceForScreen)/numberOfQueues-spaceBetweenObjectsHorizontally;
-                isScaled=true;
+                spaceBetweenCashRegisters =10;
+                cashRegisterWidth = (maximumWindowWidth- horizontalPadding) /numberOfCashRegisters- spaceBetweenCashRegisters;
 
             }
-            windowWidth=spaceBetweenObjectsHorizontally+(tillsWidth+spaceBetweenObjectsHorizontally)*numberOfQueues;
+            windowWidth= spaceBetweenCashRegisters +(cashRegisterWidth + spaceBetweenCashRegisters)*numberOfCashRegisters;
             windowHeight=(int)(windowWidth/queueProportions); 
         }
 
-        maximumClientsInQueueVisible=(windowHeight-tillsHeight-spaceVertically)/clientsHeight-2;
+        maximumNumberOfClientsInQueue =(windowHeight- cashRegisterHeight - verticalMarginBetweenObjects)/clientsHeight-2;
     }
 
-    private void calculateRelativePosition(){
 
-        doorsPositionY=spaceVertically;
-        tillsPositionY=doorsPositionY+doorsHeight+spaceVertically;        
-        
-    }
-    
-   // ************************* Calculating methods ************************** //
 
-   public Dimension calculateClientsCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
+   public Dimension calculateClientDestinationCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
        int x=0;
        int y=0;
 
-       if ( position==ClientPositionType.GOING_TO_QUEUE || position==ClientPositionType.WAITING_IN_QUEUE ){
+       switch (position){
+           case GOING_TO_QUEUE:
+           case WAITING_IN_QUEUE:
+               if (clientNumber< maximumNumberOfClientsInQueue){
+                   y= cashRegisterYPosition + cashRegisterHeight +clientsHeight*(clientNumber);
+               }
+               else{
+                   y= cashRegisterYPosition + cashRegisterHeight +clientsHeight*(maximumNumberOfClientsInQueue);
+               }
 
-            if (clientNumber<maximumClientsInQueueVisible){
-                y=tillsPositionY+tillsHeight+clientsHeight*(clientNumber);
-            }
-            else{
-                y=tillsPositionY+tillsHeight+clientsHeight*(maximumClientsInQueueVisible);
-            }
-            
-            x=(int)((queueNumber+1)*(spaceBetweenObjectsHorizontally+tillsWidth)-0.5*(tillsWidth
-                    +clientsWidth));
+               x=(int)((queueNumber+1)*(spaceBetweenCashRegisters + cashRegisterWidth)-0.5*(cashRegisterWidth
+                       +clientsWidth));
+               break;
+           case ARRIVAL:
+               x=(buttonsPanel.getWidth()+clientsWidth)/2;
+               y=buttonsPanel.getLocation().y;
+               break;
+           case WAITING_ROOM:
+               x=(buttonsPanel.getWidth()-clientsWidth)/2;
+               y=buttonsPanel.getLocation().y-clientsHeight;
+               break;
+           case EXITING:
+               int direction=1;
+               if (isQueueLeftToDoors(queueNumber)){
+                   direction=-1;
+               }
 
-        }
+               Dimension d= calculateDoorPosition();
+               y=d.height+20;
+               x=d.width+clientNumber*clientsWidth*direction;
+               break;
+           case OUTSIDE_VIEW:
+               Dimension doorPosition= calculateDoorPosition();
+               y=doorPosition.height;
+               x=doorPosition.width;
+               break;
 
-       if (position==ClientPositionType.ARRIVAL){
-            x=(buttonsPanel.getWidth()+clientsWidth)/2; 
-            y=buttonsPanel.getLocation().y;
+
        }
 
-       if ( position==ClientPositionType.WAITING_ROOM){
-    	    x=(buttonsPanel.getWidth()-clientsWidth)/2;
-        	y=buttonsPanel.getLocation().y-clientsHeight;           
-       }
 
-       if (position==ClientPositionType.EXITING){
-    	   
-    	   int direction=1;
-    	   if (isQueueLeftToDoors(queueNumber)){
-    		   System.out.println("left: "+queueNumber);
-    		   direction=-1;
-    	   }	
-    	   
-    	   Dimension d= calculateDoorPosition();
-           y=d.height+20;
-           x=d.width+clientNumber*clientsWidth*direction;
-       }
-       
-       if (position == ClientPositionType.OUTSIDE_VIEW){
-    	   Dimension d= calculateDoorPosition();
-    	   y=d.height;
-    	   x=d.width;
-       }
-//       System.out.println(" dim "+x+" y "+y);	
        return new Dimension (x,y);
 
    }
    
    private boolean isQueueLeftToDoors (int queueNumber){
-	   return calculateTillsPosition(queueNumber).width<calculateDoorPosition().width;
+	   return calculateCashRegisterPosition(queueNumber).width<calculateDoorPosition().width;
    }
 
-   public Dimension calculateTillsPosition(int tillNumber){
-        return new Dimension(spaceBetweenObjectsHorizontally+tillNumber*(tillsWidth+
-        					 spaceBetweenObjectsHorizontally), tillsPositionY);
+   public Dimension calculateCashRegisterPosition(int tillNumber){
+        return new Dimension(spaceBetweenCashRegisters +tillNumber*(cashRegisterWidth +
+                spaceBetweenCashRegisters), cashRegisterYPosition);
    }
    
-   public Dimension calculateQueueIndicator(int queueNumber){
-	   Dimension a = calculateClientsCoordinates(maximumClientsInQueueVisible, 
+   public Dimension calculateQueueIndicatorPosition(int queueNumber){
+	   Dimension a = calculateClientDestinationCoordinates(maximumNumberOfClientsInQueue,
 		   	   queueNumber, ClientPositionType.GOING_TO_QUEUE);
 	   
 	   return new Dimension (a.width+clientsWidth,a.height+clientsHeight);
    }
 
    public Dimension calculateDoorPosition(){
-       return new Dimension(windowWidth/2, doorsPositionY);
+       return new Dimension(windowWidth/2, doorPositionY);
    }
-   
-   
-
-    // ************************************* Getters ******************************** //
 
 	public Dimension getWindowDimensions(){
 	    return new Dimension(windowWidth, windowHeight);
 	}
     
-    public Dimension getTillDimensions(){
-       return new Dimension (tillsWidth,tillsHeight);
-    }
-
-    public boolean isTillScaled(){
-       return isScaled;
-    }
-    
     public int getMaximumVisibleClients(){
-    	return maximumClientsInQueueVisible;
+    	return maximumNumberOfClientsInQueue;
     }
 
     public Rectangle getMovementArea(){
@@ -225,13 +192,10 @@ public class CustomLayout {
     }
 
 	public Dimension calculateWaitingRoomIndicatorPosition() {
-		Dimension d = calculateClientsCoordinates(0, 0,
+		Dimension d = calculateClientDestinationCoordinates(0, 0,
                 ClientPositionType.WAITING_ROOM);
 		return new Dimension (d.width+clientsWidth, d.height+clientsHeight);
 	}
 
-	public void setNumberOfQueues(int number){
-		numberOfQueues=number;
-	}
 
 }

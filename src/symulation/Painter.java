@@ -11,7 +11,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.text.DecimalFormat;
@@ -157,7 +156,6 @@ public class Painter extends JPanel {
 //         bottomPanel.setBackground(Color.BLUE);
 
         layout=new CustomLayout(numberOfQueues, bottomPanel);
-        layout.setNumberOfQueues(numberOfQueues);
 
         layout.calculateWindowSize(numberOfQueues);
         maxClientsVisibleInQueue=layout.getMaximumVisibleClients();
@@ -199,11 +197,11 @@ public class Painter extends JPanel {
 
 
     public Dimension calculateClientCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
-        return layout.calculateClientsCoordinates(clientNumber, queueNumber, position);
+        return layout.calculateClientDestinationCoordinates(clientNumber, queueNumber, position);
     }
 
-    public Dimension calculateQueueIndicator(int queueNumber){
-        return layout.calculateQueueIndicator(queueNumber);
+    public Dimension calculateQueueIndicatorPosition(int queueNumber){
+        return layout.calculateQueueIndicatorPosition(queueNumber);
     }
 
     public void setButtonStopActiveness(boolean isActive){
@@ -225,8 +223,8 @@ public class Painter extends JPanel {
     }
 
 
-    public Dimension getTillPosition(int tillNumber){
-        return layout.calculateTillsPosition(tillNumber);
+    public Dimension getCashRegisterPosition(int tillNumber){
+        return layout.calculateCashRegisterPosition(tillNumber);
     }
 
     public Dimension getDoorPosition(){
