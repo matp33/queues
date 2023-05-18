@@ -130,6 +130,7 @@ public class Simulation {
             }
             
             client.saveInformation(dim,type);
+			client.startDrawingMe();
             clientAction=new ClientAction(time,action, client);
             listOfEvents.add(clientAction); 
                         

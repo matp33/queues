@@ -120,13 +120,13 @@ public class Timing {
 		            switch (action){
 		                case Simulation.ARRIVAL:	   
 //		                     	    System.out.println("arrival");
-		                	 client.startDrawingMe();
-		             	     client.moveToWaitingRoom();
+							client.moveToWaitingRoom();
+							client.startDrawingMe();
 		                     break;
-		                case Simulation.APPEAR_IN_POSITION:		
-		                	client.startDrawingMe();
+		                case Simulation.APPEAR_IN_POSITION:
+							client.moveToQueue();
+							client.startDrawingMe();
 //		                     	   System.out.println("appear");
-		                     client.moveToQueue();
 							 break;
 		                case Simulation.DEPARTURE:
 //		                     	    System.out.println("exit "+client.abc);
