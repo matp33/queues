@@ -8,9 +8,11 @@ import java.io.IOException;
 
 import javax.swing.JComponent;
 
+import sprites.SpriteManager;
+import sprites.SpriteType;
 import symulation.Painter;
 import animations.Animation;
-import animations.Sprite;
+import sprites.Sprite;
 
 public abstract class AnimatedObject extends JComponent {
 	
@@ -26,19 +28,20 @@ public abstract class AnimatedObject extends JComponent {
 	protected int spriteWidth;
 	protected int spriteHeight;
 	protected Dimension size;
+	private SpriteManager spriteManager;
 	
 	
-	public AnimatedObject (Sprite sprite, Painter painter){
+	public AnimatedObject (SpriteType spriteType, Painter painter){
 		
 		try{
+			spriteManager = new SpriteManager();
+			Sprite sprite = spriteManager.getSprite(spriteType);
 			BufferedImage b=sprite.getSprite(0, 0);
 			size=new Dimension(b.getWidth(), b.getHeight());
 			this.painter=painter;
 			position=new Dimension();
 			initializePosition();
-//			this.spriteWidth=spriteWidth;
-//			this.spriteHeight=spriteHeight;
-			
+
 			animations = new Animation [sprite.getNumberOfRows()*sprite.getNumberOfColumns()];
 			
 			for (int i=0; i<sprite.getNumberOfRows(); i++ ){

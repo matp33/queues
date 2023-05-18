@@ -9,7 +9,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import animations.Sprite;
+import sprites.SpriteType;
 import symulation.Painter;
 
 import java.awt.Dimension;
@@ -26,9 +26,9 @@ public class Queue extends AnimatedAndObservable{
 	private List<Client> clientsExiting;
 	private List <Client> clientsInQueue;
         
-        public Queue (Sprite sprite, Painter painter, int queueNumber){
+        public Queue (Painter painter, int queueNumber){
             
-        	super(sprite,painter);
+        	super(SpriteType.QUEUE, painter);
         	maxClients=painter.maxClientsVisibleInQueue;
             clientsAboveLimit=0;
             setClientsList(new ArrayList <Client>());

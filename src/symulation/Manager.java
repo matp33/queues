@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import animations.Sprite;
 import otherFunctions.ClientAction;
 import otherFunctions.TimeTable;
 import visualComponents.Client;
@@ -25,9 +24,7 @@ import visualComponents.Queue;
 
 public class Manager {
 	
-	public static final int SPRITE_CLIENT=0;
-	public static final int SPRITE_QUEUE = 1;
-	
+
 	private Simulation simulation;
 	private Painter painter;
 	private TimeTable timeTable;
@@ -44,37 +41,20 @@ public class Manager {
 	
 	private int numberOfQueues;
 	
-	private Sprite clientSprite;
-	private Sprite doorSprite;
-	private Sprite queueSprite;
+
 	private List<ClientAction> listOfEvents;
 	
 	public Manager(int numberOfQueues){
 		
 		 
 		try {
-			doorSprite = new Sprite (43, 69, "/door2.png");
-			Sprite backgrnd=new Sprite(620,395,"/supermarket-kolejka.jpg");
-			clientSprite = new Sprite (30, 45, "/sprite.png");
-			queueSprite = new Sprite (106, 58, "/kasa.png");
-		
-			
-		 
-			 BufferedImage [] images=new BufferedImage [4];
-	         
-			 images[0]=queueSprite.getSprite(0, 0);		
-			 images[1]=backgrnd.getSprite(0, 0);
-	         images[2]=doorSprite.getSprite(0, 0);
-	         images[3]=clientSprite.getSprite(0, 0);
-	         
-	         
-	         
-	         painter = new Painter(numberOfQueues, 0, images,this);
+
+	         painter = new Painter(numberOfQueues, 0, this);
 	         timerClass=new Timing(numberOfQueues, this,painter);
 	         
 	         queues=new Queue [numberOfQueues];
 				 for (int i=0;i<numberOfQueues;i++){
-		            queues[i]=new Queue (queueSprite,painter,i);
+		            queues[i]=new Queue (painter,i);
 		         }
 	         
          } 
@@ -91,7 +71,7 @@ public class Manager {
 			 i++;
 		 }
 		 System.out.println("IIIIIIIIIII"+i);
-		 door=new Door(doorSprite,20,painter,i);
+		 door=new Door(20,painter,i);
 		 door.start();
          
          
@@ -121,7 +101,7 @@ public class Manager {
         timeTable.departures=departures;
     }
 	
-	public void restart(double time) throws InterruptedException{
+	public void restart(double time) throws InterruptedException, IOException {
 		
 		clean();
 		doSimulation(time);
@@ -132,7 +112,7 @@ public class Manager {
 		painter.clean();
 		queues=new Queue [numberOfQueues];
 		 for (int i=0;i<numberOfQueues;i++){
-           queues[i]=new Queue (queueSprite,painter,i);
+           queues[i]=new Queue ( painter,i);
            
            
         }
@@ -141,18 +121,18 @@ public class Manager {
 		 while (painter.getTillPosition(i).width<d.width){
 			 i++;
 		 }
-		 door=new Door(doorSprite,20,painter,i);		 
+		 door=new Door(20,painter,i);
 		 door.start();
 		 System.out.println("!!!!!!!!!!!!!!!!!!!!!! "+i);
 	}
 
-    public void doSimulation () throws InterruptedException{
+    public void doSimulation () throws InterruptedException, IOException {
 		clean();
         doSimulation(0.0);
     }
 
 
-	public void doSimulation (double time) throws InterruptedException{
+	public void doSimulation (double time) throws InterruptedException, IOException {
     	Client.nr=0;
     	waitingRoomIndicator.clear();
     	
@@ -241,10 +221,10 @@ public class Manager {
     	return timerClass.getTime();
     }
     
-    public void doChange(int numberOfQueues){
+    public void doChange(int numberOfQueues) throws IOException {
     	this.numberOfQueues=numberOfQueues;
     	simulation.setNumberOfQueues(numberOfQueues);
-    	painter.initiate(numberOfQueues,true);
+    	painter.initiate(numberOfQueues);
        
     }
     
@@ -315,18 +295,8 @@ public class Manager {
         return false;
 //        return !timerClass.getClientsArriving().isEmpty() || !timerClass.getClientsExiting().isEmpty();
     }
-    
-    
-    public Sprite getSprite (int type){
-    	if (type==SPRITE_CLIENT){
-    		return clientSprite;
-    	}
-    	else if (type==SPRITE_QUEUE){
-    		return queueSprite;    		
-    	}
-    	else return null;
-    }
-    
+
+
     public Queue getQueue (int queueNumber){
     	return queues[queueNumber];
     }

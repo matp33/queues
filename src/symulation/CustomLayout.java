@@ -6,9 +6,12 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import javax.swing.JPanel;
 
+import sprites.SpriteManager;
+import sprites.SpriteType;
 import visualComponents.Client;
 
 public class CustomLayout {
@@ -40,25 +43,28 @@ public class CustomLayout {
     private int numberOfQueues;
     
     
-    private int maximumClientsInQueueVisible;         
+    private int maximumClientsInQueueVisible;
 
-    public CustomLayout (int numberOfQueues, BufferedImage [] images, JPanel buttonsPanel){
+    private SpriteManager spriteManager;
+
+    public CustomLayout (int numberOfQueues, JPanel buttonsPanel) throws IOException {
     	
-    	
+
+        spriteManager = new SpriteManager();
      this.numberOfQueues=numberOfQueues;	
      this.buttonsPanel=buttonsPanel;
-     BufferedImage imgTill=images[0];
-     BufferedImage imgBackground=images[1];
-     BufferedImage imgDoor=images[2];
-     BufferedImage imgClient = images[3];
+     BufferedImage imgCashRegister=spriteManager.getSprite(SpriteType.QUEUE).getSprite(0, 0);
+     BufferedImage imgBackground=spriteManager.getSprite(SpriteType.BACKGROUND).getSprite(0, 0);
+     BufferedImage imgDoor= spriteManager.getSprite(SpriteType.DOOR).getSprite(0, 0);
+     BufferedImage imgClient = spriteManager.getSprite(SpriteType.CLIENT).getSprite(0, 0);
 
      doorsHeight=imgDoor.getHeight();
 
      clientsWidth=imgClient.getWidth();
      clientsHeight=imgClient.getHeight();
 
-     tillsWidth=imgTill.getWidth();
-     tillsHeight=imgTill.getHeight();
+     tillsWidth=imgCashRegister.getWidth();
+     tillsHeight=imgCashRegister.getHeight();
 
      int backgroundWidth=imgBackground.getWidth();
      int backgroundHeight=imgBackground.getHeight();

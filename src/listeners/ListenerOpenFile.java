@@ -38,7 +38,11 @@ protected Manager manager;
         int optionChooser= fileChoosingWindow.showOpenDialog(null);
 
            if (optionChooser==JFileChooser.APPROVE_OPTION){
-               analyze(e);          
+               try {
+                   analyze(e);
+               } catch (IOException ex) {
+                   throw new RuntimeException(ex);
+               }
            }         
            
            else{
@@ -50,7 +54,7 @@ protected Manager manager;
            manager.resume(false);
     }
     
-    private void analyze(ActionEvent e){
+    private void analyze(ActionEvent e) throws IOException {
     	
     	File selectedFile = fileChoosingWindow.getSelectedFile();                 
         TimeTable timeTable= new TimeTable();

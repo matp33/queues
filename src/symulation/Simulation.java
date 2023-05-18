@@ -2,6 +2,7 @@
 package symulation;
 
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +43,7 @@ public class Simulation {
     }
 
     public void prepareSimulation(double initialTime,double [][] arrivals,
-                          double [][] departures) throws InterruptedException{
+                          double [][] departures) throws InterruptedException, IOException {
    
 //    timerClass.isRunning=true;
     
@@ -112,7 +113,7 @@ public class Simulation {
             	
 //            int clientNumber=arriveIndex-departIndex;	
 //            System.out.println(arrivalTime+"at "+peopleInQueue[queueNumber]);
-            Client client=new Client(manager.getSprite(Manager.SPRITE_CLIENT), 
+            Client client=new Client(
             		manager.getQueue(queueNumber),peopleInQueue[queueNumber],painter,
             		arrivalTime,manager);                        
 	        Dimension dim;

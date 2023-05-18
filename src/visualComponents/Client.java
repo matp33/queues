@@ -8,10 +8,12 @@ import java.awt.*;
 import java.io.IOException;
 
 import otherFunctions.ClientMovement;
+import sprites.SpriteManager;
+import sprites.SpriteType;
 import symulation.Manager;
 import symulation.Painter;
 import animations.Animation;
-import animations.Sprite;
+import sprites.Sprite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,22 +70,22 @@ public static int nr;
 public final int id; 
 
 private boolean isWaiting;
-//private boolean red; // TODO remove it
+private SpriteManager spriteManager;
 
-public Client(Sprite spriteClient, Queue queue,int clientNumber, Painter painter,
-    				double destinationTime,Manager manager) {
+public Client(Queue queue,int clientNumber, Painter painter,
+    				double destinationTime,Manager manager) throws IOException {
 
-		super(spriteClient,painter);
-
+		super(SpriteType.CLIENT,painter);
+spriteManager = new SpriteManager();
 		nr++;
 		id=nr;
 		this.manager=manager;
 		this.queueDelay=createDelay();
     	this.destinationTime=destinationTime;
         try {
-            
+			Sprite spriteClient = spriteManager.getSprite(SpriteType.CLIENT);
 
-            moveDown=new Animation(spriteClient.getSprite(0),frameTime);
+			moveDown=new Animation(spriteClient.getSprite(0),frameTime);
             moveUp=new Animation(spriteClient.getSprite(3),frameTime);
             moveLeft=new Animation(spriteClient.getSprite(1),frameTime);
             moveRight=new Animation(spriteClient.getSprite(2),frameTime);

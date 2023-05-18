@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -125,10 +126,7 @@ public class ListenerFromTheStart implements ActionListener{
             if (manager.isTimeTableNotEmpty()){
 
                 manager.pause();
-//                manager.restartSimulation();
-//                manager.simulation=s;
-//                manager.initiate(manager.getNumberOfQueues());
-                
+
                 try{
                     if (btnFromStart.isSelected()){
                         manager.restart(0.0);
@@ -137,7 +135,7 @@ public class ListenerFromTheStart implements ActionListener{
                         manager.restart(d);
                     }
                 }
-                catch (InterruptedException ex){
+                catch (InterruptedException | IOException ex){
                     ex.printStackTrace();
                 }
 

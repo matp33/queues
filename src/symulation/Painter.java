@@ -64,7 +64,7 @@ public class Painter extends JPanel {
     private Manager manager;
 
     public Painter(final int numberOfQueues, double symulationTime,
-                   BufferedImage[] images, Manager manager) {
+                   Manager manager) throws IOException {
 
         this.manager=manager;
         objects= new ArrayList <AnimatedObject>();
@@ -80,7 +80,7 @@ public class Painter extends JPanel {
 
 
         initiateButtons();
-        initiate(numberOfQueues,images);
+        initiate(numberOfQueues);
 
         window.pack();
         window.setLocationRelativeTo(null);
@@ -136,11 +136,8 @@ public class Painter extends JPanel {
 
     }
 
-    public void initiate(int numberOfQueues,boolean isRunning){
-        initiate(numberOfQueues, new BufferedImage[0]);
-    }
 
-    public void initiate(int numberOfQueues, BufferedImage[] images){
+    public void initiate(int numberOfQueues) throws IOException {
 
         Border blackline, raisedetched, loweredetched,
                 raisedbevel, loweredbevel, empty;
@@ -158,8 +155,8 @@ public class Painter extends JPanel {
         bottomPanel.setBorder(blackline);
 //         bottomPanel.setBackground(Color.BLUE);
 
-        if (images.length>0) layout=new CustomLayout(numberOfQueues, images, bottomPanel);
-        else layout.setNumberOfQueues(numberOfQueues);
+        layout=new CustomLayout(numberOfQueues, bottomPanel);
+        layout.setNumberOfQueues(numberOfQueues);
 
         layout.calculateWindowSize(numberOfQueues);
         maxClientsVisibleInQueue=layout.getMaximumVisibleClients();
@@ -226,17 +223,6 @@ public class Painter extends JPanel {
         btnPause.setText(BUTTON_RESUME);
     }
 
-    public Dimension getTillDimensions(){
-        BufferedImage b;
-        try {
-            b = manager.getSprite(Manager.SPRITE_QUEUE).getSprite(0, 0);
-            return new Dimension (b.getWidth(), b.getHeight());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
 
     public Dimension getTillPosition(int tillNumber){
         return layout.calculateTillsPosition(tillNumber);

@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import animations.Sprite;
-import symulation.Manager;
+import sprites.SpriteType;
 import symulation.Painter;
 
 public class Door extends AnimatedAndObservable  {
@@ -30,8 +29,8 @@ public class Door extends AnimatedAndObservable  {
 
 	private TimerTask currentAnimationTask;
 	
-	public Door(Sprite sprite, int frameDelay, Painter painter, int queue){
-		super(sprite,painter);
+	public Door(int frameDelay, Painter painter, int queue){
+		super(SpriteType.DOOR,painter);
 			
 		state=STATE_NEUTRAL;
 		observers = new ArrayList <Observer>();

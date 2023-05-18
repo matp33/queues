@@ -1,6 +1,6 @@
 
 
-package animations;
+package sprites;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
