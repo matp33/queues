@@ -10,10 +10,10 @@ public class ClientAction {
     private Client client;
    
 
-    public ClientAction (double time, SimulationEventType action, Client queueNumber){
+    public ClientAction (double time, SimulationEventType action, Client client){
         this.time=time;
         this.action=action;
-        this.client=queueNumber;
+        this.client=client;
     }
 
     public double getTime(){

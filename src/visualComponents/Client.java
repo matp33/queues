@@ -6,7 +6,6 @@ import interfaces.Observable;
 import interfaces.Observer;
 
 import java.awt.*;
-import java.io.IOException;
 
 import otherFunctions.ClientMovement;
 import sprites.SpriteManager;
@@ -39,7 +38,7 @@ private Manager manager;
 private ClientMovement movement;
 private List <Dimension> trajectory;
 private List <Observer> observers;
-private Queue queue;
+private StoreCheckout storeCheckout;
 
 private Timer timer;
 private Timer timerDelay; // timer for moving inside queue connected to clients having some delays
@@ -67,8 +66,8 @@ public final int id;
 private boolean isWaiting;
 private SpriteManager spriteManager;
 
-public Client(Queue queue,int clientNumber, Painter painter,
-    				double destinationTime,Manager manager) throws Exception {
+public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
+			  double destinationTime, Manager manager) throws Exception {
 
 		super(SpriteType.CLIENT,painter);
 		spriteManager = new SpriteManager();
@@ -95,7 +94,7 @@ public Client(Queue queue,int clientNumber, Painter painter,
         trajectory=new ArrayList <Dimension>();
         currentAnimation=moveUp;
         currentAnimation.start();    
-        this.queue=queue;
+        this.storeCheckout = storeCheckout;
         delayWaited=0;
         observers=new ArrayList <Observer>();
 		timer=new Timer();
@@ -133,7 +132,7 @@ public Client(Queue queue,int clientNumber, Painter painter,
             }
         };
         
-        if (queue.getClientsList().contains(this)){ // if client is in queue
+        if (storeCheckout.getClientsList().contains(this)){ // if client is in queue
 //        	System.out.println("queue "+queueDelay+" delay "+delayWaited);
         	timerDelay.schedule(tt, (int)(queueDelay-delayWaited));
         			
@@ -151,8 +150,8 @@ public Client(Queue queue,int clientNumber, Painter painter,
 
 	protected void decrease() {
 		if ((
-				getPositionType()==ClientPositionType.WAITING_IN_QUEUE && queue.isClientLastVisible(this))){
-			queue.decreaseNumber();
+				getPositionType()==ClientPositionType.WAITING_IN_QUEUE && storeCheckout.isClientLastVisible(this))){
+			storeCheckout.decreaseNumber();
 			
 		}
     	clientNumber--;    	
@@ -219,7 +218,7 @@ public Client(Queue queue,int clientNumber, Painter painter,
     }
 
     public void moveToQueue(){     
-    	queue.addClient(this);
+    	storeCheckout.addClient(this);
     	setPositionType(ClientPositionType.GOING_TO_QUEUE);
         calculateTrajectory();
         timeSupposed+=trajectory.size()*movementDelay;        
@@ -230,7 +229,7 @@ public Client(Queue queue,int clientNumber, Painter painter,
 //    	if (id==12){
 //    		manager.pause();
 //    	}
-    	queue.getClientsList().remove(this);
+    	storeCheckout.getClientsList().remove(this);
     	
 //    	System.out.println("Exit "+id);
     	setPositionType(ClientPositionType.EXITING);
@@ -291,8 +290,8 @@ public Client(Queue queue,int clientNumber, Painter painter,
         	
             if (getPositionType()==ClientPositionType.GOING_TO_QUEUE &&  isSavedInLog==false){
   
-                queue.getClientsArriving().remove(this);
-                queue.getClientsList().add(this); 
+                storeCheckout.getClientsArriving().remove(this);
+                storeCheckout.getClientsList().add(this);
 //                System.out.println("!!!!"+queue.getClientsList().size());
                 saveMeInLog();
                 
@@ -390,8 +389,8 @@ public Client(Queue queue,int clientNumber, Painter painter,
 	}
 	
 	public void saveMeInLog(){
-		if (queue.isClientOutOfSight(this)) queue.increaseNumber();
-        queue.getClientsArriving().remove(this);
+		if (storeCheckout.isClientOutOfSight(this)) storeCheckout.increaseNumber();
+        storeCheckout.getClientsArriving().remove(this);
         isSavedInLog=true;
         manager.saveEvent(getQueueNumber(),timeSupposed,manager.getTime());
         setPositionType(ClientPositionType.WAITING_IN_QUEUE);
@@ -402,7 +401,7 @@ public Client(Queue queue,int clientNumber, Painter painter,
 	}
 
 	public int getQueueNumber() {
-		return queue.getQueueNumber();
+		return storeCheckout.getQueueNumber();
 	}
 
 

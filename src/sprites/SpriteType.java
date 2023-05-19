@@ -1,5 +1,5 @@
 package sprites;
 
 public enum SpriteType {
-    CLIENT, QUEUE, DOOR, BACKGROUND
+    CLIENT, STORE_CHECKOUT, DOOR, BACKGROUND
 }

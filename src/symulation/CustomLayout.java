@@ -21,7 +21,7 @@ public class CustomLayout {
     private final int verticalPadding =50;
     private final int verticalMarginBetweenObjects =10;
     private final JPanel buttonsPanel;
-    private double queueProportions;
+    private double checkoutProportions;
     private int spaceBetweenCashRegisters;
     private int clientsWidth;
     private int clientsHeight;
@@ -37,12 +37,12 @@ public class CustomLayout {
 
     private SpriteManager spriteManager;
 
-    public CustomLayout (int numberOfQueues, JPanel buttonsPanel) throws IOException {
+    public CustomLayout (int checkoutsAmount, JPanel buttonsPanel) throws IOException {
     	
 
         spriteManager = new SpriteManager();
         this.buttonsPanel=buttonsPanel;
-        BufferedImage imgCashRegister=spriteManager.getSprite(SpriteType.QUEUE).getSprite(0, 0);
+        BufferedImage imgCashRegister=spriteManager.getSprite(SpriteType.STORE_CHECKOUT).getSprite(0, 0);
         BufferedImage imgBackground=spriteManager.getSprite(SpriteType.BACKGROUND).getSprite(0, 0);
         BufferedImage imgDoor= spriteManager.getSprite(SpriteType.DOOR).getSprite(0, 0);
         BufferedImage imgClient = spriteManager.getSprite(SpriteType.CLIENT).getSprite(0, 0);
@@ -58,9 +58,9 @@ public class CustomLayout {
         int backgroundWidth=imgBackground.getWidth();
         int backgroundHeight=imgBackground.getHeight();
 
-        queueProportions=(double)backgroundWidth/(double)backgroundHeight;
+        checkoutProportions =(double)backgroundWidth/(double)backgroundHeight;
 
-        calculateWindowSize(numberOfQueues);
+        calculateWindowSize(checkoutsAmount);
         doorPositionY = verticalMarginBetweenObjects;
         cashRegisterYPosition = doorPositionY + doorHeight + verticalMarginBetweenObjects;
     
@@ -68,23 +68,23 @@ public class CustomLayout {
     
     public void calculateWindowSize(int numberOfCashRegisters){
     	 
-    	int minimumWindowWidth=(int)(minimumWindowHeight*queueProportions);
+    	int minimumWindowWidth=(int)(minimumWindowHeight* checkoutProportions);
     	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         final double SCREEN_WIDTH = screenSize.getWidth();
         final double SCREEN_HEIGHT = screenSize.getHeight();
 
         int maximumWindowWidth;
-        if (SCREEN_WIDTH/queueProportions<SCREEN_HEIGHT){
+        if (SCREEN_WIDTH/ checkoutProportions <SCREEN_HEIGHT){
             maximumWindowWidth=(int)(SCREEN_WIDTH);
         }
         else{
-            maximumWindowWidth=(int)((SCREEN_HEIGHT- verticalPadding)*queueProportions);
+            maximumWindowWidth=(int)((SCREEN_HEIGHT- verticalPadding)* checkoutProportions);
 //            System.out.println("2");
         }
 
         if (numberOfCashRegisters* cashRegisterWidth <=minimumWindowWidth){
            windowWidth=minimumWindowWidth;
-           windowHeight=(int)(windowWidth/queueProportions- verticalPadding);
+           windowHeight=(int)(windowWidth/ checkoutProportions - verticalPadding);
            spaceBetweenCashRegisters = (minimumWindowWidth-numberOfCashRegisters* cashRegisterWidth) /(numberOfCashRegisters+1);
         }
         
@@ -100,7 +100,7 @@ public class CustomLayout {
 
             }
             windowWidth= spaceBetweenCashRegisters +(cashRegisterWidth + spaceBetweenCashRegisters)*numberOfCashRegisters;
-            windowHeight=(int)(windowWidth/queueProportions); 
+            windowHeight=(int)(windowWidth/ checkoutProportions);
         }
 
         maximumNumberOfClientsInQueue =(windowHeight- cashRegisterHeight - verticalMarginBetweenObjects)/clientsHeight-2;
@@ -135,7 +135,7 @@ public class CustomLayout {
                break;
            case EXITING:
                int direction=1;
-               if (isQueueLeftToDoors(queueNumber)){
+               if (isQueueLeftSideOfDoors(queueNumber)){
                    direction=-1;
                }
 
@@ -157,7 +157,7 @@ public class CustomLayout {
 
    }
    
-   private boolean isQueueLeftToDoors (int queueNumber){
+   private boolean isQueueLeftSideOfDoors(int queueNumber){
 	   return calculateCashRegisterPosition(queueNumber).width<calculateDoorPosition().width;
    }
 

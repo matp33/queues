@@ -63,12 +63,12 @@ public class ListenerExtraction extends ListenerOpenFile{
     	return numbers;
     }
     
-    private TimeTable extractQueues(TimeTable table, List<Integer> queuesNumber){
+    private TimeTable extractQueues(TimeTable table, List<Integer> checkoutsAmount){
     	double [][] arrivals = new double [table.arrivals.length][2];
     	double [][] departs = new double [table.departures.length][2];
     	int j=0;
     	for (int i=0; i<table.arrivals.length; i++){
-    		if (queuesNumber.contains((int)table.arrivals[i][1])){
+    		if (checkoutsAmount.contains((int)table.arrivals[i][1])){
     			arrivals[j][0]=table.arrivals[i][0];
     			
     			arrivals[j][1]=table.arrivals[i][1];
@@ -80,7 +80,7 @@ public class ListenerExtraction extends ListenerOpenFile{
     	
     	j=0;
     	for (int i=0; i<table.departures.length; i++){
-    		if (queuesNumber.contains((int)table.departures[i][1])){
+    		if (checkoutsAmount.contains((int)table.departures[i][1])){
     			departs[j][0]=table.departures[i][0];
     			departs[j][1]=table.departures[i][1];
     			System.out.println("#dep time"+departs[j][0] +" queue "+departs[j][1]);

@@ -14,7 +14,7 @@ import symulation.Painter;
 
 import java.awt.Dimension;
 
-public class Queue extends AnimatedAndObservable{
+public class StoreCheckout extends AnimatedAndObservable{
 
 	private static final long serialVersionUID = 1L;
 	private int clientsAboveLimit;
@@ -26,9 +26,9 @@ public class Queue extends AnimatedAndObservable{
 	private List<Client> clientsExiting;
 	private List <Client> clientsInQueue;
         
-        public Queue (Painter painter, int queueNumber){
+        public StoreCheckout(Painter painter, int queueNumber){
             
-        	super(SpriteType.QUEUE, painter);
+        	super(SpriteType.STORE_CHECKOUT, painter);
         	maxClients=painter.maxClientsVisibleInQueue;
             clientsAboveLimit=0;
             setClientsList(new ArrayList <Client>());

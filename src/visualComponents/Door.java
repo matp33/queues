@@ -19,7 +19,7 @@ public class Door extends AnimatedAndObservable  {
 	private Timer timer;
 	private final int delay=10;
 	private List <Observer> observers;
-	private int queue;
+	private int indexOfQueueClosestToTheLeftOfDoor;
 	
 	public static int STATE_CLOSING=-1;
 	public static int STATE_NEUTRAL=0; // nothing
@@ -29,13 +29,13 @@ public class Door extends AnimatedAndObservable  {
 
 	private TimerTask currentAnimationTask;
 	
-	public Door(int frameDelay, Painter painter, int queue){
+	public Door(Painter painter, int indexOfQueueClosestToTheLeftOfDoor){
 		super(SpriteType.DOOR,painter);
 			
 		state=STATE_NEUTRAL;
 		observers = new ArrayList <Observer>();
 		isNotified=false;
-		this.queue=queue;
+		this.indexOfQueueClosestToTheLeftOfDoor =indexOfQueueClosestToTheLeftOfDoor;
 		startDrawingMe();
 		timer = new Timer();
 		
@@ -245,7 +245,7 @@ public class Door extends AnimatedAndObservable  {
 	}
 	
 	public int chooseLeftOrRight(Client c){
-		if (c.getQueueNumber()>=queue){
+		if (c.getQueueNumber()>= indexOfQueueClosestToTheLeftOfDoor){
 			return 1; //right
 		}
 		else{

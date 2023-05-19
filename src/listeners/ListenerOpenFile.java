@@ -82,16 +82,16 @@ protected Manager manager;
                  }
              }
              
-         maximum++; // queues are counted from 0         
+         maximum++; // counters are counted from 0
          timeTable=processTimeTable(timeTable);
          arrivals=timeTable.arrivals; // TODO reconsider it; we taking 2 times arrivals and departures from timeTable
          departures=timeTable.departures;
          
-             if(manager.isQueueNumberSame(maximum)==false){  
+             if(manager.isStoreCheckoutNumberSame(maximum)==false){
              manager.doChange(maximum);
              }
                           
-         manager.saveTimeTable(arrivals, departures);
+         manager.setTimeTable(arrivals, departures);
              
          try{                       
         	 manager.restart(0);

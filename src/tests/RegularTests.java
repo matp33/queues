@@ -12,20 +12,20 @@ public class RegularTests {
 //    static int nrKolejki=;
     static int arrivalDelay=700;
 
-    public static void testInserting(int numberOfQueues,int numberOfClients){
+    public static void testInserting(int numberOfStoreCounters,int numberOfClients){
 
-//                Painter painter= new Painter(numberOfQueues,10.0,new WindowFrame());
-                Manager manager = new Manager(numberOfQueues);
+//                Painter painter= new Painter(numberOfStoreCounters,10.0,new WindowFrame());
+                Manager manager = new Manager(numberOfStoreCounters);
                 
                 try{
                     manager.beginSimulation();
 //                    painter.simulation.timerClass.isRunning=true;
                     for (int i=0; i<numberOfClients;i++){
-//                        painter.simulation.insertClient(numberOfQueues-1);
+//                        painter.simulation.insertClient(numberOfStoreCounters-1);
 //                        
                     }
                     for (int i=0; i<numberOfClients;i++){
-//                        painter.simulation.timerClass.clientLeaves(painter.simulation, numberOfQueues-1);
+//                        painter.simulation.timerClass.clientLeaves(painter.simulation, numberOfStoreCounters-1);
                         Thread.sleep(1500);
                     }
                          
@@ -54,7 +54,7 @@ public class RegularTests {
                         System.out.println("---- "+arrivals[i][0]);
 //                        System.out.println("---- "+departures[i][0]);
                     }
-                    manager.saveTimeTable(arrivals, departures);
+                    manager.setTimeTable(arrivals, departures);
                     manager.clean();
                     manager.doSimulation();
 
@@ -86,7 +86,7 @@ public class RegularTests {
 //    		departs[i-4][1]=i;
 //    	}
     	
-    	manager.saveTimeTable(arrivals, departs);
+    	manager.setTimeTable(arrivals, departs);
     	
     	try{
             manager.doSimulation();
@@ -131,7 +131,7 @@ public class RegularTests {
                 arrivals[i][1]=queueNumber-1;
             }
 
-        manager.saveTimeTable(arrivals, departures);
+        manager.setTimeTable(arrivals, departures);
         try{
             manager.doSimulation();
         }

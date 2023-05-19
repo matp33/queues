@@ -21,12 +21,12 @@ public class Timing {
 	private Painter painter;
 	private Thread t;
 
-	public Timing( int numberOfQueues,Manager manager,Painter painter) {
+	public Timing( Manager manager,Painter painter) {
 //		simulation=s;
 		this.painter=painter;
 		this.manager=manager;
 		threadsNumber=0;
-		listOfEvents=new ArrayList <ClientAction> ();
+		listOfEvents= new ArrayList<>();
 				
 	}
 

@@ -19,7 +19,7 @@ import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.Indicator;
 import visualComponents.OutsideWorld;
-import visualComponents.Queue;
+import visualComponents.StoreCheckout;
 
 public class Manager {
 	
@@ -34,7 +34,7 @@ public class Manager {
 	private static final String lOG_HEADER="Queue no.\ttime predicted\tarrival time";
 
 	public OutsideWorld outside;
-	public Queue[] queues; 
+	public StoreCheckout[] storeCheckouts;
 	public Indicator waitingRoomIndicator;
 	public Door door;
 	
@@ -43,17 +43,17 @@ public class Manager {
 
 	private List<ClientAction> listOfEvents;
 	
-	public Manager(int numberOfQueues){
+	public Manager(int checkoutsAmount){
 		
 		 
 		try {
 
-	         painter = new Painter(numberOfQueues, 0, this);
-	         timerClass=new Timing(numberOfQueues, this,painter);
+	         painter = new Painter(checkoutsAmount, this);
+	         timerClass=new Timing(this,painter);
 	         
-	         queues=new Queue [numberOfQueues];
-				 for (int i=0;i<numberOfQueues;i++){
-		            queues[i]=new Queue (painter,i);
+	         storeCheckouts =new StoreCheckout[checkoutsAmount];
+				 for (int i=0;i<checkoutsAmount;i++){
+		            storeCheckouts[i]=new StoreCheckout(painter,i);
 		         }
 	         
          } 
@@ -70,13 +70,13 @@ public class Manager {
 			 i++;
 		 }
 		 System.out.println("IIIIIIIIIII"+i);
-		 door=new Door(20,painter,i);
+		 door=new Door(painter,i);
 		 door.start();
          
          
-		 this.numberOfQueues=numberOfQueues;
+		 this.numberOfQueues=checkoutsAmount;
 		 timeTable=new TimeTable();	  
-		 simulation=new Simulation(numberOfQueues,painter,this); //simulation starts here
+		 simulation=new Simulation(checkoutsAmount,painter,this); //simulation starts here
 		 
 	     try{
 			 if (!logsFile.getParentFile().exists()){
@@ -95,7 +95,7 @@ public class Manager {
 	    
 	}
 	
-	public void saveTimeTable(double [][] arrivals, double [][] departures){
+	public void setTimeTable(double [][] arrivals, double [][] departures){
         timeTable.arrivals=arrivals;
         timeTable.departures=departures;
     }
@@ -109,9 +109,9 @@ public class Manager {
 	public void clean(){
 		//TODO its copypasted
 		painter.clean();
-		queues=new Queue [numberOfQueues];
+		storeCheckouts =new StoreCheckout[numberOfQueues];
 		 for (int i=0;i<numberOfQueues;i++){
-           queues[i]=new Queue ( painter,i);
+           storeCheckouts[i]=new StoreCheckout( painter,i);
            
            
         }
@@ -120,7 +120,7 @@ public class Manager {
 		 while (painter.getCashRegisterPosition(i).width<d.width){
 			 i++;
 		 }
-		 door=new Door(20,painter,i);
+		 door=new Door(painter,i);
 		 door.start();
 		 System.out.println("!!!!!!!!!!!!!!!!!!!!!! "+i);
 	}
@@ -191,7 +191,7 @@ public class Manager {
         return isTimeTableNotEmpty() && time<=timeTable.departures[timeTable.departures.length-1][0];
     }
     
-    public boolean isQueueNumberSame(int numbOfQueues) {
+    public boolean isStoreCheckoutNumberSame(int numbOfQueues) {
         return numbOfQueues==numberOfQueues;
     }
     
@@ -205,15 +205,6 @@ public class Manager {
     
     public boolean isRunning(){
     	return timerClass.isRunning();
-    }
-    
-    public void restartSimulation(){
-    	restartSimulation(numberOfQueues);
-    }
-    
-    public void restartSimulation(int numberOfQueues){
-    	painter.cleanScreen();
-    	simulation=new Simulation(numberOfQueues,painter,this);
     }
     
     public double getTime(){
@@ -269,12 +260,12 @@ public class Manager {
     }
     
     public boolean isAnyClientThere(){
-        for (int i=0; i< queues.length;i++){
-            if (!queues[i].getClientsList().isEmpty()){
+        for (int i = 0; i< storeCheckouts.length; i++){
+            if (!storeCheckouts[i].getClientsList().isEmpty()){
 //            	System.out.println("1");
                 return true;
             }
-            if (!queues[i].getClientsArriving().isEmpty()){
+            if (!storeCheckouts[i].getClientsArriving().isEmpty()){
 //            	System.out.println("2");
                 return true;
             }
@@ -296,8 +287,8 @@ public class Manager {
     }
 
 
-    public Queue getQueue (int queueNumber){
-    	return queues[queueNumber];
+    public StoreCheckout getQueue (int queueNumber){
+    	return storeCheckouts[queueNumber];
     }
     
     public void saveEventsList(List<ClientAction> e){

@@ -7,13 +7,11 @@ import interfaces.AnimatedObject;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import symulation.Painter;
 import visualComponents.Client;
-import visualComponents.Queue;
+import visualComponents.StoreCheckout;
 
 public class ClientMovement {
     
@@ -45,11 +43,11 @@ private List <AnimatedObject> objects;
     int i=client.id;
     
     for (AnimatedObject object: objects){
-    	if (object instanceof Queue){
-    		Queue q = (Queue)object;
-    		Rectangle queueArea = new Rectangle (q.getPosition().width, q.getPosition().height, q.getSize().width,
+    	if (object instanceof StoreCheckout){
+    		StoreCheckout q = (StoreCheckout)object;
+    		Rectangle checkoutArea = new Rectangle (q.getPosition().width, q.getPosition().height, q.getSize().width,
     				q.getSize().height);
-    			if (queueArea.intersects(clientTrajectory)){
+    			if (checkoutArea.intersects(clientTrajectory)){
     				objectsOnTheWay.add(object);
     			}
 

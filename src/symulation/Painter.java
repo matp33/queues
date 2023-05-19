@@ -63,7 +63,7 @@ public class Painter extends JPanel {
 
     private Manager manager;
 
-    public Painter(final int numberOfQueues, double symulationTime,
+    public Painter(final int numberOfQueues,
                    Manager manager) throws IOException {
 
         this.manager=manager;
