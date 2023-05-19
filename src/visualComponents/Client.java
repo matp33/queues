@@ -258,19 +258,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
        resume();
     }
     
-//    public void calculateExitTrajectory(){ //TODO temporary fix; remove moveToExit method from movement class
-////    	System.out.println("exit trajectory :"+getQueueNumber());
-//    	Dimension destination=painter.calculateClientCoordinates(clientNumber, getQueueNumber(), 
-//   			    positionType);  
-//    	
-//
-//		trajectory=movement.moveToExit(destination,painter.getTillPosition(getQueueNumber()),
-//		                        painter.getTillDimensions(), getSize().width);		
-////		System.out.println("exit trajectory :"+destination+" destination "+trajectory);
-//		resume();
-//    }
-
-
     private void move(){
 
         if (manager.isRunning()==false){

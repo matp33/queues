@@ -20,16 +20,16 @@ public class CustomLayout {
     private final int verticalMarginBetweenObjects =10;
     private final JPanel buttonsPanel;
     private double checkoutProportions;
-    private int spaceBetweenCashRegisters;
+    private int spaceBetweenCounters;
     private int clientsWidth;
     private int clientsHeight;
     private int windowWidth;      
     private int windowHeight;      
-    private int cashRegisterWidth;
-    private int cashRegisterHeight;
+    private int counterWidth;
+    private int counterHeight;
     private int doorHeight;
     
-    private int cashRegisterYPosition;
+    private int counterYPosition;
     private int doorPositionY;
     private int maximumNumberOfClientsInQueue;
 
@@ -40,7 +40,7 @@ public class CustomLayout {
 
         spriteManager = new SpriteManager();
         this.buttonsPanel=buttonsPanel;
-        BufferedImage imgCashRegister=spriteManager.getSprite(SpriteType.STORE_CHECKOUT).getSprite(0, 0);
+        BufferedImage imgStoreCounter=spriteManager.getSprite(SpriteType.STORE_CHECKOUT).getSprite(0, 0);
         BufferedImage imgBackground=spriteManager.getSprite(SpriteType.BACKGROUND).getSprite(0, 0);
         BufferedImage imgDoor= spriteManager.getSprite(SpriteType.DOOR).getSprite(0, 0);
         BufferedImage imgClient = spriteManager.getSprite(SpriteType.CLIENT).getSprite(0, 0);
@@ -50,8 +50,8 @@ public class CustomLayout {
         clientsWidth=imgClient.getWidth();
         clientsHeight=imgClient.getHeight();
 
-        cashRegisterWidth =imgCashRegister.getWidth();
-        cashRegisterHeight =imgCashRegister.getHeight();
+        counterWidth =imgStoreCounter.getWidth();
+        counterHeight =imgStoreCounter.getHeight();
 
         int backgroundWidth=imgBackground.getWidth();
         int backgroundHeight=imgBackground.getHeight();
@@ -60,11 +60,11 @@ public class CustomLayout {
 
         calculateWindowSize(checkoutsAmount);
         doorPositionY = verticalMarginBetweenObjects;
-        cashRegisterYPosition = doorPositionY + doorHeight + verticalMarginBetweenObjects;
+        counterYPosition = doorPositionY + doorHeight + verticalMarginBetweenObjects;
     
     }
     
-    public void calculateWindowSize(int numberOfCashRegisters){
+    public void calculateWindowSize(int numberOfCounters){
     	 
     	int minimumWindowWidth=(int)(minimumWindowHeight* checkoutProportions);
     	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -80,28 +80,28 @@ public class CustomLayout {
 //            System.out.println("2");
         }
 
-        if (numberOfCashRegisters* cashRegisterWidth <=minimumWindowWidth){
+        if (numberOfCounters* counterWidth <=minimumWindowWidth){
            windowWidth=minimumWindowWidth;
            windowHeight=(int)(windowWidth/ checkoutProportions - verticalPadding);
-           spaceBetweenCashRegisters = (minimumWindowWidth-numberOfCashRegisters* cashRegisterWidth) /(numberOfCashRegisters+1);
+           spaceBetweenCounters = (minimumWindowWidth-numberOfCounters* counterWidth) /(numberOfCounters+1);
         }
         
         else{
 
-            if (numberOfCashRegisters* cashRegisterWidth <=maximumWindowWidth){
-               spaceBetweenCashRegisters = (maximumWindowWidth-
-                       numberOfCashRegisters* cashRegisterWidth - horizontalPadding)/(numberOfCashRegisters+1);
+            if (numberOfCounters* counterWidth <=maximumWindowWidth){
+               spaceBetweenCounters = (maximumWindowWidth-
+                       numberOfCounters* counterWidth - horizontalPadding)/(numberOfCounters+1);
             }
             else{
-                spaceBetweenCashRegisters =10;
-                cashRegisterWidth = (maximumWindowWidth- horizontalPadding) /numberOfCashRegisters- spaceBetweenCashRegisters;
+                spaceBetweenCounters =10;
+                counterWidth = (maximumWindowWidth- horizontalPadding) /numberOfCounters- spaceBetweenCounters;
 
             }
-            windowWidth= spaceBetweenCashRegisters +(cashRegisterWidth + spaceBetweenCashRegisters)*numberOfCashRegisters;
+            windowWidth= spaceBetweenCounters +(counterWidth + spaceBetweenCounters)*numberOfCounters;
             windowHeight=(int)(windowWidth/ checkoutProportions);
         }
 
-        maximumNumberOfClientsInQueue =(windowHeight- cashRegisterHeight - verticalMarginBetweenObjects)/clientsHeight-2;
+        maximumNumberOfClientsInQueue =(windowHeight- counterHeight - verticalMarginBetweenObjects)/clientsHeight-2;
     }
 
 
@@ -114,13 +114,13 @@ public class CustomLayout {
            case GOING_TO_QUEUE:
            case WAITING_IN_QUEUE:
                if (clientNumber< maximumNumberOfClientsInQueue){
-                   y= cashRegisterYPosition + cashRegisterHeight +clientsHeight*(clientNumber);
+                   y= counterYPosition + counterHeight +clientsHeight*(clientNumber);
                }
                else{
-                   y= cashRegisterYPosition + cashRegisterHeight +clientsHeight*(maximumNumberOfClientsInQueue);
+                   y= counterYPosition + counterHeight +clientsHeight*(maximumNumberOfClientsInQueue);
                }
 
-               x=(int)((queueNumber+1)*(spaceBetweenCashRegisters + cashRegisterWidth)-0.5*(cashRegisterWidth
+               x=(int)((queueNumber+1)*(spaceBetweenCounters + counterWidth)-0.5*(counterWidth
                        +clientsWidth));
                break;
            case ARRIVAL:
@@ -155,13 +155,13 @@ public class CustomLayout {
 
    }
    
-   private boolean isQueueLeftSideOfDoors(int queueNumber){
-	   return calculateCashRegisterPosition(queueNumber).x<calculateDoorPosition().x;
+   private boolean isQueueLeftSideOfDoors(int counterIndex){
+	   return calculateCounterPosition(counterIndex).x<calculateDoorPosition().x;
    }
 
-   public Point calculateCashRegisterPosition(int tillNumber){
-        return new Point(spaceBetweenCashRegisters +tillNumber*(cashRegisterWidth +
-                spaceBetweenCashRegisters), cashRegisterYPosition);
+   public Point calculateCounterPosition(int storeCounterIndex){
+        return new Point(spaceBetweenCounters +storeCounterIndex*(counterWidth +
+                spaceBetweenCounters), counterYPosition);
    }
    
    public Point calculateQueueIndicatorPosition(int queueNumber){

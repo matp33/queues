@@ -217,7 +217,7 @@ public class Painter extends JPanel {
 
 
     public Point getCounterPosition(int counterPosition){
-        return layout.calculateCashRegisterPosition(counterPosition);
+        return layout.calculateCounterPosition(counterPosition);
     }
 
     public Point getDoorPosition(){
