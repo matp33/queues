@@ -12,20 +12,20 @@ public class RegularTests {
 //    static int nrKolejki=;
     static int arrivalDelay=700;
 
-    public static void testInserting(int numberOfStoreCounters,int numberOfClients){
+    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients){
 
-//                Painter painter= new Painter(numberOfStoreCounters,10.0,new WindowFrame());
-                Manager manager = new Manager(numberOfStoreCounters);
+//                Painter painter= new Painter(numberOfStoreCheckouts,10.0,new WindowFrame());
+                Manager manager = new Manager(numberOfStoreCheckouts);
                 
                 try{
                     manager.beginSimulation();
 //                    painter.simulation.timerClass.isRunning=true;
                     for (int i=0; i<numberOfClients;i++){
-//                        painter.simulation.insertClient(numberOfStoreCounters-1);
+//                        painter.simulation.insertClient(numberOfStoreCheckouts-1);
 //                        
                     }
                     for (int i=0; i<numberOfClients;i++){
-//                        painter.simulation.timerClass.clientLeaves(painter.simulation, numberOfStoreCounters-1);
+//                        painter.simulation.timerClass.clientLeaves(painter.simulation, numberOfStoreCheckouts-1);
                         Thread.sleep(1500);
                     }
                          

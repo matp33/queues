@@ -65,7 +65,7 @@ public class Manager {
 		 waitingRoomIndicator=new Indicator(painter);
 		 Point point=painter.getDoorPosition();
 		 int i=0;
-		 while (painter.getCounterPosition(i).x<point.x){
+		 while (painter.getCheckoutPosition(i).x<point.x){
 			 i++;
 		 }
 		 System.out.println("IIIIIIIIIII"+i);
@@ -116,7 +116,7 @@ public class Manager {
         }
 		 Point point=painter.getDoorPosition();
 		 int i=0;
-		 while (painter.getCounterPosition(i).x<point.x){
+		 while (painter.getCheckoutPosition(i).x<point.x){
 			 i++;
 		 }
 		 door=new Door(painter,i);

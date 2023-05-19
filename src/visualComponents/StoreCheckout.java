@@ -37,7 +37,7 @@ public class StoreCheckout extends AnimatedAndObservable{
            
             clientsArriving=new ArrayList<Client>();
             clientsExiting=new ArrayList<Client>();
-            this.position =painter.getCounterPosition(queueNumber);
+            this.position =painter.getCheckoutPosition(queueNumber);
             startDrawingMe();
 
         }
