@@ -1,12 +1,12 @@
 package interfaces;
 
-import java.awt.Dimension;
+import java.awt.*;
 
 public interface Observable {
 
 	public void addObserver (Observer client);
 	public void removeObserver (Observer client);
 	public void notifyClients ();
-	public Dimension getPosition ();
+	public Point getPosition ();
 	
 }

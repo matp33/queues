@@ -1,6 +1,6 @@
 package visualComponents;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,11 +9,11 @@ import interfaces.Observer;
 
 public class OutsideWorld implements Observable {
 
-	private Dimension position;
+	private Point position;
 	private List <Observer> observers;
 	
 	public OutsideWorld (){
-		position=new Dimension(0,0);
+		position=new Point(0,0);
 		observers = new ArrayList <Observer>();
 	}
 	
@@ -36,7 +36,7 @@ public class OutsideWorld implements Observable {
 	}
 
 	@Override
-	public Dimension getPosition() {
+	public Point getPosition() {
 		return position;
 	}
 	

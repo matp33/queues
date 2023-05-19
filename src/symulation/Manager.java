@@ -2,8 +2,7 @@ package symulation;
 
 import interfaces.AnimatedObject;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -64,9 +63,9 @@ public class Manager {
 		
 		 outside = new OutsideWorld();
 		 waitingRoomIndicator=new Indicator(painter);
-		 Dimension d=painter.getDoorPosition();
+		 Point point=painter.getDoorPosition();
 		 int i=0;
-		 while (painter.getCashRegisterPosition(i).width<d.width){
+		 while (painter.getCounterPosition(i).x<point.x){
 			 i++;
 		 }
 		 System.out.println("IIIIIIIIIII"+i);
@@ -115,9 +114,9 @@ public class Manager {
            
            
         }
-		 Dimension d=painter.getDoorPosition();
+		 Point point=painter.getDoorPosition();
 		 int i=0;
-		 while (painter.getCashRegisterPosition(i).width<d.width){
+		 while (painter.getCounterPosition(i).x<point.x){
 			 i++;
 		 }
 		 door=new Door(painter,i);

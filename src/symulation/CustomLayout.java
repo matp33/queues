@@ -2,9 +2,7 @@
 
 package symulation;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -108,7 +106,7 @@ public class CustomLayout {
 
 
 
-   public Dimension calculateClientDestinationCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
+   public Point calculateClientDestinationCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
        int x=0;
        int y=0;
 
@@ -139,42 +137,42 @@ public class CustomLayout {
                    direction=-1;
                }
 
-               Dimension d= calculateDoorPosition();
-               y=d.height+20;
-               x=d.width+clientNumber*clientsWidth*direction;
+               Point point= calculateDoorPosition();
+               y=point.y+20;
+               x=point.x+clientNumber*clientsWidth*direction;
                break;
            case OUTSIDE_VIEW:
-               Dimension doorPosition= calculateDoorPosition();
-               y=doorPosition.height;
-               x=doorPosition.width;
+               Point doorPosition= calculateDoorPosition();
+               y=doorPosition.y;
+               x=doorPosition.x;
                break;
 
 
        }
 
 
-       return new Dimension (x,y);
+       return new Point(x,y);
 
    }
    
    private boolean isQueueLeftSideOfDoors(int queueNumber){
-	   return calculateCashRegisterPosition(queueNumber).width<calculateDoorPosition().width;
+	   return calculateCashRegisterPosition(queueNumber).x<calculateDoorPosition().x;
    }
 
-   public Dimension calculateCashRegisterPosition(int tillNumber){
-        return new Dimension(spaceBetweenCashRegisters +tillNumber*(cashRegisterWidth +
+   public Point calculateCashRegisterPosition(int tillNumber){
+        return new Point(spaceBetweenCashRegisters +tillNumber*(cashRegisterWidth +
                 spaceBetweenCashRegisters), cashRegisterYPosition);
    }
    
-   public Dimension calculateQueueIndicatorPosition(int queueNumber){
-	   Dimension a = calculateClientDestinationCoordinates(maximumNumberOfClientsInQueue,
+   public Point calculateQueueIndicatorPosition(int queueNumber){
+       Point a = calculateClientDestinationCoordinates(maximumNumberOfClientsInQueue,
 		   	   queueNumber, ClientPositionType.GOING_TO_QUEUE);
 	   
-	   return new Dimension (a.width+clientsWidth,a.height+clientsHeight);
+	   return new Point (a.x+clientsWidth,a.y+clientsHeight);
    }
 
-   public Dimension calculateDoorPosition(){
-       return new Dimension(windowWidth/2, doorPositionY);
+   public Point calculateDoorPosition(){
+       return new Point(windowWidth/2, doorPositionY);
    }
 
 	public Dimension getWindowDimensions(){
@@ -191,10 +189,10 @@ public class CustomLayout {
     	return new Rectangle(0,0,windowWidth, windowHeight);
     }
 
-	public Dimension calculateWaitingRoomIndicatorPosition() {
-		Dimension d = calculateClientDestinationCoordinates(0, 0,
+	public Point calculateWaitingRoomIndicatorPosition() {
+		Point d = calculateClientDestinationCoordinates(0, 0,
                 ClientPositionType.WAITING_ROOM);
-		return new Dimension (d.width+clientsWidth, d.height+clientsHeight);
+		return new Point (d.x+clientsWidth, d.y+clientsHeight);
 	}
 
 

@@ -1,7 +1,7 @@
 
 package symulation;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -112,21 +112,21 @@ public class Simulation {
             Client client=new Client(
             		manager.getQueue(queueNumber),peopleInQueue[queueNumber],painter,
             		arrivalTime,manager);                        
-	        Dimension dim;
+	        Point point;
 			ClientPositionType type;
             if (action== SimulationEventType.ARRIVAL){
             	type=ClientPositionType.ARRIVAL; // TODO client should appear in type = "Arrival"
-            	dim=painter.calculateClientCoordinates(0, 0, type);
+            	point=painter.calculateClientCoordinates(0, 0, type);
             	
             }
             else{
-            	Pair <Dimension, ClientPositionType> pair= calculatePosition(queueNumber,arrivalTime,initialTime,
+            	Pair <Point, ClientPositionType> pair= calculatePosition(queueNumber,arrivalTime,initialTime,
 						peopleInQueue[queueNumber]);
-            	dim= pair.getObject1();
+            	point= pair.getObject1();
                 type=pair.getObject2();
             }
             
-            client.saveInformation(dim,type);
+            client.saveInformation(point,type);
 			client.startDrawingMe();
             clientAction=new ClientAction(time,action, client);
             listOfEvents.add(clientAction); 
@@ -231,14 +231,14 @@ public class Simulation {
     private Pair <Double,SimulationEventType> calculateAppearTime(int queueNumber, double eventTime, double initialTime,
     													int peopleInQueue){
     				
-		Dimension dimWaitPlace=painter.calculateClientCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
-		Dimension dimInQueue=painter.calculateClientCoordinates(peopleInQueue, queueNumber,
+		Point pointWaitPlace=painter.calculateClientCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
+		Point pointInQueue=painter.calculateClientCoordinates(peopleInQueue, queueNumber,
 				ClientPositionType.GOING_TO_QUEUE);
                            	
 //		System.out.println(queues[queueNumber].
 //				findNumberOfLastClient()+"in queue");
       
-		double timeToQueue=Client.calculateTimeToGetToQueue(dimInQueue, dimWaitPlace);
+		double timeToQueue=Client.calculateTimeToGetToQueue(pointInQueue, pointWaitPlace);
 		double totalTime=timeToQueue+//timeToWaitPlace+ // TODO add it
 				Client.waitRoomDelay/1000;
 		
@@ -282,19 +282,19 @@ public class Simulation {
 		
 	}
 
-	public Pair <Dimension,ClientPositionType> calculatePosition(int queueNumber, double arrivalTime,
+	public Pair <Point,ClientPositionType> calculatePosition(int queueNumber, double arrivalTime,
 					double initialTime, int peopleInQueue){
 	
 		// TODO this is too similar method to calculateAppearTime check it
 		
 		
-		Dimension dimInitial=painter.calculateClientCoordinates(0, 0, ClientPositionType.ARRIVAL);
-		Dimension dimInQueue=painter.calculateClientCoordinates(peopleInQueue,
+		Point pointInitial=painter.calculateClientCoordinates(0, 0, ClientPositionType.ARRIVAL);
+		Point pointInQueue=painter.calculateClientCoordinates(peopleInQueue,
                              queueNumber, ClientPositionType.GOING_TO_QUEUE);
-        Dimension calculatedPosition = Client.calculateCoordinates(dimInQueue, dimInitial,
+        Point calculatedPosition = Client.calculateCoordinates(pointInQueue, pointInitial,
         								arrivalTime);
         
-        	if (calculatedPosition.equals(dimInQueue)){
+        	if (calculatedPosition.equals(pointInQueue)){
 //        		System.out.println("same"+arrivalTime+"?"+queueNumber);
         		return new Pair <>(calculatedPosition,ClientPositionType.WAITING_IN_QUEUE);
         	}
@@ -307,7 +307,7 @@ public class Simulation {
 	    
 	    if (arrivalTime<=initialTime){
 	    	positionType=ClientPositionType.WAITING_IN_QUEUE;
-	    	calculatedPosition=dimInQueue;	
+	    	calculatedPosition=pointInQueue;
 	    }
 	    else{
 	    	positionType=ClientPositionType.GOING_TO_QUEUE;

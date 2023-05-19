@@ -36,7 +36,7 @@ private boolean isSavedInLog;
 
 private Manager manager;
 private ClientMovement movement;
-private List <Dimension> trajectory;
+private List <Point> trajectory;
 private List <Observer> observers;
 private StoreCheckout storeCheckout;
 
@@ -46,7 +46,7 @@ private Timer timerDelay; // timer for moving inside queue connected to clients 
 private TimerTask movingTask;
 private Animation currentAnimation,moveLeft,moveRight,moveDown,moveUp;
 private Observable objectObservedByMe;
-private Dimension position;
+private Point position;
 
 public final int queueDelay; // delay before client moves when he sees that another client moved
 private static final int frameTime=20; // so many steps before animation changes to next
@@ -91,7 +91,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         this.clientNumber=clientNumber;
         movement=new ClientMovement(this,manager.getAllObjects());
 //        positionType=Client.POSITION_WAITING_ROOM;
-        trajectory=new ArrayList <Dimension>();
+        trajectory=new ArrayList <>();
         currentAnimation=moveUp;
         currentAnimation.start();    
         this.storeCheckout = storeCheckout;
@@ -251,7 +251,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 
     public void calculateTrajectory(){
     	
-       Dimension destination=painter.calculateClientCoordinates(getClientNumber(), getQueueNumber(), positionType);
+       Point destination=painter.calculateClientCoordinates(getClientNumber(), getQueueNumber(), positionType);
        
        trajectory=movement.moveClient(destination);  
 //       System.out.println("outside desti"+trajectory);
@@ -323,38 +323,29 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
             }
             
 
-            Dimension d=trajectory.get(0);
+            Point point=trajectory.get(0);
             trajectory.remove(0);
-            chooseDirection(d);  
+            chooseDirection(point);
             currentAnimation.start();
             currentAnimation.updateFrame();
-            position=new Dimension(d.width,d.height);
+            position=new Point(point.x, point.y);
             
         }
 
     }
 
-    public static double calculateTimeToGetToQueue(Dimension queuePosition,
-                                             Dimension waitingRoomPosition){
+    public static double calculateTimeToGetToQueue(Point queuePosition,
+                                             Point waitingRoomPosition){
 
-        int horizontalMoves=Math.abs(queuePosition.width-waitingRoomPosition.width)/stepSize+1;
-        int verticalMoves=Math.abs(queuePosition.height-waitingRoomPosition.height)/stepSize+1;
-
-        return (horizontalMoves+verticalMoves)*movementDelay;
-
-    }
-
-    public static double calculateTimeToGetToWaitingRoom (Dimension waitingRoomPosition,
-                                                   Dimension startingPosition){
-
-        int horizontalMoves=Math.abs(waitingRoomPosition.width-startingPosition.width)/stepSize+1;
-        int verticalMoves=Math.abs(waitingRoomPosition.height-startingPosition.height)/stepSize+1;
+        int horizontalMoves=Math.abs(queuePosition.x - waitingRoomPosition.x)/stepSize+1;
+        int verticalMoves=Math.abs(queuePosition.y - waitingRoomPosition.y)/stepSize+1;
 
         return (horizontalMoves+verticalMoves)*movementDelay;
 
     }
 
-    public static Dimension calculateCoordinates (Dimension tillPosition, Dimension startingPosition,
+
+    public static Point calculateCoordinates (Point checkoutPosition, Point startingPosition,
                                                double destinationTime){
         
         int amount=(int) (destinationTime/(2*movementDelay));
@@ -363,19 +354,19 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         int additional=2*excess;
 
          
-        int signumForX=(int)Math.signum(startingPosition.width-tillPosition.width); // should add or
+        int signumForX=(int)Math.signum(startingPosition.x-checkoutPosition.x); // should add or
         										// subtract from x position? add -> 1, subtract -1
-        int signumForY=(int)Math.signum(startingPosition.height-tillPosition.height);
+        int signumForY=(int)Math.signum(startingPosition.y-checkoutPosition.y);
                     
-        Dimension d=new Dimension(tillPosition.width+signumForX*((amount)*stepSize+additional),
-                tillPosition.height+signumForY*((amount)*stepSize));
+        Point point=new Point(checkoutPosition.x+signumForX*((amount)*stepSize+additional),
+                checkoutPosition.y+signumForY*((amount)*stepSize));
                 
-        if (d.height>startingPosition.height){
-        	int diff=d.height-startingPosition.height;
-        	d.setSize(d.width+signumForX*diff, d.height-signumForY*diff);
+        if (point.y>startingPosition.y){
+        	int diff=point.y-startingPosition.y;
+//        	point.setSize(point.x+signumForX*diff, point.y-signumForY*diff);
         }
         
-        return d;
+        return point;
 
     }    
 
@@ -383,8 +374,8 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		return queueDelay;
 	}
 
-	public void saveInformation(Dimension dim, ClientPositionType type) {
-		position=dim;
+	public void saveInformation(Point point, ClientPositionType type) {
+		position=point;
 		setPositionType(type);		
 	}
 	
@@ -396,7 +387,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         setPositionType(ClientPositionType.WAITING_IN_QUEUE);
 	}
 	
-	public Dimension getPosition(){
+	public Point getPosition(){
 		return position;
 	}
 
@@ -425,7 +416,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		this.clientNumber = clientNumber;
 	}
 		
-	public List<Dimension> getTrajectory(){
+	public List<Point> getTrajectory(){
 		return trajectory;
 	}
 
@@ -453,29 +444,29 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		o.addObserver(this);	
 	}
 	
-	private void chooseDirection (Dimension destination){
+	private void chooseDirection (Point destination){
 		
 		if (destination==null){
 		}
 		
-		int diff1=Math.abs(position.width-destination.width);
-		int diff2=Math.abs(position.height-destination.height);
+		int diff1=Math.abs(position.x-destination.x);
+		int diff2=Math.abs(position.y-destination.y);
 		
 		if (diff1<diff2){
-			if (position.height<destination.height){
+			if (position.y<destination.y){
 	            currentAnimation=moveDown;
 	        }
-	        if (position.height>destination.height){
+	        if (position.y>destination.y){
 	            currentAnimation=moveUp;
 	        }
 		}
 		
 		else{
 			
-	        if (position.width<destination.width){
+	        if (position.x<destination.x){
 	            currentAnimation=moveRight;
 	        }
-	        if (position.width>destination.width){
+	        if (position.x>destination.x){
 	            currentAnimation=moveLeft;
 	        }
 		}
@@ -498,8 +489,8 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 	@Override
     public void paintComponent(Graphics g) {
      
-    	int x = position.width;
-    	int y = position.height;
+    	int x = position.x;
+    	int y = position.y;
         painter.paintClient(this);
         Graphics2D g2d = (Graphics2D) g;
 //        if (red){

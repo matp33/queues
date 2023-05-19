@@ -17,9 +17,9 @@ public int clientsOverLimit,x,y;
     public Indicator(Painter painter){
 
 	    clientsOverLimit=0;
-	    Dimension position = painter.calculateWaitingRoomIndicatorPosition();
-	    this.x=position.width;
-	    this.y=position.height;
+	    Point position = painter.calculateWaitingRoomIndicatorPosition();
+	    this.x=position.x;
+	    this.y=position.y;
 
     }
     

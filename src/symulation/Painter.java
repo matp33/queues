@@ -3,14 +3,7 @@ package symulation;
 import constants.ClientPositionType;
 import interfaces.AnimatedObject;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Dimension;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.text.DecimalFormat;
@@ -196,11 +189,11 @@ public class Painter extends JPanel {
 
 
 
-    public Dimension calculateClientCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
+    public Point calculateClientCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
         return layout.calculateClientDestinationCoordinates(clientNumber, queueNumber, position);
     }
 
-    public Dimension calculateQueueIndicatorPosition(int queueNumber){
+    public Point calculateQueueIndicatorPosition(int queueNumber){
         return layout.calculateQueueIndicatorPosition(queueNumber);
     }
 
@@ -223,11 +216,11 @@ public class Painter extends JPanel {
     }
 
 
-    public Dimension getCashRegisterPosition(int tillNumber){
-        return layout.calculateCashRegisterPosition(tillNumber);
+    public Point getCounterPosition(int counterPosition){
+        return layout.calculateCashRegisterPosition(counterPosition);
     }
 
-    public Dimension getDoorPosition(){
+    public Point getDoorPosition(){
         return layout.calculateDoorPosition();
     }
 
@@ -239,7 +232,7 @@ public class Painter extends JPanel {
         this.movementArea = movementArea;
     }
 
-    public Dimension calculateWaitingRoomIndicatorPosition() {
+    public Point calculateWaitingRoomIndicatorPosition() {
         return layout.calculateWaitingRoomIndicatorPosition();
     }
 

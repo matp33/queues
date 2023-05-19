@@ -3,16 +3,12 @@ package visualComponents;
 import interfaces.AnimatedAndObservable;
 import interfaces.Observer;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import sprites.SpriteType;
 import symulation.Painter;
-
-import java.awt.Dimension;
 
 public class StoreCheckout extends AnimatedAndObservable{
 
@@ -34,14 +30,14 @@ public class StoreCheckout extends AnimatedAndObservable{
             setClientsList(new ArrayList <Client>());
             this.queueNumber=queueNumber;
 
-            Dimension d=painter.calculateQueueIndicatorPosition(queueNumber);
+            Point position=painter.calculateQueueIndicatorPosition(queueNumber);
 //            Dimension clientDimensions=Client.clientDimensions;
-            x=d.width;
-            y=d.height;
+            x=position.x;
+            y=position.y;
            
             clientsArriving=new ArrayList<Client>();
             clientsExiting=new ArrayList<Client>();
-            position=painter.getCashRegisterPosition(queueNumber);
+            this.position =painter.getCounterPosition(queueNumber);
             startDrawingMe();
 
         }

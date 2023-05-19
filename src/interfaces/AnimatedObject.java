@@ -1,8 +1,6 @@
 package interfaces;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -21,7 +19,7 @@ public abstract class AnimatedObject extends JComponent {
 	
 	protected Animation [] animations;
 	protected Animation currentAnimation;
-	protected Dimension position;
+	protected Point position;
 	protected Painter painter;
 	protected int max;
 	protected int state;
@@ -39,7 +37,7 @@ public abstract class AnimatedObject extends JComponent {
 			BufferedImage b=sprite.getSprite(0, 0);
 			size=new Dimension(b.getWidth(), b.getHeight());
 			this.painter=painter;
-			position=new Dimension();
+			position=new Point();
 			initializePosition();
 
 			animations = new Animation [sprite.getNumberOfRows()*sprite.getNumberOfColumns()];
@@ -72,7 +70,7 @@ public abstract class AnimatedObject extends JComponent {
 		return currentAnimation.getSprite();
 	}
 	
-	public Dimension getPosition(){
+	public Point getPosition(){
 		return position;
 	}
 	
@@ -87,8 +85,8 @@ public abstract class AnimatedObject extends JComponent {
 	@Override
 	public void paintComponent(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;		
-		painter.repaint(position.width,position.height,spriteWidth,spriteHeight);
-        g2d.drawImage(currentAnimation.getSprite(),position.width, position.height,null); 
+		painter.repaint(position.x,position.y,spriteWidth,spriteHeight);
+        g2d.drawImage(currentAnimation.getSprite(),position.x, position.y,null);
 //        System.out.println("#"+position);
 	}
 
