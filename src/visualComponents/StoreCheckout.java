@@ -74,7 +74,7 @@ public class StoreCheckout extends AnimatedAndObservable{
 			clientsAboveLimit++;
         }
         
-        public void decreaseNumber(){
+        public void decreaseClientsAboveLimit(){
         	clientsAboveLimit--;
         }
 
@@ -217,7 +217,7 @@ public class StoreCheckout extends AnimatedAndObservable{
 		}
 
 		@Override
-		public void resume() {
+		public void scheduleMoving() {
 			// TODO Auto-generated method stub
 			
 		}

@@ -33,8 +33,8 @@ public class Timing {
 	public void startSimulation(){		    
 	    
 	    manager.beginSimulation();
-	    startTimer();
-	    startThreadForEvents();
+	    scheduleTimeUpdatingForUI();
+	    startThreadForClientPositionUpdates();
 	
 	}
 	
@@ -50,7 +50,7 @@ public class Timing {
 	    
 	}
 	
-	private void startTimer() {
+	private void scheduleTimeUpdatingForUI() {
 		
 		timer=new Timer();        
 	    TimerTask task=new TimerTask(){
@@ -78,15 +78,15 @@ public class Timing {
 	    timer.scheduleAtFixedRate(task, 0, TIMER_TIME_DELAY);
 	}
 
-	private void startThreadForEvents() {
+	private void startThreadForClientPositionUpdates() {
 		
 		Runnable r = new Runnable (){
 			@Override
 			public void run (){
 				while (!listOfEvents.isEmpty() && isRunning==true){
 					
-					ClientAction c=listOfEvents.get(0);
-					double time=c.getTime();
+					ClientAction clientAction=listOfEvents.get(0);
+					double time=clientAction.getTime();
 					
 					synchronized (listOfEvents){
 						while (isRunning() && getTime()<time){
@@ -108,8 +108,8 @@ public class Timing {
 					
 		    		listOfEvents.remove(0);
 
-					SimulationEventType action=c.getAction();
-		            Client client=c.getClient();	     	                       
+					SimulationEventType action=clientAction.getAction();
+		            Client client=clientAction.getClient();
 
 		            switch (action){
 		                case ARRIVAL:

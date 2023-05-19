@@ -112,21 +112,21 @@ public class Simulation {
             Client client=new Client(
             		manager.getQueue(queueNumber),peopleInQueue[queueNumber],painter,
             		arrivalTime,manager);                        
-	        Point point;
-			ClientPositionType type;
+	        Point clientPosition;
+			ClientPositionType positionType;
             if (action== SimulationEventType.ARRIVAL){
-            	type=ClientPositionType.ARRIVAL; // TODO client should appear in type = "Arrival"
-            	point=painter.calculateClientCoordinates(0, 0, type);
+            	positionType=ClientPositionType.ARRIVAL; // TODO client should appear in positionType = "Arrival"
+            	clientPosition=painter.calculateClientDestinationCoordinates(0, 0, positionType);
             	
             }
             else{
             	Pair <Point, ClientPositionType> pair= calculatePosition(queueNumber,arrivalTime,initialTime,
 						peopleInQueue[queueNumber]);
-            	point= pair.getObject1();
-                type=pair.getObject2();
+            	clientPosition= pair.getObject1();
+                positionType=pair.getObject2();
             }
             
-            client.saveInformation(point,type);
+            client.saveInformation(clientPosition,positionType);
 			client.startDrawingMe();
             clientAction=new ClientAction(time,action, client);
             listOfEvents.add(clientAction); 
@@ -175,12 +175,9 @@ public class Simulation {
     }           
     // Sorting events by ascending times
     sortEvents(listOfEvents);
-    manager.saveEventsList(listOfEvents);
+    manager.setEventsList(listOfEvents);
 
-//    if (timerClass.timer==null){
-//        timerClass.startSimulation();
-//    }  
-   
+
     for (int i=0; i<listOfEvents.size();i++){
     	if (listOfEvents.get(i).getClient()!=null)
     	System.out.println(" time: "+listOfEvents.get(i).getTime()+
@@ -231,8 +228,8 @@ public class Simulation {
     private Pair <Double,SimulationEventType> calculateAppearTime(int queueNumber, double eventTime, double initialTime,
     													int peopleInQueue){
     				
-		Point pointWaitPlace=painter.calculateClientCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
-		Point pointInQueue=painter.calculateClientCoordinates(peopleInQueue, queueNumber,
+		Point pointWaitPlace=painter.calculateClientDestinationCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
+		Point pointInQueue=painter.calculateClientDestinationCoordinates(peopleInQueue, queueNumber,
 				ClientPositionType.GOING_TO_QUEUE);
                            	
 //		System.out.println(queues[queueNumber].
@@ -288,8 +285,8 @@ public class Simulation {
 		// TODO this is too similar method to calculateAppearTime check it
 		
 		
-		Point pointInitial=painter.calculateClientCoordinates(0, 0, ClientPositionType.ARRIVAL);
-		Point pointInQueue=painter.calculateClientCoordinates(peopleInQueue,
+		Point pointInitial=painter.calculateClientDestinationCoordinates(0, 0, ClientPositionType.ARRIVAL);
+		Point pointInQueue=painter.calculateClientDestinationCoordinates(peopleInQueue,
                              queueNumber, ClientPositionType.GOING_TO_QUEUE);
         Point calculatedPosition = Client.calculateCoordinates(pointInQueue, pointInitial,
         								arrivalTime);

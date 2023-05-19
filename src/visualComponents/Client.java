@@ -25,7 +25,7 @@ import java.util.TimerTask;
 public class Client extends AnimatedAndObservable implements Observer {
 
 private double destinationTime;	
-private double timeSupposed=0;	
+private double timeSupposed=0;
 private int clientNumber;
 private ClientPositionType positionType;
 private int delayWaited;
@@ -110,7 +110,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
     
     @Override
-    public void updateMyNumber(){
+    public void moveUpInQueue(){
     	
 //    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
     	
@@ -124,7 +124,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
             public void run(){
             	isWaiting=false;
             	delayWaited=0; 
-            	decrease();
+            	decreaseNumberOfClientsInQueue();
 	            	if (getPositionType().ordinal()>ClientPositionType.WAITING_ROOM.ordinal()){
 	            		calculateTrajectory();    
 	            	}            	
@@ -148,10 +148,10 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 
     
 
-	protected void decrease() {
+	protected void decreaseNumberOfClientsInQueue() {
 		if ((
 				getPositionType()==ClientPositionType.WAITING_IN_QUEUE && storeCheckout.isClientLastVisible(this))){
-			storeCheckout.decreaseNumber();
+			storeCheckout.decreaseClientsAboveLimit();
 			
 		}
     	clientNumber--;    	
@@ -159,7 +159,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 	}
 
 
-    public void resume(){
+    public void scheduleMoving(){
 
     	
     	if (isMoving()){
@@ -178,7 +178,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         timer.scheduleAtFixedRate(movingTask, 0, (int)(1000*movementDelay));
         if (isWaiting){
 //        	System.out.println("client "+clientNumber+" delay >0 "+delayWaited);
-        	updateMyNumber();
+        	moveUpInQueue();
         }
     }
     
@@ -211,7 +211,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
 
     public void moveToWaitingRoom(){  
-    	createDelayTimer(waitRoomDelay);
+    	scheduleGoingToQueue(waitRoomDelay); //TODO why going to queue when he should go to waiting room
     	setPositionType(ClientPositionType.WAITING_ROOM);
         calculateTrajectory();
         timeSupposed=manager.getTime()+trajectory.size()*movementDelay+ waitRoomDelay;
@@ -251,11 +251,11 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 
     public void calculateTrajectory(){
     	
-       Point destination=painter.calculateClientCoordinates(getClientNumber(), getQueueNumber(), positionType);
+       Point destination=painter.calculateClientDestinationCoordinates(getClientNumber(), getQueueNumber(), positionType);
        
        trajectory=movement.moveClient(destination);  
 //       System.out.println("outside desti"+trajectory);
-       resume();
+       scheduleMoving();
     }
     
     private void move(){
@@ -418,7 +418,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 	public void notifyClients (){
 		
 		for (int i=0; i<observers.size();i++){
-			observers.get(i).updateMyNumber();
+			observers.get(i).moveUpInQueue();
 		}
 	}
 	
@@ -464,7 +464,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 
 	@Override
 	protected void initializePosition() {
-		position=painter.calculateClientCoordinates(clientNumber, 0, ClientPositionType.ARRIVAL);
+		position=painter.calculateClientDestinationCoordinates(clientNumber, 0, ClientPositionType.ARRIVAL);
 	}
 
 	
@@ -490,7 +490,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
 	
 	
-	private void createDelayTimer(int delay){
+	private void scheduleGoingToQueue(int delay){
 		TimerTask tt = new TimerTask (){
 			@Override
 			public void run(){
@@ -506,7 +506,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		TimerTask tt = new TimerTask (){
 			@Override
 			public void run(){
-				resume();
+				scheduleMoving();
 			}
 		};
 		timerDelay.schedule(tt, (int)(1000*delay));

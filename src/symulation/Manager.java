@@ -70,7 +70,7 @@ public class Manager {
 		 }
 		 System.out.println("IIIIIIIIIII"+i);
 		 door=new Door(painter,i);
-		 door.start();
+		 door.initializePosition();
          
          
 		 this.numberOfQueues=checkoutsAmount;
@@ -120,7 +120,7 @@ public class Manager {
 			 i++;
 		 }
 		 door=new Door(painter,i);
-		 door.start();
+		 door.initializePosition();
 		 System.out.println("!!!!!!!!!!!!!!!!!!!!!! "+i);
 	}
 
@@ -290,7 +290,7 @@ public class Manager {
     	return storeCheckouts[queueNumber];
     }
     
-    public void saveEventsList(List<ClientAction> e){
+    public void setEventsList(List<ClientAction> e){
     	listOfEvents = e;
     }
     

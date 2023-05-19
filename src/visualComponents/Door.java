@@ -41,7 +41,7 @@ public class Door extends AnimatedAndObservable  {
 		
 	}
 	
-	protected void initializePosition (){
+	public void initializePosition (){
 		position=painter.getDoorPosition();		
 	}
 		
@@ -74,7 +74,7 @@ public class Door extends AnimatedAndObservable  {
 		}		
 	}
 	
-	public void resume(){
+	public void scheduleMoving(){
 		
 		if (state==STATE_OPENING){
 			doOpening();
@@ -116,10 +116,7 @@ public class Door extends AnimatedAndObservable  {
 				
 	}
 	
-	public void start(){
-        initializePosition(); 
-	}
-	
+
 	public boolean canClientEnter(){
 		if (currentAnimation.getCurrentFrame()>=2 && state == STATE_OPENING ){
 			return true;

@@ -189,7 +189,7 @@ public class Painter extends JPanel {
 
 
 
-    public Point calculateClientCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
+    public Point calculateClientDestinationCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
         return layout.calculateClientDestinationCoordinates(clientNumber, queueNumber, position);
     }
 
@@ -259,7 +259,7 @@ public class Painter extends JPanel {
 
     public void resumeSprites(){
         for (int i=0; i<objects.size(); i++){
-            objects.get(i).resume();
+            objects.get(i).scheduleMoving();
             if (objects.get(i) instanceof Client){
                 Client c=(Client)objects.get(i);
 //				System.out.println("@@"+c.id);

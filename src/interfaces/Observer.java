@@ -2,6 +2,6 @@ package interfaces;
 
 public interface Observer {
 
-	public void updateMyNumber();	
+	public void moveUpInQueue();
 	
 }
