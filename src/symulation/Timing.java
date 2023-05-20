@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import constants.SimulationEventType;
+import core.MainLoop;
 import otherFunctions.ClientAction;
 import visualComponents.Client;
 
@@ -19,7 +20,7 @@ public class Timing {
 	private static final int TIMER_TIME_DELAY=10;
 	private Manager manager;
 	private Painter painter;
-	private Thread t;
+	private Thread clientMovementThread;
 
 	public Timing( Manager manager,Painter painter) {
 //		simulation=s;
@@ -27,6 +28,7 @@ public class Timing {
 		this.manager=manager;
 		threadsNumber=0;
 		listOfEvents= new ArrayList<>();
+		timer = new Timer();
 				
 	}
 
@@ -37,22 +39,39 @@ public class Timing {
 	    startThreadForClientPositionUpdates();
 	
 	}
+
+	public void resumeSimulation (){
+		try {
+			MainLoop.getInstance().resume();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		isRunning = true;
+		painter.repaint();
+		scheduleTimeUpdatingForUI();
+		startThreadForClientPositionUpdates();
+	}
 	
 	public void stopSimulation(){
 		
 		timer.cancel();
 	    timer.purge();
-	    timer=null;
 	    isRunning=false;
 	    synchronized(listOfEvents){
 	    	listOfEvents.notify();
 	    }
 	    
 	}
+
+	public void stopTimeCounting(){
+		timer.cancel();
+		isRunning = false;
+	}
 	
-	private void scheduleTimeUpdatingForUI() {
+	public void scheduleTimeUpdatingForUI() {
 		
-		timer=new Timer();        
+
+
 	    TimerTask task=new TimerTask(){
 	        @Override
 	        public void run(){
@@ -75,6 +94,7 @@ public class Timing {
 	          
 	        }
 	    };
+		timer = new Timer();
 	    timer.scheduleAtFixedRate(task, 0, TIMER_TIME_DELAY);
 	}
 
@@ -156,8 +176,8 @@ public class Timing {
 			System.out.println("!"+listOfEvents.get(i).getClient().id);
 		}
 		
-		t=new Thread(r);
-		t.start();
+		clientMovementThread =new Thread(r);
+		clientMovementThread.start();
 		
     }
 	    

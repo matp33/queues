@@ -4,21 +4,28 @@ import tests.RegularTests;
 
 public class Start {
 
-	public static void main(String[] args) throws InterruptedException { 
+	public static void main(String[] args) throws Exception {
 	      		
     	
     	
         if (args.length == 0) {
             
-            try{
 //            	RegularTests.test1ClientPerQueue(8);
             	RegularTests.testMultipleClientsWithMultipleQueues(3,8);
 //            	new Painter(1,10.0,new WindowFrame());
 
-            }
-            catch (Exception ex){
-                ex.printStackTrace();
-            }             
+//                Painter painter = Painter.getInstance();
+//                Manager manager = new Manager(painter);
+//                painter.setManager(manager);
+//                StoreCheckout storeCheckout = new StoreCheckout(painter, 3);
+//
+//                Client client = new Client(storeCheckout, 0, painter, 5, manager);
+//                client.setPosition(new Point(5, 300));
+//                client.moveToQueue();
+//                manager.initializeStaticObjects();
+
+
+
 
           
 }

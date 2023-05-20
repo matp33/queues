@@ -56,10 +56,16 @@ public class Painter extends JPanel {
 
     private Manager manager;
 
-    public Painter(final int numberOfQueues,
-                   Manager manager) throws IOException {
+    private static int NUMBER_OF_QUEUES = 1;
 
-        this.manager=manager;
+    private static Painter instance = null;
+
+    public static Painter getInstance() throws IOException {
+        return instance;
+    }
+
+    private Painter() throws IOException {
+
         objects= new ArrayList <AnimatedObject>();
         window = new JFrame();
         decFormat = new DecimalFormat("0.00");
@@ -70,19 +76,50 @@ public class Painter extends JPanel {
         double maxFontWidth=getFontMetrics(getFont()).stringWidth(MAX_VISIBLE_TIME_VALUE);
         double maxFontHeight=getFontMetrics(getFont()).getHeight();
         maxTextDimensions=new Dimension((int)maxFontWidth,(int)maxFontHeight);
+        bottomPanel=new JPanel();
+        layout=new CustomLayout(NUMBER_OF_QUEUES, bottomPanel);
 
+    }
 
+    private void initiateWindow() throws IOException {
         initiateButtons();
-        initiate(numberOfQueues);
+        initiate();
 
         window.pack();
         window.setLocationRelativeTo(null);
         window.setResizable(false);
         window.setVisible(true);
-
     }
 
-    private void initiateButtons(){
+    public static Painter initialize (int numberOfQueues) throws IOException {
+        NUMBER_OF_QUEUES = numberOfQueues;
+        if (instance != null){
+            if (instance.manager.isRunning()){
+                try {
+
+                    throw new IllegalStateException("Stop the simulation first before changing queue numbers");
+                }
+                catch (IllegalStateException ex){
+                    ex.printStackTrace();
+                    System.exit(1);
+                }
+            }
+        }
+        instance = new Painter();
+        return instance;
+    }
+
+
+    public static int getNumberOfQueues() {
+        return NUMBER_OF_QUEUES;
+    }
+
+    public void setManager (Manager manager) throws IOException {
+        this.manager = manager;
+        initiateWindow();
+    }
+
+    private void initiateButtons() throws IOException {
 
         btnPause=new JButton(BUTTON_PAUSE);
         btnOpenFile=new JButton(BUTTON_OPEN);
@@ -97,7 +134,7 @@ public class Painter extends JPanel {
         buttons[2]=btnRestart;
         buttons[3]=btnPause;
 
-        bottomPanel=new JPanel();
+
         bottomPanel.setLayout(new FlowLayout());
 
         for (int i=0; i<buttons.length;i++){
@@ -130,7 +167,7 @@ public class Painter extends JPanel {
     }
 
 
-    public void initiate(int numberOfQueues) throws IOException {
+    public void initiate() throws IOException {
 
         Border blackline, raisedetched, loweredetched,
                 raisedbevel, loweredbevel, empty;
@@ -146,11 +183,8 @@ public class Painter extends JPanel {
 
         //https://docs.oracle.com/javase/tutorial/uiswing/components/border.html TODO mess with it
         bottomPanel.setBorder(blackline);
-//         bottomPanel.setBackground(Color.BLUE);
 
-        layout=new CustomLayout(numberOfQueues, bottomPanel);
-
-        layout.calculateWindowSize(numberOfQueues);
+        layout.calculateWindowSize(NUMBER_OF_QUEUES);
         maxClientsVisibleInQueue=layout.getMaximumVisibleClients();
         Rectangle r=layout.getMovementArea();
 
@@ -174,11 +208,10 @@ public class Painter extends JPanel {
         Graphics2D g2=(Graphics2D) g;
 
         for (int i=0; i<objects.size(); i++){
-            objects.get(i).paintComponent(g2);
-//        	if (objects.get(i) instanceof Client){
-//        		Client c= (Client)objects.get(i);     
-//        		System.out.println("client nr "+c.id);
-//        	}
+            AnimatedObject animatedObject = objects.get(i);
+            if (animatedObject.getPosition() != null){
+                animatedObject.paintComponent(g2);
+            }
         }
 
     }

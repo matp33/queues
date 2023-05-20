@@ -36,7 +36,7 @@ private boolean isSavedInLog;
 
 private Manager manager;
 private ClientMovement movement;
-private List <Point> trajectory;
+private List <Point> trajectory = new ArrayList<>();
 private List <Observer> observers;
 private StoreCheckout storeCheckout;
 
@@ -89,9 +89,8 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         
         this.painter=painter;
         this.clientNumber=clientNumber;
-        movement=new ClientMovement(this,manager.getAllObjects());
+        movement=new ClientMovement(this, new ArrayList<>());
 //        positionType=Client.POSITION_WAITING_ROOM;
-        trajectory=new ArrayList <>();
         currentAnimation=moveUp;
         currentAnimation.start();    
         this.storeCheckout = storeCheckout;
@@ -146,7 +145,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     	
     }
 
-    
 
 	protected void decreaseNumberOfClientsInQueue() {
 		if ((
@@ -161,25 +159,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 
     public void scheduleMoving(){
 
-    	
-    	if (isMoving()){
-    		return;
-    	}
-    	isMoving=true;
 
-        movingTask = new TimerTask(){
-            @Override
-            public void run(){
-                move();
-            }
-        };
-
-        
-        timer.scheduleAtFixedRate(movingTask, 0, (int)(1000*movementDelay));
-        if (isWaiting){
-//        	System.out.println("client "+clientNumber+" delay >0 "+delayWaited);
-        	moveUpInQueue();
-        }
     }
     
     @Override
@@ -211,7 +191,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
 
     public void moveToWaitingRoom(){  
-    	scheduleGoingToQueue(waitRoomDelay); //TODO why going to queue when he should go to waiting room
     	setPositionType(ClientPositionType.WAITING_ROOM);
         calculateTrajectory();
         timeSupposed=manager.getTime()+trajectory.size()*movementDelay+ waitRoomDelay;
@@ -224,6 +203,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         timeSupposed+=trajectory.size()*movementDelay;        
     }
 
+
     public void moveToExit(){
     	
 //    	if (id==12){
@@ -234,7 +214,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 //    	System.out.println("Exit "+id);
     	setPositionType(ClientPositionType.EXITING);
     	calculateTrajectory();
-    	setObjectObserved(manager.door);
+    	setObjectObserved(manager.getDoor());
                 
         notifyClients();    
         
@@ -254,10 +234,9 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
        Point destination=painter.calculateClientDestinationCoordinates(getClientNumber(), getQueueNumber(), positionType);
        
        trajectory=movement.moveClient(destination);  
-//       System.out.println("outside desti"+trajectory);
-       scheduleMoving();
     }
-    
+
+
     private void move(){
 
         if (manager.isRunning()==false){
@@ -290,7 +269,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
             }
             
             if (getPositionType()==ClientPositionType.EXITING  ){
-            	if (manager.door.isFirst(this))
+            	if (manager.getDoor().isFirst(this))
                 manager.openDoor();
             }
             // Opening client 3, but moving outside: 1, 1 should open not 3
@@ -379,7 +358,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 	}
 
 	public int getQueueNumber() {
-		return storeCheckout.getQueueNumber();
+		return storeCheckout.getCheckoutIndex();
 	}
 
 
@@ -463,8 +442,21 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 	}
 
 	@Override
+	public void update() {
+
+		if (!trajectory.isEmpty()){
+			Point point=trajectory.get(0);
+			trajectory.remove(0);
+			chooseDirection(point);
+			currentAnimation.start();
+			currentAnimation.updateFrame();
+			position=new Point(point.x, point.y);
+		}
+	}
+
+	@Override
 	protected void initializePosition() {
-		position=painter.calculateClientDestinationCoordinates(clientNumber, 0, ClientPositionType.ARRIVAL);
+//		position=painter.calculateClientDestinationCoordinates(clientNumber, 0, ClientPositionType.ARRIVAL);
 	}
 
 	
@@ -478,7 +470,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
      
     	int x = position.x;
     	int y = position.y;
-        painter.paintClient(this);
         Graphics2D g2d = (Graphics2D) g;
 //        if (red){
 //        	g2d.setColor(Color.red);

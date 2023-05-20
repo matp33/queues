@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.swing.JComponent;
 
+import core.MainLoop;
 import sprites.SpriteManager;
 import sprites.SpriteType;
 import symulation.Painter;
@@ -49,6 +50,7 @@ public abstract class AnimatedObject extends JComponent {
 			}
 			max=animations.length;
 			currentAnimation=animations[0];
+			MainLoop.getInstance().addObject(this);
 		}
 		catch (IOException exception){
 			exception.printStackTrace(); // TODO save in log file
@@ -60,7 +62,7 @@ public abstract class AnimatedObject extends JComponent {
 	}
 		
 	
-	
+	public void update() {};
 	protected abstract void initializePosition();
 	
 	public abstract void interrupt();

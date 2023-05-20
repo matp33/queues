@@ -14,7 +14,7 @@ public class StoreCheckout extends AnimatedAndObservable{
 
 	private static final long serialVersionUID = 1L;
 	private int clientsAboveLimit;
-    private int queueNumber;
+    private int checkoutIndex;
     private int x,y;
     private final int maxClients;
      
@@ -22,22 +22,22 @@ public class StoreCheckout extends AnimatedAndObservable{
 	private List<Client> clientsExiting;
 	private List <Client> clientsInQueue;
         
-        public StoreCheckout(Painter painter, int queueNumber){
+        public StoreCheckout(Painter painter, int checkoutIndex){
             
         	super(SpriteType.STORE_CHECKOUT, painter);
         	maxClients=painter.maxClientsVisibleInQueue;
             clientsAboveLimit=0;
             setClientsList(new ArrayList <Client>());
-            this.queueNumber=queueNumber;
+            this.checkoutIndex =checkoutIndex;
 
-            Point position=painter.calculateQueueIndicatorPosition(queueNumber);
+            Point position=painter.calculateQueueIndicatorPosition(checkoutIndex);
 //            Dimension clientDimensions=Client.clientDimensions;
             x=position.x;
             y=position.y;
            
             clientsArriving=new ArrayList<Client>();
             clientsExiting=new ArrayList<Client>();
-            this.position =painter.getCheckoutPosition(queueNumber);
+            this.position =painter.getCheckoutPosition(checkoutIndex);
             startDrawingMe();
 
         }
@@ -112,7 +112,7 @@ public class StoreCheckout extends AnimatedAndObservable{
         
         private int findClientMovingToHere(){
         	for (int i=getClientsArriving().size()-1; i>=0;i--){
-        		if (getClientsArriving().get(i).getQueueNumber()==getQueueNumber()){
+        		if (getClientsArriving().get(i).getQueueNumber()== getCheckoutIndex()){
         			return i;
         		}
         	}
@@ -182,8 +182,8 @@ public class StoreCheckout extends AnimatedAndObservable{
 			this.clientsInQueue = clientsList;
 		}
 
-		public int getQueueNumber() {
-			return queueNumber;
+		public int getCheckoutIndex() {
+			return checkoutIndex;
 		}
 
 		@Override
@@ -204,7 +204,8 @@ public class StoreCheckout extends AnimatedAndObservable{
 			
 		}
 
-		@Override
+
+	@Override
 		protected void initializePosition() {
 			// TODO Auto-generated method stub
 			

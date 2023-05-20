@@ -2,8 +2,10 @@
 package tests;
 
 import symulation.Manager;
+import symulation.Painter;
 import visualComponents.Client;
 
+import java.io.IOException;
 import java.util.Random;
 
 
@@ -12,20 +14,14 @@ public class RegularTests {
 //    static int nrKolejki=;
     static int arrivalDelay=700;
 
-    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients){
+    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws IOException {
 
-//                Painter painter= new Painter(numberOfStoreCheckouts,10.0,new WindowFrame());
-                Manager manager = new Manager(numberOfStoreCheckouts);
+        Painter painter = Painter.initialize(numberOfStoreCheckouts);
+        Manager manager = new Manager( painter);
                 
                 try{
                     manager.beginSimulation();
-//                    painter.simulation.timerClass.isRunning=true;
                     for (int i=0; i<numberOfClients;i++){
-//                        painter.simulation.insertClient(numberOfStoreCheckouts-1);
-//                        
-                    }
-                    for (int i=0; i<numberOfClients;i++){
-//                        painter.simulation.timerClass.clientLeaves(painter.simulation, numberOfStoreCheckouts-1);
                         Thread.sleep(1500);
                     }
                          
@@ -37,14 +33,16 @@ public class RegularTests {
     
     }
 
-    public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients){
-             Manager manager= new Manager(numberOfQueues);
+    public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients) throws Exception {
+        Painter painter = Painter.initialize(numberOfQueues);
+        Manager manager= new Manager(painter);
+         painter.setManager(manager);
+         manager.initializeStaticObjects();
 
-                try{
                     Thread.sleep(500);
                     double [][] arrivals= new double [numberOfClients][2];
                     double [][] departures = new double [numberOfClients][2];
-                    
+
                     for (int i=0; i<numberOfClients;i++){
                         int queueNumber = new Random().nextInt(numberOfQueues);
                         arrivals[i][0]=i*(double)arrivalDelay/1000;
@@ -55,20 +53,16 @@ public class RegularTests {
 //                        System.out.println("---- "+departures[i][0]);
                     }
                     manager.setTimeTable(arrivals, departures);
-                    manager.clean();
                     manager.doSimulation();
 
 
-                }
-                catch (Exception ex){
-                    ex.printStackTrace();
-                }
 
     }
         
-    public static void test1ClientPerQueue(int numberOfQueues){
+    public static void test1ClientPerQueue(int numberOfQueues) throws IOException {
     	double time = 1.5;
-    	Manager manager = new Manager (numberOfQueues);
+        Painter painter = Painter.initialize(numberOfQueues);
+        Manager manager = new Manager (painter);
     	double [][] arrivals = new double [numberOfQueues][2];
     	double [][] departs = new double [numberOfQueues][2];
     	
@@ -98,8 +92,9 @@ public class RegularTests {
     	
     }
 
-    public static void testQueueUpdating (int queueNumber, int delay){
-        Manager manager= new Manager(10);
+    public static void testQueueUpdating (int queueNumber, int delay) throws IOException {
+        Painter painter = Painter.initialize(queueNumber);
+        Manager manager= new Manager(painter);
         int insertedClients=2;
         
         for (int i=0; i<insertedClients;i++){

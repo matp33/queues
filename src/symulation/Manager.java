@@ -1,5 +1,6 @@
 package symulation;
 
+import core.MainLoop;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
@@ -27,6 +28,8 @@ public class Manager {
 	private Painter painter;
 	private TimeTable timeTable;
 	private Timing timerClass;
+
+	private Door door;
 	
 	private PrintWriter printWriter;
 	private File logsFile =new File("./src/logs/log.txt");
@@ -35,33 +38,21 @@ public class Manager {
 	public OutsideWorld outside;
 	public StoreCheckout[] storeCheckouts;
 	public Indicator waitingRoomIndicator;
-	public Door door;
-	
+
 	private int numberOfQueues;
 	
 
 	private List<ClientAction> listOfEvents;
 	
-	public Manager(int checkoutsAmount){
-		
-		 
-		try {
+	public Manager(Painter painter){
 
-	         painter = new Painter(checkoutsAmount, this);
-	         timerClass=new Timing(this,painter);
-	         
-	         storeCheckouts =new StoreCheckout[checkoutsAmount];
-				 for (int i=0;i<checkoutsAmount;i++){
-		            storeCheckouts[i]=new StoreCheckout(painter,i);
-		         }
-	         
-         } 
-		
-		catch (IOException e1) {
- 			e1.printStackTrace();
- 		}
-		
-		 outside = new OutsideWorld();
+
+		this.painter = painter;
+		timerClass=new Timing(this,painter);
+
+
+
+		outside = new OutsideWorld();
 		 waitingRoomIndicator=new Indicator(painter);
 		 Point point=painter.getDoorPosition();
 		 int i=0;
@@ -69,13 +60,10 @@ public class Manager {
 			 i++;
 		 }
 		 System.out.println("IIIIIIIIIII"+i);
-		 door=new Door(painter,i);
-		 door.initializePosition();
-         
-         
-		 this.numberOfQueues=checkoutsAmount;
+
+		this.numberOfQueues=Painter.getNumberOfQueues();
 		 timeTable=new TimeTable();	  
-		 simulation=new Simulation(checkoutsAmount,painter,this); //simulation starts here
+		 simulation=new Simulation(painter,this);
 		 
 	     try{
 			 if (!logsFile.getParentFile().exists()){
@@ -93,7 +81,21 @@ public class Manager {
 	     
 	    
 	}
-	
+
+	public void initializeStaticObjects (){
+		door = new Door(painter, 0);
+		door.initializePosition();
+		int numberOfQueues = Painter.getNumberOfQueues();
+		storeCheckouts =new StoreCheckout[numberOfQueues];
+		for (int i=0;i<numberOfQueues;i++){
+			storeCheckouts[i]=new StoreCheckout(painter,i);
+		}
+	}
+
+	public Door getDoor() {
+		return door;
+	}
+
 	public void setTimeTable(double [][] arrivals, double [][] departures){
         timeTable.arrivals=arrivals;
         timeTable.departures=departures;
@@ -102,30 +104,15 @@ public class Manager {
 	public void restart(double time) throws Exception {
 		
 		clean();
+		initializeStaticObjects();
 		doSimulation(time);
 	}
 	
 	public void clean(){
-		//TODO its copypasted
 		painter.clean();
-		storeCheckouts =new StoreCheckout[numberOfQueues];
-		 for (int i=0;i<numberOfQueues;i++){
-           storeCheckouts[i]=new StoreCheckout( painter,i);
-           
-           
-        }
-		 Point point=painter.getDoorPosition();
-		 int i=0;
-		 while (painter.getCheckoutPosition(i).x<point.x){
-			 i++;
-		 }
-		 door=new Door(painter,i);
-		 door.initializePosition();
-		 System.out.println("!!!!!!!!!!!!!!!!!!!!!! "+i);
 	}
 
     public void doSimulation () throws Exception {
-		clean();
         doSimulation(0.0);
     }
 
@@ -151,12 +138,10 @@ public class Manager {
 	        timerClass.setTime(0);
 	    }
 	    
-	    if (timerClass.timer==null){
-	    	timerClass.startSimulation();
-	    }
+		timerClass.resumeSimulation();
 	    painter.resumeSprites();
 		painter.setButtonStopToPaused();
-	    	
+
 	}
 
 	public void pause(){
@@ -165,11 +150,16 @@ public class Manager {
 			return;
 		}
 	    
-		timerClass.stopSimulation();
+		timerClass.stopTimeCounting();
 	    painter.setButtonStopToResume();
 	    painter.stopSprites();
-	    
-	    
+		try {
+			MainLoop.getInstance().pause();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+
 	}
 	
 	public void openDoor(){
@@ -178,10 +168,6 @@ public class Manager {
 	
 	
 
-	public int getNumberOfClientsAtDoor(){
-		return door.getObserversSize();
-	}
-	
 	public boolean isTimeTableNotEmpty(){
         return timeTable.arrivals!=null;
     }
@@ -212,8 +198,8 @@ public class Manager {
     
     public void doChange(int numberOfQueues) throws IOException {
     	this.numberOfQueues=numberOfQueues;
-    	simulation.setNumberOfQueues(numberOfQueues);
-    	painter.initiate(numberOfQueues);
+		painter = Painter.initialize(numberOfQueues);
+    	painter.initiate();
        
     }
     
@@ -257,7 +243,8 @@ public class Manager {
         }
 
     }
-    
+
+
     public boolean isAnyClientThere(){
         for (int i = 0; i< storeCheckouts.length; i++){
             if (!storeCheckouts[i].getClientsList().isEmpty()){

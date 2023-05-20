@@ -10,6 +10,8 @@ public class ListenerStopStart implements ActionListener {
 
 private Manager manager;
 
+    private boolean isSimulationPaused = false;
+
     public ListenerStopStart (Manager manager){
         this.manager=manager;                
     }
@@ -17,16 +19,17 @@ private Manager manager;
     @Override
     public void actionPerformed (ActionEvent e){
 
-         if (manager.isRunning()  ){             
-             manager.pause();
-             return;
-         }
+        if (!isSimulationPaused){
+            manager.pause();
+            isSimulationPaused = true;
 
-         if (!manager.isRunning()  ){           
-             manager.resume(false);
-             return;
-         }
-        
+        }
+        else{
+            manager.resume(false);
+            isSimulationPaused = false;
+        }
+
+
     }
 
 }

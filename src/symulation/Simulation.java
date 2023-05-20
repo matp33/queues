@@ -25,16 +25,13 @@ public class Simulation {
     private final Manager manager;
     private List <Pair<Double,Integer>> queueEvents; // Map time to queue number
 
-    private int numberOfQueues;
-//    public Timing timerClass;
+
     
-    
-	public Simulation (int numberOfQueues, Painter painter, Manager manager){
+	public Simulation (Painter painter, Manager manager){
 		
 		this.painter=painter;
 		this.manager=manager;
-		this.numberOfQueues=numberOfQueues;
-		
+
                 
     }
 
@@ -46,7 +43,7 @@ public class Simulation {
     	queueEvents=new ArrayList <Pair<Double,Integer>>();
     
     
-    int peopleInQueue []=new int [numberOfQueues];
+    int peopleInQueue []=new int [Painter.getNumberOfQueues()];
 //    System.out.println("queue numbers "+numberOfQueues);
 
 
@@ -313,9 +310,6 @@ public class Simulation {
 	    return new Pair<>(calculatedPosition, positionType);
 	}
 
-	public void setNumberOfQueues(int numberOfQueues){
-		this.numberOfQueues=numberOfQueues;
-	}
 
     
 
