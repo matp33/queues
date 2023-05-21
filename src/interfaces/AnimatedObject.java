@@ -53,9 +53,6 @@ public abstract class AnimatedObject extends JComponent {
 			currentAnimation=animations[0];
 			MainLoop.getInstance().addObject(this);
 		}
-		catch (IOException exception){
-			exception.printStackTrace(); // TODO save in log file
-		}
 		catch (Exception exception){
 			exception.printStackTrace();
 		}
@@ -66,7 +63,7 @@ public abstract class AnimatedObject extends JComponent {
 	public void update() {};
 	protected abstract void initializePosition();
 	
-	public abstract void interrupt() throws Exception;
+	public abstract void interrupt();
 	public abstract void scheduleMoving();
 	
 	public BufferedImage getImage(){

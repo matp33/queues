@@ -278,7 +278,7 @@ public class Painter extends JPanel {
     }
 
 
-    public void stopSprites() throws Exception {
+    public void stopSprites() {
 
         for (int i=0; i<objects.size(); i++){
             objects.get(i).interrupt();
@@ -315,7 +315,7 @@ public class Painter extends JPanel {
 
     }
 
-    public void pause() throws Exception {
+    public void pause() {
 
 
         setButtonStopToResume();
@@ -374,7 +374,7 @@ public class Painter extends JPanel {
 
             }
 
-            private void loop() throws Exception {
+            private void loop()  {
                 MainLoop mainLoop = MainLoop.getInstance();
                 while (!listOfEvents.isEmpty() && !mainLoop.isPaused()){
 
@@ -384,7 +384,11 @@ public class Painter extends JPanel {
                     synchronized (listOfEvents){
                         double timePassed = (double) mainLoop.getTimePassedMilliseconds() / 1000;
                         if (timePassed < actionTime){
-                            Thread.sleep((long)actionTime *1000-(long)timePassed * 1000);
+                            try {
+                                Thread.sleep((long)actionTime *1000-(long)timePassed * 1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                     System.out.print("###### ");

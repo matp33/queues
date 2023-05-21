@@ -98,7 +98,7 @@ public class Manager implements EventSubscriber {
         timeTable.departures=departures;
     }
 
-	public void restart(double time) throws Exception {
+	public void restart(double time) {
 		
 		clean();
 		initializeStaticObjects();
@@ -109,12 +109,12 @@ public class Manager implements EventSubscriber {
 		painter.clean();
 	}
 
-    public void doSimulation () throws Exception {
+    public void doSimulation ()  {
         doSimulation(0.0);
     }
 
 
-	public void doSimulation (double time) throws Exception {
+	public void doSimulation (double time)  {
     	Client.nr=0;
 		MainLoop.getInstance().setTimePassed ((long)time * 1000);
     	waitingRoomIndicator.clear();

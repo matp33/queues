@@ -14,7 +14,7 @@ public class RegularTests {
 //    static int nrKolejki=;
     static int arrivalDelay=700;
 
-    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws Exception {
+    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) {
 
         Manager manager = new Manager( );
 
@@ -32,12 +32,11 @@ public class RegularTests {
     
     }
 
-    public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients) throws Exception {
+    public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients)  {
 
                     ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
                     applicationConfiguration.setNumberOfQueues(numberOfQueues);
 
-                    Thread.sleep(500);
                     double [][] arrivals= new double [numberOfClients][2];
                     double [][] departures = new double [numberOfClients][2];
 
@@ -59,7 +58,7 @@ public class RegularTests {
 
     }
         
-    public static void test1ClientPerQueue(int numberOfQueues) throws Exception {
+    public static void test1ClientPerQueue(int numberOfQueues) {
     	double time = 1.5;
         ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
         applicationConfiguration.setNumberOfQueues(numberOfQueues);
@@ -94,7 +93,7 @@ public class RegularTests {
     	
     }
 
-    public static void testQueueUpdating (int queueNumber, int delay) throws Exception {
+    public static void testQueueUpdating (int queueNumber, int delay)  {
         ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
         applicationConfiguration.setNumberOfQueues(queueNumber);
         int insertedClients=2;

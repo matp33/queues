@@ -39,7 +39,7 @@ public class Simulation {
     }
 
     public void prepareSimulation(double initialTime,double [][] arrivals,
-                          double [][] departures) throws Exception {
+                          double [][] departures)  {
 		this.manager=applicationConfiguration.getManager();
 		//TODO remove cyclic dependency manager <--> simulation
 //    timerClass.isRunning=true;

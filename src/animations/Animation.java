@@ -18,14 +18,14 @@ public class Animation {
     private boolean isStopped;
     private List<Frame> framesList= new ArrayList<Frame>();
 
-    public Animation(BufferedImage [] frames, int delay) throws Exception{
+    public Animation(BufferedImage [] frames, int delay) {
 
         this.frameDelay=delay;
         isStopped=true;
 
         for (int i=0; i<frames.length;i++){
             if (delay<0){
-                throw new Exception ("Delay must be positive integer. Current delay is not positive.");
+                throw new IllegalArgumentException ("Delay must be positive integer. Current delay is not positive.");
             }
             this.framesList.add(new Frame (frames[i],delay));
         }

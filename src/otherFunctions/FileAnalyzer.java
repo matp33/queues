@@ -9,14 +9,14 @@ import java.util.Scanner;
 
 public class FileAnalyzer {
 
-    public static TimeTable analyze(File file) throws IOException, NumberFormatException{
+    public static TimeTable analyze(File file) throws IOException{
         
         Scanner s=new Scanner(file);
 
         ArrayList <double[]> timeTable= new ArrayList <double[]> ();
         if (!s.hasNextLine()){
         	s.close();
-            throw new NumberFormatException ("Choosen file is not a text file or is empty..");
+            throw new IllegalArgumentException ("Choosen file is not a text file or is empty..");
         }
         
 

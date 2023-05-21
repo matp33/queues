@@ -69,7 +69,7 @@ private boolean isWaiting;
 private SpriteManager spriteManager;
 
 public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
-			  double destinationTime, Manager manager) throws Exception {
+			  double destinationTime, Manager manager)  {
 
 		super(SpriteType.CLIENT,painter);
 		spriteManager = ApplicationConfiguration.getInstance().getSpriteManager();
@@ -111,7 +111,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
     
     @Override
-    public void moveUpInQueue() throws Exception {
+    public void moveUpInQueue()  {
     	
 //    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
     	
@@ -169,7 +169,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
     
     @Override
-    public void interrupt() throws Exception {
+    public void interrupt()  {
     	    	
     	if (isWaiting){
     		
@@ -196,7 +196,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     	}
     }
 
-    public void moveToWaitingRoom() throws Exception {
+    public void moveToWaitingRoom()  {
     	setPositionType(ClientPositionType.WAITING_ROOM);
         calculateTrajectory();
         timeSupposed=MainLoop.getInstance().getTimePassedMilliseconds()+trajectory.size()*movementDelay+ waitRoomDelay;
@@ -210,7 +210,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
 
 
-    public void moveToExit() throws Exception {
+    public void moveToExit()  {
     	
 //    	if (id==12){
 //    		manager.pause();
@@ -243,7 +243,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
 
 
-    private void move() throws Exception {
+    private void move() {
 
         if (MainLoop.getInstance().isPaused()){
             stopMoving();
@@ -351,7 +351,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		setPositionType(type);		
 	}
 	
-	public void saveMeInLog() throws Exception {
+	public void saveMeInLog()  {
 		if (storeCheckout.isClientOutOfSight(this)) storeCheckout.increaseNumber();
         storeCheckout.getClientsArriving().remove(this);
         isSavedInLog=true;
@@ -400,7 +400,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		observers.remove(o);
 	}
 	
-	public void notifyClients () throws Exception {
+	public void notifyClients ()  {
 		
 		for (int i=0; i<observers.size();i++){
 			observers.get(i).moveUpInQueue();

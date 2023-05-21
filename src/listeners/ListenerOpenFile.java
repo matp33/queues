@@ -73,7 +73,7 @@ private ApplicationConfiguration applicationConfiguration;
         painter.resume(false);
     }
     
-    private void analyze(ActionEvent e) throws Exception {
+    private void analyze(ActionEvent e) {
     	
     	File selectedFile = fileChoosingWindow.getSelectedFile();                 
         TimeTable timeTable= new TimeTable();
