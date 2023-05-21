@@ -24,6 +24,7 @@ import listeners.ListenerStopStart;
 import otherFunctions.ClientAction;
 import otherFunctions.TimeTable;
 import visualComponents.Client;
+import visualComponents.Door;
 
 public class Painter extends JPanel {
 
@@ -87,6 +88,10 @@ public class Painter extends JPanel {
         bottomPanel=new JPanel();
         layout=new CustomLayout(bottomPanel);
 
+    }
+
+    public Door getDoor (){
+        return objects.stream().filter(Door.class::isInstance).map(Door.class::cast).findAny().orElseThrow(()-> new IllegalArgumentException("No door inside objects"));
     }
 
     public boolean isTimeWithinSimulationRange(double time){

@@ -1,5 +1,6 @@
 package symulation;
 
+import otherFunctions.AppLogger;
 import sprites.SpriteManager;
 
 import java.io.IOException;
@@ -12,6 +13,8 @@ public class ApplicationConfiguration {
     private Manager manager;
 
     private Painter painter;
+
+    private AppLogger appLogger;
 
     private static ApplicationConfiguration applicationConfiguration;
 
@@ -32,6 +35,7 @@ public class ApplicationConfiguration {
         applicationConfiguration.spriteManager = new SpriteManager();
         applicationConfiguration.painter = Painter.getInstance();
         applicationConfiguration.manager = new Manager();
+        applicationConfiguration.appLogger = new AppLogger();
     }
 
 
@@ -52,6 +56,10 @@ public class ApplicationConfiguration {
 
     public SpriteManager getSpriteManager() {
         return spriteManager;
+    }
+
+    public AppLogger getAppLogger() {
+        return appLogger;
     }
 
     public Manager getManager() {

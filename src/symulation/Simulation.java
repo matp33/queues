@@ -2,7 +2,6 @@
 package symulation;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -112,7 +111,7 @@ public class Simulation {
 //            System.out.println(arrivalTime+"at "+peopleInQueue[queueNumber]);
             Client client=new Client(
             		manager.getQueue(queueNumber),peopleInQueue[queueNumber],painter,
-            		arrivalTime,manager);                        
+            		arrivalTime);
 	        Point clientPosition;
 			ClientPositionType positionType;
             if (action== SimulationEventType.ARRIVAL){

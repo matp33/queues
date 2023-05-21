@@ -25,12 +25,6 @@ public class Manager implements EventSubscriber {
 	private Painter painter;
 	private TimeTable timeTable;
 
-	private Door door;
-	
-	private PrintWriter printWriter;
-	private File logsFile =new File("./src/logs/log.txt");
-	private static final String lOG_HEADER="Queue no.\ttime predicted\tarrival time";
-
 	public OutsideWorld outside;
 	public StoreCheckout[] storeCheckouts;
 	public Indicator waitingRoomIndicator;
@@ -61,36 +55,17 @@ public class Manager implements EventSubscriber {
 		this.numberOfQueues=applicationConfiguration.getNumberOfQueues();
 		 timeTable=new TimeTable();
 		 simulation=new Simulation();
-		 
-	     try{
-			 if (!logsFile.getParentFile().exists()){
-				 logsFile.getParentFile().mkdirs();
-			 }
-	         printWriter=new PrintWriter(logsFile,"UTF-8");
-	         printWriter.println(lOG_HEADER);
-	     }
-	     catch (FileNotFoundException fg){
-	         fg.printStackTrace();
-	     }
-	     catch (UnsupportedEncodingException fg){
-	         fg.printStackTrace();
-	     }
-	     
-	    
+
 	}
 
 	public void initializeStaticObjects (){
-		door = new Door(painter, 0);
+		Door door = new Door(painter, 0);
 		door.initializePosition();
 		int numberOfQueues = applicationConfiguration.getNumberOfQueues();
 		storeCheckouts =new StoreCheckout[numberOfQueues];
 		for (int i=0;i<numberOfQueues;i++){
 			storeCheckouts[i]=new StoreCheckout(painter,i);
 		}
-	}
-
-	public Door getDoor() {
-		return door;
 	}
 
 	public void setTimeTable(double [][] arrivals, double [][] departures){
@@ -125,15 +100,6 @@ public class Manager implements EventSubscriber {
         painter.resume(false);
 //        System.out.println("resume");
     }
-    
-
-
-	
-	public void openDoor(){
-		door.doOpening();		
-	}
-	
-	
 
 	public boolean isTimeTableNotEmpty(){
         return timeTable.arrivals!=null;
@@ -146,24 +112,7 @@ public class Manager implements EventSubscriber {
     public boolean isStoreCheckoutNumberSame(int numbOfQueues) {
         return numbOfQueues==numberOfQueues;
     }
-    
-    public void stopWritingLogs(){
-        printWriter.close();
-    }
-    
-    public void saveEvent (int queueNumber, double timePredicted, double arrivalTime){
-        printWriter.println(queueNumber+"\t"+timePredicted+"\t"+arrivalTime+"\t");
-    }   
-    
 
-
-
-    
-
-
-    
-
-    
     public void beginSimulation(){
     	painter.repaint(painter.getMovementArea());
 //	    System.out.println("!!!!!! "+simulation.painter.getMovementArea());
@@ -191,8 +140,8 @@ public class Manager implements EventSubscriber {
                 return true;
             }
 //            System.out.println("@@"+door.getObserversSize());
-            if (door.getObserversSize()!=0){
-            	Client c=(Client)door.getFirstObserver();
+            if (painter.getDoor().getObserversSize()!=0){
+            	Client c=(Client)painter.getDoor().getFirstObserver();
 //            	System.out.println("3"+c.id);
                 return true;
             }

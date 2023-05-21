@@ -83,7 +83,7 @@ public class Door extends AnimatedAndObservable  {
 			doClosing();
 		}
 	}
-		
+
 	private void scheduleTask(){
 		
 		if (currentAnimationTask!=null){

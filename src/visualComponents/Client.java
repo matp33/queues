@@ -8,6 +8,7 @@ import interfaces.Observer;
 
 import java.awt.*;
 
+import otherFunctions.AppLogger;
 import otherFunctions.ClientMovement;
 import sprites.SpriteManager;
 import sprites.SpriteType;
@@ -36,7 +37,6 @@ private int delayStartTime;
 private boolean isMoving;
 private boolean isSavedInLog; 
 
-private Manager manager;
 private ClientMovement movement;
 private List <Point> trajectory = new ArrayList<>();
 private List <Observer> observers;
@@ -49,6 +49,8 @@ private TimerTask movingTask;
 private Animation currentAnimation,moveLeft,moveRight,moveDown,moveUp;
 private Observable objectObservedByMe;
 private Point position;
+
+private AppLogger logger;
 
 public final int queueDelay; // delay before client moves when he sees that another client moved
 private static final int frameTime=20; // so many steps before animation changes to next
@@ -69,13 +71,14 @@ private boolean isWaiting;
 private SpriteManager spriteManager;
 
 public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
-			  double destinationTime, Manager manager)  {
+			  double destinationTime)  {
 
 		super(SpriteType.CLIENT,painter);
-		spriteManager = ApplicationConfiguration.getInstance().getSpriteManager();
+		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
+		spriteManager = applicationConfiguration.getSpriteManager();
+		logger = applicationConfiguration.getAppLogger();
 		nr++;
 		id=nr;
-		this.manager=manager;
 		this.queueDelay=createDelay();
     	this.destinationTime=destinationTime;
 		Sprite spriteClient = spriteManager.getSprite(SpriteType.CLIENT);
@@ -220,7 +223,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 //    	System.out.println("Exit "+id);
     	setPositionType(ClientPositionType.EXITING);
     	calculateTrajectory();
-    	setObjectObserved(manager.getDoor());
+    	setObjectObserved(painter.getDoor());
                 
         notifyClients();    
         
@@ -231,7 +234,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 //    	red=true;
 //    	System.out.println("outside: "+id);
     	setPositionType(ClientPositionType.OUTSIDE_VIEW);
-    	setObjectObserved(manager.outside);
     	calculateTrajectory();
     }
 
@@ -260,24 +262,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         		return;
         	} // TODO if get time == destinationTime jump to queue 
         	
-            if (getPositionType()==ClientPositionType.GOING_TO_QUEUE &&  isSavedInLog==false){
-  
-                storeCheckout.getClientsArriving().remove(this);
-                storeCheckout.getClientsList().add(this);
-//                System.out.println("!!!!"+queue.getClientsList().size());
-                saveMeInLog();
-                
-            }
-            
-            if (getPositionType()==ClientPositionType.OUTSIDE_VIEW ){
-                painter.removeObject(this);
-                objectObservedByMe.removeObserver(this);
-            }
-            
-            if (getPositionType()==ClientPositionType.EXITING  ){
-            	if (manager.getDoor().isFirst(this))
-                manager.openDoor();
-            }
+
             // Opening client 3, but moving outside: 1, 1 should open not 3
             
             stopMoving();
@@ -355,7 +340,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		if (storeCheckout.isClientOutOfSight(this)) storeCheckout.increaseNumber();
         storeCheckout.getClientsArriving().remove(this);
         isSavedInLog=true;
-        manager.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedMilliseconds());
+        logger.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedMilliseconds());
         setPositionType(ClientPositionType.WAITING_IN_QUEUE);
 	}
 	
@@ -458,6 +443,17 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 			currentAnimation.updateFrame();
 			position=new Point(point.x, point.y);
 		}
+		else{
+			if (getPositionType()==ClientPositionType.EXITING  ){
+				if (painter.getDoor().isFirst(this))
+					painter.getDoor().doOpening();
+			}
+			if (getPositionType()==ClientPositionType.OUTSIDE_VIEW ){
+				painter.removeObject(this);
+				objectObservedByMe.removeObserver(this);
+			}
+		}
+
 	}
 
 	@Override
