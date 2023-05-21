@@ -16,14 +16,16 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import core.MainLoop;
+import events.UIEventQueue;
 import otherFunctions.ExpressionAnalyzer;
 import symulation.Manager;
+import symulation.Painter;
 import symulation.Simulation;
 
 
 public class ListenerFromTheStart implements ActionListener{
 
-    private Manager manager;
     private boolean isErrorFound;
     private JLabel labelError;
     private JPanel panel;
@@ -39,10 +41,15 @@ public class ListenerFromTheStart implements ActionListener{
             "<html><font color='red'>Please enter a proper number<br>" +   
             "according to symulation time.</font></html>";
 
-    public ListenerFromTheStart(Manager manager){
-        
+    private Painter painter;
+
+    private UIEventQueue uiEventQueue;
+
+    public ListenerFromTheStart(Painter painter, UIEventQueue uiEventQueue){
+
+        this.uiEventQueue = uiEventQueue;
         isErrorFound=false;
-        this.manager=manager;
+        this.painter=painter;
 //        this.numberOfQueues=numberOfQueues;
 
         btnFromStart=new JRadioButton("From the start");
@@ -65,18 +72,27 @@ public class ListenerFromTheStart implements ActionListener{
             panel.add(labelError);
         }
 
-        boolean wasRunning=manager.isRunning();
+        boolean wasRunning;
+        try {
+            wasRunning = !MainLoop.getInstance().isPaused();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
         if (wasRunning){
-        	manager.pause();
+            try {
+                painter.pause();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
         
-        int optionChoosed=manager.displayWindowWithPanel(panel, Simulation.TITLE_FROM_BEGINNING);       
+        int optionChoosed=painter.displayWindowWithPanel(panel, Simulation.TITLE_FROM_BEGINNING);
 
         if (optionChoosed==JOptionPane.NO_OPTION){
 //            System.out.println("cancel");
             setIsErrorTo(false);
             if (wasRunning){
-            	manager.resume(false);
+            	painter.resume(false);
             }
             
             return;
@@ -106,33 +122,36 @@ public class ListenerFromTheStart implements ActionListener{
                     setIsErrorTo(true);
                     actionPerformed(e);
 	                    if (wasRunning){
-	                    	manager.resume(false);
+	                    	painter.resume(false);
 	                    }
                     return;
                 }
 
-                if (!manager.isTimeWithinSimulationRange(d)){
+                if (!painter.isTimeWithinSimulationRange(d)){
                     setErrorTextTo(RANGE_ERROR);
                     setIsErrorTo(true);
                     actionPerformed(e);
 	                    if (wasRunning){
-	                    	manager.resume(false);
+                            painter.resume(false);
 	                    }
                     return;
                 }
                 
             }
 
-            if (manager.isTimeTableNotEmpty()){
 
-                manager.pause();
+                try {
+                    painter.pause();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
 
                 try{
                     if (btnFromStart.isSelected()){
-                        manager.restart(0.0);
+                        uiEventQueue.publishRestartEvent(0);
                     }
                     else{
-                        manager.restart(d);
+                        uiEventQueue.publishRestartEvent(d);
                     }
                 }
                 catch (Exception ex){
@@ -147,7 +166,6 @@ public class ListenerFromTheStart implements ActionListener{
             }
 
             
-        }
 
                 
     }

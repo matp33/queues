@@ -1,6 +1,10 @@
 package symulation;
 
 import constants.ClientPositionType;
+import constants.SimulationEventType;
+import core.MainLoop;
+import events.UIEventQueue;
+import events.EventSubscriber;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
@@ -10,11 +14,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
@@ -22,6 +22,8 @@ import listeners.ListenerExtraction;
 import listeners.ListenerFromTheStart;
 import listeners.ListenerOpenFile;
 import listeners.ListenerStopStart;
+import otherFunctions.ClientAction;
+import otherFunctions.TimeTable;
 import visualComponents.Client;
 
 public class Painter extends JPanel {
@@ -35,6 +37,7 @@ public class Painter extends JPanel {
     public static final String BUTTON_EXTRACT="Extract queue";
     private static final String MAX_VISIBLE_TIME_VALUE="+99";
 
+    private TimeTable timeTable = new TimeTable();
     private JFrame window;
 
     private JButton btnRestart;
@@ -54,11 +57,14 @@ public class Painter extends JPanel {
     private List <AnimatedObject> objects;
 
 
-    private Manager manager;
 
     private static int NUMBER_OF_QUEUES = 1;
 
     private static Painter instance = null;
+    private List<ClientAction> listOfEvents;
+    private Thread clientMovementThread;
+
+    private final UIEventQueue uIEventQueue = new UIEventQueue();
 
     public static Painter getInstance() throws IOException {
         return instance;
@@ -78,7 +84,12 @@ public class Painter extends JPanel {
         maxTextDimensions=new Dimension((int)maxFontWidth,(int)maxFontHeight);
         bottomPanel=new JPanel();
         layout=new CustomLayout(NUMBER_OF_QUEUES, bottomPanel);
+        initiateWindow();
 
+    }
+
+    public boolean isTimeWithinSimulationRange(double time){
+        return timeTable.departures.length>0 && time<=timeTable.departures[timeTable.departures.length-1][0];
     }
 
     private void initiateWindow() throws IOException {
@@ -91,10 +102,10 @@ public class Painter extends JPanel {
         window.setVisible(true);
     }
 
-    public static Painter initialize (int numberOfQueues) throws IOException {
+    public static Painter initialize (int numberOfQueues) throws Exception {
         NUMBER_OF_QUEUES = numberOfQueues;
         if (instance != null){
-            if (instance.manager.isRunning()){
+            if (!MainLoop.getInstance().isPaused()){
                 try {
 
                     throw new IllegalStateException("Stop the simulation first before changing queue numbers");
@@ -114,9 +125,13 @@ public class Painter extends JPanel {
         return NUMBER_OF_QUEUES;
     }
 
-    public void setManager (Manager manager) throws IOException {
-        this.manager = manager;
-        initiateWindow();
+    public void addEventsSubscriber(EventSubscriber eventSubscriber){
+        uIEventQueue.addSubscriber(eventSubscriber);
+    }
+
+    public void setTimeTable(double [][] arrivals, double [][] departures){
+        timeTable.arrivals=arrivals;
+        timeTable.departures=departures;
     }
 
     private void initiateButtons() throws IOException {
@@ -153,10 +168,10 @@ public class Painter extends JPanel {
 
         window.add(mainPanel);
 
-        ActionListener listenerStopStart=new ListenerStopStart(manager);
-        ActionListener listenerOpen = new ListenerOpenFile(manager);
-        ActionListener listenerFromStart=new ListenerFromTheStart(manager);
-        ActionListener listenerExtract=new ListenerExtraction (manager);
+        ActionListener listenerStopStart=new ListenerStopStart(this);
+        ActionListener listenerOpen = new ListenerOpenFile(this, uIEventQueue);
+        ActionListener listenerFromStart=new ListenerFromTheStart(this,uIEventQueue);
+        ActionListener listenerExtract=new ListenerExtraction (this, uIEventQueue);
 
         btnExtract.addActionListener(listenerExtract);
         btnPause.addActionListener(listenerStopStart);
@@ -283,11 +298,55 @@ public class Painter extends JPanel {
     }
 
 
-    public void stopSprites(){
+    public void stopSprites() throws Exception {
 
         for (int i=0; i<objects.size(); i++){
             objects.get(i).interrupt();
         }
+    }
+
+    public int displayWindowWithPanel(Component panel, String title){
+
+        return JOptionPane.showOptionDialog(this, panel, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, new Object[]{"Ok","Cancel"}, "Ok");
+
+    }
+
+
+    public void displayMessage (String text){
+        JOptionPane.showMessageDialog(this, text);
+    }
+
+    public void resume(boolean fromZero){
+
+
+        try {
+            MainLoop instance = MainLoop.getInstance();
+            if (fromZero) instance.setTimePassed(0);
+            instance.resume();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        repaint();
+        startThreadForClientPositionUpdates();
+        resumeSprites();
+        setButtonStopToPaused();
+
+    }
+
+    public void pause() throws Exception {
+
+
+        setButtonStopToResume();
+        stopSprites();
+        try {
+            MainLoop.getInstance().pause();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
 
     public void resumeSprites(){
@@ -317,6 +376,119 @@ public class Painter extends JPanel {
             objects.remove(0);
     }
 
+
+    public void setEventsList(List<ClientAction> listOfEvents) {
+        this.listOfEvents = listOfEvents;
+    }
+
+    public void startThreadForClientPositionUpdates() {
+
+        Runnable r = new Runnable (){
+            @Override
+            public void run (){
+                try {
+                    loop();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+
+            private void loop() throws Exception {
+                MainLoop mainLoop = MainLoop.getInstance();
+                while (!listOfEvents.isEmpty() && !mainLoop.isPaused()){
+
+                    ClientAction clientAction=listOfEvents.get(0);
+                    double actionTime=clientAction.getTime();
+
+                    synchronized (listOfEvents){
+                        double timePassed = (double) mainLoop.getTimePassedMilliseconds() / 1000;
+                        if (timePassed < actionTime){
+                            Thread.sleep((long)actionTime *1000-(long)timePassed * 1000);
+                        }
+                    }
+                    System.out.print("###### ");
+                    Thread.getAllStackTraces().keySet().stream().map(Thread::getName).sorted().peek(s-> System.out.print(", ")).forEach(System.out::print);
+                    System.out.println();
+                    if (mainLoop.isPaused()){
+                        System.out.println("returned");
+                        return;
+                    }
+
+                    listOfEvents.remove(0);
+
+                    SimulationEventType action=clientAction.getAction();
+                    Client client=clientAction.getClient();
+
+                    switch (action){
+                        case ARRIVAL:
+//		                     	    System.out.println("arrival");
+                            client.moveToWaitingRoom();
+                            client.startDrawingMe();
+                            break;
+                        case APPEAR_IN_POSITION:
+                            client.moveToQueue();
+                            client.startDrawingMe();
+//		                     	   System.out.println("appear");
+                            break;
+                        case DEPARTURE:
+//		                     	    System.out.println("exit "+client.abc);
+                            client.moveToExit();
+                            break;
+                        case PAUSE:
+                            pause();
+                            boolean b=askQuestion(Simulation.NO_MORE_ARRIVALS,
+                                    Simulation.TITLE_NO_MORE_ARRIVALS);
+                            if (b==false){
+                                finishSimulation(true);
+                            }
+                            else{
+                                resume(false);
+                                return;
+                            }
+                            break;
+                    }
+
+//		                    System.out.println("delete 1; left: "+listOfEvents.size());
+
+                }
+            }
+        };
+
+        System.out.println("calle"+listOfEvents.size());
+        double[] eventsTimes = new double [listOfEvents.size()];
+
+        for (int i=0; i<listOfEvents.size();i++){
+            eventsTimes[i]=listOfEvents.get(i).getTime();
+            if (listOfEvents.get(i).getClient()!=null)
+                System.out.println("!"+listOfEvents.get(i).getClient().id);
+        }
+
+        clientMovementThread =new Thread(r);
+        clientMovementThread.start();
+
+    }
+
+    public void finishSimulation(boolean skipMsg){
+        setButtonStopActiveness(false);
+        if (!skipMsg)
+            displayMessage(Simulation.SIMULATION_FINISHED);
+    }
+
+    public boolean askQuestion (String question, String title){
+
+        int chosenOption=JOptionPane.showOptionDialog(null, question, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, new Object[]{"Yes","No"}, "Yes");
+
+        if (chosenOption==JOptionPane.YES_OPTION){
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
 
 }
 

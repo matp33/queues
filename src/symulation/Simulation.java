@@ -172,7 +172,7 @@ public class Simulation {
     }           
     // Sorting events by ascending times
     sortEvents(listOfEvents);
-    manager.setEventsList(listOfEvents);
+    painter.setEventsList(listOfEvents);
 
 
     for (int i=0; i<listOfEvents.size();i++){

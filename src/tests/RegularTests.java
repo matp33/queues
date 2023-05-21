@@ -5,7 +5,6 @@ import symulation.Manager;
 import symulation.Painter;
 import visualComponents.Client;
 
-import java.io.IOException;
 import java.util.Random;
 
 
@@ -14,7 +13,7 @@ public class RegularTests {
 //    static int nrKolejki=;
     static int arrivalDelay=700;
 
-    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws IOException {
+    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws Exception {
 
         Painter painter = Painter.initialize(numberOfStoreCheckouts);
         Manager manager = new Manager( painter);
@@ -34,9 +33,9 @@ public class RegularTests {
     }
 
     public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients) throws Exception {
+
         Painter painter = Painter.initialize(numberOfQueues);
         Manager manager= new Manager(painter);
-         painter.setManager(manager);
          manager.initializeStaticObjects();
 
                     Thread.sleep(500);
@@ -52,6 +51,7 @@ public class RegularTests {
                         System.out.println("---- "+arrivals[i][0]);
 //                        System.out.println("---- "+departures[i][0]);
                     }
+                    painter.setTimeTable(arrivals, departures);
                     manager.setTimeTable(arrivals, departures);
                     manager.doSimulation();
 
@@ -59,7 +59,7 @@ public class RegularTests {
 
     }
         
-    public static void test1ClientPerQueue(int numberOfQueues) throws IOException {
+    public static void test1ClientPerQueue(int numberOfQueues) throws Exception {
     	double time = 1.5;
         Painter painter = Painter.initialize(numberOfQueues);
         Manager manager = new Manager (painter);
@@ -81,7 +81,8 @@ public class RegularTests {
 //    	}
     	
     	manager.setTimeTable(arrivals, departs);
-    	
+    	painter.setTimeTable(arrivals, departs);
+
     	try{
             manager.doSimulation();
         }
@@ -92,7 +93,7 @@ public class RegularTests {
     	
     }
 
-    public static void testQueueUpdating (int queueNumber, int delay) throws IOException {
+    public static void testQueueUpdating (int queueNumber, int delay) throws Exception {
         Painter painter = Painter.initialize(queueNumber);
         Manager manager= new Manager(painter);
         int insertedClients=2;
@@ -127,6 +128,7 @@ public class RegularTests {
             }
 
         manager.setTimeTable(arrivals, departures);
+        painter.setTimeTable(arrivals, departures);
         try{
             manager.doSimulation();
         }

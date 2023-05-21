@@ -1,6 +1,7 @@
 package visualComponents;
 
 import constants.ClientPositionType;
+import core.MainLoop;
 import interfaces.AnimatedAndObservable;
 import interfaces.Observable;
 import interfaces.Observer;
@@ -109,7 +110,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
     
     @Override
-    public void moveUpInQueue(){
+    public void moveUpInQueue() throws Exception {
     	
 //    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
     	
@@ -126,9 +127,13 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
             	decreaseNumberOfClientsInQueue();
 	            	if (getPositionType().ordinal()>ClientPositionType.WAITING_ROOM.ordinal()){
 	            		calculateTrajectory();    
-	            	}            	
-            	notifyClients();    
-            }
+	            	}
+				try {
+					notifyClients();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
         };
         
         if (storeCheckout.getClientsList().contains(this)){ // if client is in queue
@@ -139,7 +144,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         else{
         	timerDelay.schedule(tt, 0);
         }
-        delayStartTime=(int)(manager.getTime()*1000); //TODO this is too complicated I guess
+        delayStartTime=(int)(MainLoop.getInstance().getTimePassedMilliseconds()); //TODO this is too complicated I guess
         isWaiting=true;
         
     	
@@ -163,11 +168,11 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
     
     @Override
-    public void interrupt(){
+    public void interrupt() throws Exception {
     	    	
     	if (isWaiting){
     		
-    		delayWaited+=(int)(manager.getTime()*1000)-delayStartTime; // no negative values allowed
+    		delayWaited+=(int)(MainLoop.getInstance().getTimePassedMilliseconds())-delayStartTime; // no negative values allowed
 //    		System.out.println("delay wait: "+delayWaited+"abc"+abc);
     		timerDelay.cancel();
 			timer.cancel();
@@ -190,10 +195,10 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     	}
     }
 
-    public void moveToWaitingRoom(){  
+    public void moveToWaitingRoom() throws Exception {
     	setPositionType(ClientPositionType.WAITING_ROOM);
         calculateTrajectory();
-        timeSupposed=manager.getTime()+trajectory.size()*movementDelay+ waitRoomDelay;
+        timeSupposed=MainLoop.getInstance().getTimePassedMilliseconds()+trajectory.size()*movementDelay+ waitRoomDelay;
     }
 
     public void moveToQueue(){     
@@ -204,7 +209,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
 
 
-    public void moveToExit(){
+    public void moveToExit() throws Exception {
     	
 //    	if (id==12){
 //    		manager.pause();
@@ -237,17 +242,17 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
     }
 
 
-    private void move(){
+    private void move() throws Exception {
 
-        if (manager.isRunning()==false){
+        if (MainLoop.getInstance().isPaused()){
             stopMoving();
             return;
         }
         
         if (trajectory.isEmpty()){ // stopped
 
-        	if (manager.getTime()<destinationTime){ // client came before his arrival time, so he waits
-        		double d=destinationTime-manager.getTime();
+        	if (MainLoop.getInstance().getTimePassedMilliseconds()<destinationTime){ // client came before his arrival time, so he waits
+        		double d=0;
         		stopMoving();  
         		createDelay(d);        		 
 //        		System.out.println("waiting"+id);
@@ -345,11 +350,11 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		setPositionType(type);		
 	}
 	
-	public void saveMeInLog(){
+	public void saveMeInLog() throws Exception {
 		if (storeCheckout.isClientOutOfSight(this)) storeCheckout.increaseNumber();
         storeCheckout.getClientsArriving().remove(this);
         isSavedInLog=true;
-        manager.saveEvent(getQueueNumber(),timeSupposed,manager.getTime());
+        manager.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedMilliseconds());
         setPositionType(ClientPositionType.WAITING_IN_QUEUE);
 	}
 	
@@ -394,7 +399,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 		observers.remove(o);
 	}
 	
-	public void notifyClients (){
+	public void notifyClients () throws Exception {
 		
 		for (int i=0; i<observers.size();i++){
 			observers.get(i).moveUpInQueue();

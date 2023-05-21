@@ -1,12 +1,12 @@
 package symulation;
 
 import core.MainLoop;
+import events.EventSubscriber;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -21,13 +21,12 @@ import visualComponents.Indicator;
 import visualComponents.OutsideWorld;
 import visualComponents.StoreCheckout;
 
-public class Manager {
+public class Manager implements EventSubscriber {
 	
 
 	private Simulation simulation;
 	private Painter painter;
 	private TimeTable timeTable;
-	private Timing timerClass;
 
 	private Door door;
 	
@@ -48,8 +47,7 @@ public class Manager {
 
 
 		this.painter = painter;
-		timerClass=new Timing(this,painter);
-
+		painter.addEventsSubscriber(this);
 
 
 		outside = new OutsideWorld();
@@ -62,7 +60,7 @@ public class Manager {
 		 System.out.println("IIIIIIIIIII"+i);
 
 		this.numberOfQueues=Painter.getNumberOfQueues();
-		 timeTable=new TimeTable();	  
+		 timeTable=new TimeTable();
 		 simulation=new Simulation(painter,this);
 		 
 	     try{
@@ -100,7 +98,7 @@ public class Manager {
         timeTable.arrivals=arrivals;
         timeTable.departures=departures;
     }
-	
+
 	public void restart(double time) throws Exception {
 		
 		clean();
@@ -119,48 +117,18 @@ public class Manager {
 
 	public void doSimulation (double time) throws Exception {
     	Client.nr=0;
+		MainLoop.getInstance().setTimePassed ((long)time * 1000);
     	waitingRoomIndicator.clear();
     	
         painter.setButtonRestartToActive();
-        timerClass.setTime(time);
         simulation.prepareSimulation(time,timeTable.arrivals,timeTable.departures);
-        System.out.println("hI");
-        timerClass.setEventsList(listOfEvents);
-        timerClass.setRunning(true);
-        
-        resume(false);
+
+        painter.resume(false);
 //        System.out.println("resume");
     }
     
-    public void resume(boolean fromZero){
-		
-	    if (fromZero==true){	
-	        timerClass.setTime(0);
-	    }
-	    
-		timerClass.resumeSimulation();
-	    painter.resumeSprites();
-		painter.setButtonStopToPaused();
-
-	}
-
-	public void pause(){
-		
-		if (!timerClass.isRunning()){
-			return;
-		}
-	    
-		timerClass.stopTimeCounting();
-	    painter.setButtonStopToResume();
-	    painter.stopSprites();
-		try {
-			MainLoop.getInstance().pause();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 
 
-	}
 	
 	public void openDoor(){
 		door.doOpening();		
@@ -188,31 +156,14 @@ public class Manager {
         printWriter.println(queueNumber+"\t"+timePredicted+"\t"+arrivalTime+"\t");
     }   
     
-    public boolean isRunning(){
-    	return timerClass.isRunning();
-    }
-    
-    public double getTime(){
-    	return timerClass.getTime();
-    }
-    
-    public void doChange(int numberOfQueues) throws IOException {
-    	this.numberOfQueues=numberOfQueues;
-		painter = Painter.initialize(numberOfQueues);
-    	painter.initiate();
-       
-    }
-    
-    public void displayMessage (String text){
-        JOptionPane.showMessageDialog(painter, text);
-    }
+
+
 
     
-    public void finishSimulation(boolean skipMsg){
-    	painter.setButtonStopActiveness(false);
-    	if (!skipMsg)
-	    displayMessage(Simulation.SIMULATION_FINISHED);
-    }
+
+
+    
+
     
     public void beginSimulation(){
     	painter.repaint(painter.getMovementArea());
@@ -226,21 +177,6 @@ public class Manager {
        return JOptionPane.showOptionDialog(painter, panel, title,
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, new Object[]{"Ok","Cancel"}, "Ok");
-
-    }
-    
-    public boolean askQuestion (String question, String title){
-
-        int chosenOption=JOptionPane.showOptionDialog(null, question, title,
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, new Object[]{"Yes","No"}, "Yes");
-
-        if (chosenOption==JOptionPane.YES_OPTION){
-            return true;
-        }
-        else{
-            return false;
-        }
 
     }
 
@@ -284,5 +220,24 @@ public class Manager {
     public List <AnimatedObject> getAllObjects(){
     	return painter.getAllObjects();
     }
-	
+
+	@Override
+	public void handleNewTimetable(TimeTable event) {
+		setTimeTable(event.arrivals, event.departures);
+		painter.setTimeTable(event. arrivals, event.departures);
+		try {
+			restart(0);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void handleRestart(double time) {
+		try {
+			restart(time);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

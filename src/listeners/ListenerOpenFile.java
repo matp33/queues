@@ -9,23 +9,30 @@ import java.io.IOException;
 
 import javax.swing.JFileChooser;
 
+import core.MainLoop;
+import events.UIEventQueue;
 import otherFunctions.FileAnalyzer;
 import otherFunctions.TimeTable;
 import symulation.Manager;
+import symulation.Painter;
 
 public class ListenerOpenFile implements ActionListener{
     
 private JFileChooser fileChoosingWindow = new JFileChooser();
 private static final String TXT_FILES_DIR = "./src/txtFiles";
-protected Manager manager;
 
-    public ListenerOpenFile ( Manager s){
+protected Painter painter;
+
+private UIEventQueue UIEventQueue;
+
+    public ListenerOpenFile ( Painter painter, UIEventQueue UIEventQueue){
     	JFileChooser fileChooser=new JFileChooser();
     	File txtFilesDirectory = new File(TXT_FILES_DIR);
         fileChooser.setCurrentDirectory(txtFilesDirectory);
         
         fileChoosingWindow=fileChooser;         
-        manager=s;
+        this.painter = painter;
+        this.UIEventQueue = UIEventQueue;
     }
     
   //TODO nice option would be to show somewhere infos about the file we opened: average time in queue, 
@@ -33,28 +40,36 @@ protected Manager manager;
     
     @Override
     public void actionPerformed(ActionEvent e){
-    	
-    	manager.pause();
+
+        try {
+            painter.pause();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
         int optionChooser= fileChoosingWindow.showOpenDialog(null);
 
            if (optionChooser==JFileChooser.APPROVE_OPTION){
                try {
                    analyze(e);
-               } catch (IOException ex) {
+               } catch (Exception ex) {
                    throw new RuntimeException(ex);
                }
            }         
            
            else{
-        	   if (!manager.isRunning()){
-        		   return;
-        	   }
-        	   
+               try {
+                   if (MainLoop.getInstance().isPaused()){
+                       return;
+                   }
+               } catch (Exception ex) {
+                   throw new RuntimeException(ex);
+               }
+
            }
-           manager.resume(false);
+        painter.resume(false);
     }
     
-    private void analyze(ActionEvent e) throws IOException {
+    private void analyze(ActionEvent e) throws Exception {
     	
     	File selectedFile = fileChoosingWindow.getSelectedFile();                 
         TimeTable timeTable= new TimeTable();
@@ -64,11 +79,11 @@ protected Manager manager;
             }
             catch (IOException i){
                 i.printStackTrace();
-                manager.displayMessage("File opening failed");
+                painter.displayMessage("File opening failed");
             }
             catch (NumberFormatException ex){
                ex.printStackTrace();
-               manager.displayMessage("Invalid file format!");
+                painter.displayMessage("Invalid file format!");
                actionPerformed(e);                   
             }
          
@@ -87,14 +102,15 @@ protected Manager manager;
          arrivals=timeTable.arrivals; // TODO reconsider it; we taking 2 times arrivals and departures from timeTable
          departures=timeTable.departures;
          
-             if(manager.isStoreCheckoutNumberSame(maximum)==false){
-             manager.doChange(maximum);
+             if(Painter.getNumberOfQueues() != maximum){
+                 MainLoop.getInstance().pause();
+                 painter = Painter.initialize(maximum);
+                 painter.initiate();
              }
                           
-         manager.setTimeTable(arrivals, departures);
-             
+
          try{                       
-        	 manager.restart(0);
+             UIEventQueue.publishNewTimetableEvent(new TimeTable(arrivals, departures));
          }
          catch (Exception ex){
              ex.printStackTrace();

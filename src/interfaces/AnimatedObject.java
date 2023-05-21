@@ -65,7 +65,7 @@ public abstract class AnimatedObject extends JComponent {
 	public void update() {};
 	protected abstract void initializePosition();
 	
-	public abstract void interrupt();
+	public abstract void interrupt() throws Exception;
 	public abstract void scheduleMoving();
 	
 	public BufferedImage getImage(){

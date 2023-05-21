@@ -11,15 +11,16 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import events.UIEventQueue;
 import otherFunctions.TimeTable;
 import otherFunctions.ArrayOperations;
-import symulation.Manager;
+import symulation.Painter;
 
 public class ListenerExtraction extends ListenerOpenFile{
 	private String title = "Choosing queue number.";
 
-    public ListenerExtraction (Manager m){
-        super(m);
+    public ListenerExtraction (Painter painter, UIEventQueue UIEventQueue){
+        super(painter, UIEventQueue);
     }
     
     @Override 
@@ -51,7 +52,7 @@ public class ListenerExtraction extends ListenerOpenFile{
 	    p.add(new JLabel("Please choose the queues you want to extract."), BorderLayout.NORTH);	
     	p.add(panel,BorderLayout.SOUTH);
     	
-    	manager.displayWindowWithPanel(p, title);
+    	painter.displayWindowWithPanel(p, title);
     	
     	List <Integer> numbers = new ArrayList <Integer> ();
     	for (int i=0; i<number; i++){

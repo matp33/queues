@@ -1,13 +1,9 @@
 package core;
 
 import interfaces.AnimatedObject;
-import symulation.Manager;
 import symulation.Painter;
 import visualComponents.Client;
-import visualComponents.StoreCheckout;
 
-import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -15,6 +11,7 @@ import java.util.TimerTask;
 
 public class MainLoop {
 
+    public static final int DELTA_TIME = 20;
     private Timer timer;
     private Painter painter;
 
@@ -25,6 +22,8 @@ public class MainLoop {
     private static MainLoop instance = null;
 
     private boolean isPaused;
+
+    private long timePassedMilliseconds = 0;
 
     public static MainLoop getInstance() throws Exception {
         if (instance == null){
@@ -37,7 +36,7 @@ public class MainLoop {
     private MainLoop(Painter painter) throws Exception {
         timer = new Timer();
         this.painter = painter;
-        timer.scheduleAtFixedRate(mainLoopTask(),0, 20);
+        timer.scheduleAtFixedRate(mainLoopTask(),0, DELTA_TIME);
     }
 
     public void addObject (AnimatedObject object){
@@ -60,11 +59,23 @@ public class MainLoop {
                 if (!isPaused){
                     objectsToPaint.forEach(AnimatedObject::update);
                     painter.repaint();
+                    timePassedMilliseconds +=  DELTA_TIME;
+                    painter.updateTime((double)timePassedMilliseconds/1000);
                 }
 
             }
         };
     }
 
+    public boolean isPaused() {
+        return isPaused;
+    }
 
+    public long getTimePassedMilliseconds() {
+        return timePassedMilliseconds;
+    }
+
+    public void setTimePassed(long timePassedMilliseconds) {
+        this.timePassedMilliseconds = timePassedMilliseconds;
+    }
 }
