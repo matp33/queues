@@ -173,19 +173,11 @@ public class Manager implements EventSubscriber {
 	public void handleNewTimetable(TimeTable event) {
 		setTimeTable(event.arrivals, event.departures);
 		painter.setTimeTable(event. arrivals, event.departures);
-		try {
-			restart(0);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		restart(0);
 	}
 
 	@Override
 	public void handleRestart(double time) {
-		try {
-			restart(time);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		restart(time);
 	}
 }

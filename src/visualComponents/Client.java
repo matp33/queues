@@ -132,11 +132,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 	            	if (getPositionType().ordinal()>ClientPositionType.WAITING_ROOM.ordinal()){
 	            		calculateTrajectory();    
 	            	}
-				try {
-					notifyClients();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+				notifyClients();
 			}
         };
         

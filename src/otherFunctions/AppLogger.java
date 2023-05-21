@@ -20,10 +20,7 @@ public class AppLogger {
             printWriter=new PrintWriter(logsFile,"UTF-8");
             printWriter.println(lOG_HEADER);
         }
-        catch (FileNotFoundException fg){
-            fg.printStackTrace();
-        }
-        catch (UnsupportedEncodingException fg){
+        catch (FileNotFoundException | UnsupportedEncodingException fg){
             fg.printStackTrace();
         }
     }

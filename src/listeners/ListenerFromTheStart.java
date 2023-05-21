@@ -73,17 +73,9 @@ public class ListenerFromTheStart implements ActionListener{
         }
 
         boolean wasRunning;
-        try {
-            wasRunning = !MainLoop.getInstance().isPaused();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        wasRunning = !MainLoop.getInstance().isPaused();
         if (wasRunning){
-            try {
-                painter.pause();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            painter.pause();
         }
         
         int optionChoosed=painter.displayWindowWithPanel(panel, Simulation.TITLE_FROM_BEGINNING);
@@ -140,22 +132,13 @@ public class ListenerFromTheStart implements ActionListener{
             }
 
 
-                try {
-                    painter.pause();
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
+                painter.pause();
 
-                try{
-                    if (btnFromStart.isSelected()){
-                        uiEventQueue.publishRestartEvent(0);
-                    }
-                    else{
-                        uiEventQueue.publishRestartEvent(d);
-                    }
+                if (btnFromStart.isSelected()){
+                    uiEventQueue.publishRestartEvent(0);
                 }
-                catch (Exception ex){
-                    ex.printStackTrace();
+                else{
+                    uiEventQueue.publishRestartEvent(d);
                 }
 
             }

@@ -14,20 +14,15 @@ public class RegularTests {
 //    static int nrKolejki=;
     static int arrivalDelay=700;
 
-    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) {
+    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws InterruptedException {
 
         Manager manager = new Manager( );
 
-                try{
-                    manager.beginSimulation();
-                    for (int i=0; i<numberOfClients;i++){
-                        Thread.sleep(1500);
-                    }
+        manager.beginSimulation();
+        for (int i=0; i<numberOfClients;i++){
+            Thread.sleep(1500);
+        }
                          
-                }
-                catch (Exception ex){
-                		ex.printStackTrace();
-                }
 
     
     }
@@ -83,14 +78,8 @@ public class RegularTests {
         manager.setTimeTable(arrivals, departs);
     	applicationConfiguration.getPainter().setTimeTable(arrivals, departs);
 
-    	try{
-            manager.doSimulation();
-        }
+        manager.doSimulation();
 
-        catch (Exception ex){
-            ex.printStackTrace();
-        }
-    	
     }
 
     public static void testQueueUpdating (int queueNumber, int delay)  {
@@ -129,13 +118,7 @@ public class RegularTests {
 
         applicationConfiguration.getManager().setTimeTable(arrivals, departures);
         applicationConfiguration.getPainter().setTimeTable(arrivals, departures);
-        try{
-            applicationConfiguration.getManager().doSimulation();
-        }
-
-        catch (Exception ex){
-            ex.printStackTrace();
-        }
+        applicationConfiguration.getManager().doSimulation();
 
         
 

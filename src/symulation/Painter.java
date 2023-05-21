@@ -308,13 +308,9 @@ public class Painter extends JPanel {
     public void resume(boolean fromZero){
 
 
-        try {
-            MainLoop instance = MainLoop.getInstance();
-            if (fromZero) instance.setTimePassed(0);
-            instance.resume();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MainLoop instance = MainLoop.getInstance();
+        if (fromZero) instance.setTimePassed(0);
+        instance.resume();
         repaint();
         startThreadForClientPositionUpdates();
         resumeSprites();
@@ -327,11 +323,7 @@ public class Painter extends JPanel {
 
         setButtonStopToResume();
         stopSprites();
-        try {
-            MainLoop.getInstance().pause();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MainLoop.getInstance().pause();
 
 
     }
@@ -373,11 +365,7 @@ public class Painter extends JPanel {
         Runnable r = new Runnable (){
             @Override
             public void run (){
-                try {
-                    loop();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                loop();
 
             }
 

@@ -33,30 +33,25 @@ public abstract class AnimatedObject extends JComponent {
 	
 	public AnimatedObject (SpriteType spriteType, Painter painter){
 		
-		try{
-			spriteManager = ApplicationConfiguration.getInstance().getSpriteManager();
-			Sprite sprite = spriteManager.getSprite(spriteType);
-			BufferedImage b=sprite.getSprite(0, 0);
-			size=new Dimension(b.getWidth(), b.getHeight());
-			this.painter=painter;
-			position=new Point();
-			initializePosition();
+		spriteManager = ApplicationConfiguration.getInstance().getSpriteManager();
+		Sprite sprite = spriteManager.getSprite(spriteType);
+		BufferedImage b=sprite.getSprite(0, 0);
+		size=new Dimension(b.getWidth(), b.getHeight());
+		this.painter=painter;
+		position=new Point();
+		initializePosition();
 
-			animations = new Animation [sprite.getNumberOfRows()*sprite.getNumberOfColumns()];
-			
-			for (int i=0; i<sprite.getNumberOfRows(); i++ ){
+		animations = new Animation [sprite.getNumberOfRows()*sprite.getNumberOfColumns()];
+
+		for (int i=0; i<sprite.getNumberOfRows(); i++ ){
 //					System.out.println("i "+i);
-					animations[i]=new Animation(sprite.getSprite(i), frameDelay);
-				
-			}
-			max=animations.length;
-			currentAnimation=animations[0];
-			MainLoop.getInstance().addObject(this);
+				animations[i]=new Animation(sprite.getSprite(i), frameDelay);
+
 		}
-		catch (Exception exception){
-			exception.printStackTrace();
-		}
-		
+		max=animations.length;
+		currentAnimation=animations[0];
+		MainLoop.getInstance().addObject(this);
+
 	}
 		
 	

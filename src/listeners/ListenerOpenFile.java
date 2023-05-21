@@ -45,31 +45,18 @@ private ApplicationConfiguration applicationConfiguration;
     @Override
     public void actionPerformed(ActionEvent e){
 
-        try {
-            painter.pause();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        painter.pause();
         int optionChooser= fileChoosingWindow.showOpenDialog(null);
 
            if (optionChooser==JFileChooser.APPROVE_OPTION){
-               try {
-                   analyze(e);
-               } catch (Exception ex) {
-                   throw new RuntimeException(ex);
-               }
-           }         
-           
-           else{
-               try {
-                   if (MainLoop.getInstance().isPaused()){
-                       return;
-                   }
-               } catch (Exception ex) {
-                   throw new RuntimeException(ex);
-               }
-
+               analyze(e);
            }
+           
+           else if (MainLoop.getInstance().isPaused()){
+               return;
+           }
+
+
         painter.resume(false);
     }
     
@@ -113,12 +100,7 @@ private ApplicationConfiguration applicationConfiguration;
              }
                           
 
-         try{                       
-             UIEventQueue.publishNewTimetableEvent(new TimeTable(arrivals, departures));
-         }
-         catch (Exception ex){
-             ex.printStackTrace();
-         }
+         UIEventQueue.publishNewTimetableEvent(new TimeTable(arrivals, departures));
     }
     
     // method to be overriden if we wanna do something on the time table

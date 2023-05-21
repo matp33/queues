@@ -21,11 +21,7 @@ private Painter painter;
     public void actionPerformed (ActionEvent e){
 
         if (!isSimulationPaused){
-            try {
-                painter.pause();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            painter.pause();
             isSimulationPaused = true;
 
         }
