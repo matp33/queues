@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -25,6 +26,7 @@ import otherFunctions.ClientAction;
 import otherFunctions.TimeTable;
 import visualComponents.Client;
 import visualComponents.Door;
+import visualComponents.StoreCheckout;
 
 public class Painter extends JPanel {
 
@@ -479,5 +481,8 @@ public class Painter extends JPanel {
 
     }
 
+    public StoreCheckout getQueue(int queueNumber) {
+        return objects.stream().filter(StoreCheckout.class::isInstance).map(StoreCheckout.class::cast).filter(checkout-> checkout.getCheckoutIndex()==queueNumber).findAny().orElseThrow(() -> new IllegalArgumentException("Queue with index not found: "+queueNumber));
+    }
 }
 

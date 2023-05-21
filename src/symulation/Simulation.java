@@ -22,7 +22,6 @@ public class Simulation {
     public static final String SIMULATION_FINISHED = "Simulation has been finished.";
     
     private final Painter painter;
-    private Manager manager;
     private List <Pair<Double,Integer>> queueEvents; // Map time to queue number
 
 	private ApplicationConfiguration applicationConfiguration;
@@ -39,10 +38,7 @@ public class Simulation {
 
     public void prepareSimulation(double initialTime,double [][] arrivals,
                           double [][] departures)  {
-		this.manager=applicationConfiguration.getManager();
-		//TODO remove cyclic dependency manager <--> simulation
-//    timerClass.isRunning=true;
-    
+
     	queueEvents=new ArrayList <Pair<Double,Integer>>();
     
     
@@ -110,7 +106,7 @@ public class Simulation {
 //            int clientNumber=arriveIndex-departIndex;	
 //            System.out.println(arrivalTime+"at "+peopleInQueue[queueNumber]);
             Client client=new Client(
-            		manager.getQueue(queueNumber),peopleInQueue[queueNumber],painter,
+            		painter.getQueue(queueNumber),peopleInQueue[queueNumber],painter,
             		arrivalTime);
 	        Point clientPosition;
 			ClientPositionType positionType;
