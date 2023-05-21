@@ -25,7 +25,7 @@ public class MainLoop {
 
     private long timePassedMilliseconds = 0;
 
-    public static MainLoop getInstance() throws Exception {
+    public static MainLoop getInstance() {
         if (instance == null){
             Painter painter = Painter.getInstance();
             instance = new MainLoop(painter);
@@ -33,7 +33,7 @@ public class MainLoop {
         return instance;
     }
 
-    private MainLoop(Painter painter) throws Exception {
+    private MainLoop(Painter painter) {
         timer = new Timer();
         this.painter = painter;
         timer.scheduleAtFixedRate(mainLoopTask(),0, DELTA_TIME);

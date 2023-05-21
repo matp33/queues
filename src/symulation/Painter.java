@@ -9,7 +9,6 @@ import interfaces.AnimatedObject;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +55,8 @@ public class Painter extends JPanel {
     private Rectangle movementArea; // area that will change during simulation
     private List <AnimatedObject> objects;
 
+    private ApplicationConfiguration applicationConfiguration;
 
-
-    private static int NUMBER_OF_QUEUES = 1;
 
     private static Painter instance = null;
     private List<ClientAction> listOfEvents;
@@ -66,12 +64,16 @@ public class Painter extends JPanel {
 
     private final UIEventQueue uIEventQueue = new UIEventQueue();
 
-    public static Painter getInstance() throws IOException {
+    public static Painter getInstance()  {
+        if (instance == null){
+            instance = new Painter();
+        }
         return instance;
     }
 
-    private Painter() throws IOException {
+    private Painter()  {
 
+        applicationConfiguration = ApplicationConfiguration.getInstance();
         objects= new ArrayList <AnimatedObject>();
         window = new JFrame();
         decFormat = new DecimalFormat("0.00");
@@ -83,8 +85,7 @@ public class Painter extends JPanel {
         double maxFontHeight=getFontMetrics(getFont()).getHeight();
         maxTextDimensions=new Dimension((int)maxFontWidth,(int)maxFontHeight);
         bottomPanel=new JPanel();
-        layout=new CustomLayout(NUMBER_OF_QUEUES, bottomPanel);
-        initiateWindow();
+        layout=new CustomLayout(bottomPanel);
 
     }
 
@@ -92,7 +93,8 @@ public class Painter extends JPanel {
         return timeTable.departures.length>0 && time<=timeTable.departures[timeTable.departures.length-1][0];
     }
 
-    private void initiateWindow() throws IOException {
+    public void initiateWindow() {
+        layout.initialize(applicationConfiguration.getNumberOfQueues());
         initiateButtons();
         initiate();
 
@@ -102,28 +104,6 @@ public class Painter extends JPanel {
         window.setVisible(true);
     }
 
-    public static Painter initialize (int numberOfQueues) throws Exception {
-        NUMBER_OF_QUEUES = numberOfQueues;
-        if (instance != null){
-            if (!MainLoop.getInstance().isPaused()){
-                try {
-
-                    throw new IllegalStateException("Stop the simulation first before changing queue numbers");
-                }
-                catch (IllegalStateException ex){
-                    ex.printStackTrace();
-                    System.exit(1);
-                }
-            }
-        }
-        instance = new Painter();
-        return instance;
-    }
-
-
-    public static int getNumberOfQueues() {
-        return NUMBER_OF_QUEUES;
-    }
 
     public void addEventsSubscriber(EventSubscriber eventSubscriber){
         uIEventQueue.addSubscriber(eventSubscriber);
@@ -134,7 +114,7 @@ public class Painter extends JPanel {
         timeTable.departures=departures;
     }
 
-    private void initiateButtons() throws IOException {
+    private void initiateButtons() {
 
         btnPause=new JButton(BUTTON_PAUSE);
         btnOpenFile=new JButton(BUTTON_OPEN);
@@ -182,7 +162,7 @@ public class Painter extends JPanel {
     }
 
 
-    public void initiate() throws IOException {
+    public void initiate() {
 
         Border blackline, raisedetched, loweredetched,
                 raisedbevel, loweredbevel, empty;
@@ -199,7 +179,7 @@ public class Painter extends JPanel {
         //https://docs.oracle.com/javase/tutorial/uiswing/components/border.html TODO mess with it
         bottomPanel.setBorder(blackline);
 
-        layout.calculateWindowSize(NUMBER_OF_QUEUES);
+        layout.calculateWindowSize(applicationConfiguration.getNumberOfQueues());
         maxClientsVisibleInQueue=layout.getMaximumVisibleClients();
         Rectangle r=layout.getMovementArea();
 

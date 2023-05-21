@@ -1,6 +1,7 @@
 
 package tests;
 
+import symulation.ApplicationConfiguration;
 import symulation.Manager;
 import symulation.Painter;
 import visualComponents.Client;
@@ -15,9 +16,8 @@ public class RegularTests {
 
     public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws Exception {
 
-        Painter painter = Painter.initialize(numberOfStoreCheckouts);
-        Manager manager = new Manager( painter);
-                
+        Manager manager = new Manager( );
+
                 try{
                     manager.beginSimulation();
                     for (int i=0; i<numberOfClients;i++){
@@ -34,9 +34,8 @@ public class RegularTests {
 
     public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients) throws Exception {
 
-        Painter painter = Painter.initialize(numberOfQueues);
-        Manager manager= new Manager(painter);
-         manager.initializeStaticObjects();
+                    ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
+                    applicationConfiguration.setNumberOfQueues(numberOfQueues);
 
                     Thread.sleep(500);
                     double [][] arrivals= new double [numberOfClients][2];
@@ -51,7 +50,8 @@ public class RegularTests {
                         System.out.println("---- "+arrivals[i][0]);
 //                        System.out.println("---- "+departures[i][0]);
                     }
-                    painter.setTimeTable(arrivals, departures);
+                    applicationConfiguration.getPainter().setTimeTable(arrivals, departures);
+                    Manager manager = applicationConfiguration.getManager();
                     manager.setTimeTable(arrivals, departures);
                     manager.doSimulation();
 
@@ -61,8 +61,8 @@ public class RegularTests {
         
     public static void test1ClientPerQueue(int numberOfQueues) throws Exception {
     	double time = 1.5;
-        Painter painter = Painter.initialize(numberOfQueues);
-        Manager manager = new Manager (painter);
+        ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
+        applicationConfiguration.setNumberOfQueues(numberOfQueues);
     	double [][] arrivals = new double [numberOfQueues][2];
     	double [][] departs = new double [numberOfQueues][2];
     	
@@ -79,9 +79,10 @@ public class RegularTests {
 //    		departs[i-4][0]=time+1;
 //    		departs[i-4][1]=i;
 //    	}
-    	
-    	manager.setTimeTable(arrivals, departs);
-    	painter.setTimeTable(arrivals, departs);
+
+        Manager manager = applicationConfiguration.getManager();
+        manager.setTimeTable(arrivals, departs);
+    	applicationConfiguration.getPainter().setTimeTable(arrivals, departs);
 
     	try{
             manager.doSimulation();
@@ -94,8 +95,8 @@ public class RegularTests {
     }
 
     public static void testQueueUpdating (int queueNumber, int delay) throws Exception {
-        Painter painter = Painter.initialize(queueNumber);
-        Manager manager= new Manager(painter);
+        ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
+        applicationConfiguration.setNumberOfQueues(queueNumber);
         int insertedClients=2;
         
         for (int i=0; i<insertedClients;i++){
@@ -127,10 +128,10 @@ public class RegularTests {
                 arrivals[i][1]=queueNumber-1;
             }
 
-        manager.setTimeTable(arrivals, departures);
-        painter.setTimeTable(arrivals, departures);
+        applicationConfiguration.getManager().setTimeTable(arrivals, departures);
+        applicationConfiguration.getPainter().setTimeTable(arrivals, departures);
         try{
-            manager.doSimulation();
+            applicationConfiguration.getManager().doSimulation();
         }
 
         catch (Exception ex){

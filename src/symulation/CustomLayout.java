@@ -35,11 +35,16 @@ public class CustomLayout {
 
     private SpriteManager spriteManager;
 
-    public CustomLayout (int checkoutsAmount, JPanel buttonsPanel) throws IOException {
+    public CustomLayout (JPanel buttonsPanel) {
     	
 
-        spriteManager = new SpriteManager();
+
+        spriteManager = ApplicationConfiguration.getInstance().getSpriteManager();
         this.buttonsPanel=buttonsPanel;
+
+    }
+
+    public void initialize(int checkoutsAmount) {
         BufferedImage imgStoreCheckout=spriteManager.getSprite(SpriteType.STORE_CHECKOUT).getSprite(0, 0);
         BufferedImage imgBackground=spriteManager.getSprite(SpriteType.BACKGROUND).getSprite(0, 0);
         BufferedImage imgDoor= spriteManager.getSprite(SpriteType.DOOR).getSprite(0, 0);
@@ -61,9 +66,8 @@ public class CustomLayout {
         calculateWindowSize(checkoutsAmount);
         doorPositionY = verticalMarginBetweenObjects;
         checkoutYPosition = doorPositionY + doorHeight + verticalMarginBetweenObjects;
-    
     }
-    
+
     public void calculateWindowSize(int numberOfCheckouts){
     	 
     	int minimumWindowWidth=(int)(minimumWindowHeight* checkoutProportions);

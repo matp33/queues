@@ -5,10 +5,7 @@ import events.EventSubscriber;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -42,11 +39,13 @@ public class Manager implements EventSubscriber {
 	
 
 	private List<ClientAction> listOfEvents;
+
+	private ApplicationConfiguration applicationConfiguration;
 	
-	public Manager(Painter painter){
+	public Manager()  {
 
-
-		this.painter = painter;
+		applicationConfiguration = ApplicationConfiguration.getInstance();
+		this.painter = applicationConfiguration.getPainter();
 		painter.addEventsSubscriber(this);
 
 
@@ -59,9 +58,9 @@ public class Manager implements EventSubscriber {
 		 }
 		 System.out.println("IIIIIIIIIII"+i);
 
-		this.numberOfQueues=Painter.getNumberOfQueues();
+		this.numberOfQueues=applicationConfiguration.getNumberOfQueues();
 		 timeTable=new TimeTable();
-		 simulation=new Simulation(painter,this);
+		 simulation=new Simulation();
 		 
 	     try{
 			 if (!logsFile.getParentFile().exists()){
@@ -83,7 +82,7 @@ public class Manager implements EventSubscriber {
 	public void initializeStaticObjects (){
 		door = new Door(painter, 0);
 		door.initializePosition();
-		int numberOfQueues = Painter.getNumberOfQueues();
+		int numberOfQueues = applicationConfiguration.getNumberOfQueues();
 		storeCheckouts =new StoreCheckout[numberOfQueues];
 		for (int i=0;i<numberOfQueues;i++){
 			storeCheckouts[i]=new StoreCheckout(painter,i);

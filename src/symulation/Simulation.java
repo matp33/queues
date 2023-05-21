@@ -2,6 +2,7 @@
 package symulation;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,28 +23,31 @@ public class Simulation {
     public static final String SIMULATION_FINISHED = "Simulation has been finished.";
     
     private final Painter painter;
-    private final Manager manager;
+    private Manager manager;
     private List <Pair<Double,Integer>> queueEvents; // Map time to queue number
 
+	private ApplicationConfiguration applicationConfiguration;
 
     
-	public Simulation (Painter painter, Manager manager){
-		
-		this.painter=painter;
-		this.manager=manager;
+	public Simulation ()  {
+
+		this.applicationConfiguration = ApplicationConfiguration.getInstance();
+		this.painter=applicationConfiguration.getPainter();
+
 
                 
     }
 
     public void prepareSimulation(double initialTime,double [][] arrivals,
                           double [][] departures) throws Exception {
-   
+		this.manager=applicationConfiguration.getManager();
+		//TODO remove cyclic dependency manager <--> simulation
 //    timerClass.isRunning=true;
     
     	queueEvents=new ArrayList <Pair<Double,Integer>>();
     
     
-    int peopleInQueue []=new int [Painter.getNumberOfQueues()];
+    int peopleInQueue []=new int [applicationConfiguration.getNumberOfQueues()];
 //    System.out.println("queue numbers "+numberOfQueues);
 
 

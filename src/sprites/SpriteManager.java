@@ -9,7 +9,7 @@ public class SpriteManager {
     private Sprite storeCheckoutSprite;
     private Sprite backgroundSprite;
 
-    public SpriteManager() throws IOException {
+    public void loadSprites () throws IOException {
         doorSprite = new Sprite (43, 69, "/door2.png");
         backgroundSprite=new Sprite(620,395,"/supermarket-kolejka.jpg");
         clientSprite = new Sprite (30, 45, "/sprite.png");

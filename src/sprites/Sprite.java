@@ -41,14 +41,14 @@ public class Sprite {
     	return numberOfColumns;
     }
 
-    public BufferedImage getSprite(int rowNumber, int columnNumber) throws IOException{     
+    public BufferedImage getSprite(int rowNumber, int columnNumber) {
 
         return spriteFile.getSubimage(columnNumber*SPRITE_DIMENSION_HORIZONTAL, rowNumber*SPRITE_DIMENSION_VERTICAL,
                 SPRITE_DIMENSION_HORIZONTAL, SPRITE_DIMENSION_VERTICAL);
 
     }
     
-    public BufferedImage [] getSprite(int rowNumber) throws IOException{     
+    public BufferedImage [] getSprite(int rowNumber) {
 
         BufferedImage [] sprites = new BufferedImage [spriteFile.getWidth()/SPRITE_DIMENSION_HORIZONTAL];
         int currentColumnNumber=0;

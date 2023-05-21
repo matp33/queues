@@ -9,6 +9,7 @@ import javax.swing.JComponent;
 import core.MainLoop;
 import sprites.SpriteManager;
 import sprites.SpriteType;
+import symulation.ApplicationConfiguration;
 import symulation.Painter;
 import animations.Animation;
 import sprites.Sprite;
@@ -33,7 +34,7 @@ public abstract class AnimatedObject extends JComponent {
 	public AnimatedObject (SpriteType spriteType, Painter painter){
 		
 		try{
-			spriteManager = new SpriteManager();
+			spriteManager = ApplicationConfiguration.getInstance().getSpriteManager();
 			Sprite sprite = spriteManager.getSprite(spriteType);
 			BufferedImage b=sprite.getSprite(0, 0);
 			size=new Dimension(b.getWidth(), b.getHeight());

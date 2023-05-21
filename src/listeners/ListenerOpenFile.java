@@ -13,6 +13,7 @@ import core.MainLoop;
 import events.UIEventQueue;
 import otherFunctions.FileAnalyzer;
 import otherFunctions.TimeTable;
+import symulation.ApplicationConfiguration;
 import symulation.Manager;
 import symulation.Painter;
 
@@ -25,7 +26,9 @@ protected Painter painter;
 
 private UIEventQueue UIEventQueue;
 
-    public ListenerOpenFile ( Painter painter, UIEventQueue UIEventQueue){
+private ApplicationConfiguration applicationConfiguration;
+
+    public ListenerOpenFile ( Painter painter, UIEventQueue UIEventQueue)  {
     	JFileChooser fileChooser=new JFileChooser();
     	File txtFilesDirectory = new File(TXT_FILES_DIR);
         fileChooser.setCurrentDirectory(txtFilesDirectory);
@@ -33,6 +36,7 @@ private UIEventQueue UIEventQueue;
         fileChoosingWindow=fileChooser;         
         this.painter = painter;
         this.UIEventQueue = UIEventQueue;
+        applicationConfiguration = ApplicationConfiguration.getInstance();
     }
     
   //TODO nice option would be to show somewhere infos about the file we opened: average time in queue, 
@@ -102,9 +106,9 @@ private UIEventQueue UIEventQueue;
          arrivals=timeTable.arrivals; // TODO reconsider it; we taking 2 times arrivals and departures from timeTable
          departures=timeTable.departures;
          
-             if(Painter.getNumberOfQueues() != maximum){
+             if(applicationConfiguration.getNumberOfQueues() != maximum){
                  MainLoop.getInstance().pause();
-                 painter = Painter.initialize(maximum);
+                 applicationConfiguration.setNumberOfQueues(maximum);
                  painter.initiate();
              }
                           

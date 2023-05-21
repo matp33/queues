@@ -11,6 +11,7 @@ import java.awt.*;
 import otherFunctions.ClientMovement;
 import sprites.SpriteManager;
 import sprites.SpriteType;
+import symulation.ApplicationConfiguration;
 import symulation.Manager;
 import symulation.Painter;
 import animations.Animation;
@@ -71,7 +72,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
 			  double destinationTime, Manager manager) throws Exception {
 
 		super(SpriteType.CLIENT,painter);
-		spriteManager = new SpriteManager();
+		spriteManager = ApplicationConfiguration.getInstance().getSpriteManager();
 		nr++;
 		id=nr;
 		this.manager=manager;
