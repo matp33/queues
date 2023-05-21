@@ -106,7 +106,7 @@ public class Simulation {
 //            int clientNumber=arriveIndex-departIndex;	
 //            System.out.println(arrivalTime+"at "+peopleInQueue[queueNumber]);
             Client client=new Client(
-            		painter.getQueue(queueNumber),peopleInQueue[queueNumber],painter,
+            		painter.getQueue(queueNumber),peopleInQueue[queueNumber],
             		arrivalTime);
 	        Point clientPosition;
 			ClientPositionType positionType;

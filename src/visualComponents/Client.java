@@ -70,10 +70,9 @@ public final int id;
 private boolean isWaiting;
 private SpriteManager spriteManager;
 
-public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
-			  double destinationTime)  {
+public Client(StoreCheckout storeCheckout, int clientNumber,  double destinationTime)  {
 
-		super(SpriteType.CLIENT,painter);
+		super(SpriteType.CLIENT,ApplicationConfiguration.getInstance().getPainter());
 		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
 		spriteManager = applicationConfiguration.getSpriteManager();
 		logger = applicationConfiguration.getAppLogger();
@@ -92,7 +91,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber, Painter painter,
         isMoving=false;
         isSavedInLog=false;
         
-        this.painter=painter;
+        this.painter=applicationConfiguration.getPainter();
         this.clientNumber=clientNumber;
         movement=new ClientMovement(this, new ArrayList<>());
 //        positionType=Client.POSITION_WAITING_ROOM;
