@@ -428,7 +428,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
 	}
 
 	@Override
-	public void update() {
+	public void update(long timePassed) {
 
 		if (!trajectory.isEmpty()){
 			Point point=trajectory.get(0);

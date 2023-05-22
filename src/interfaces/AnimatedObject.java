@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.swing.JComponent;
 
+import core.ChangeableObject;
 import core.MainLoop;
 import sprites.SpriteManager;
 import sprites.SpriteType;
@@ -14,7 +15,7 @@ import symulation.Painter;
 import animations.Animation;
 import sprites.Sprite;
 
-public abstract class AnimatedObject extends JComponent {
+public abstract class AnimatedObject extends JComponent implements ChangeableObject {
 	
 	private static final long serialVersionUID = 1L;
 	private static final int frameDelay=20;

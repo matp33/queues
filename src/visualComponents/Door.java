@@ -257,6 +257,9 @@ public class Door extends AnimatedAndObservable  {
 		return observers.get(0)==o;
 	}
 
-	
 
+	@Override
+	public void update(long currentTimeMilliseconds) {
+
+	}
 }

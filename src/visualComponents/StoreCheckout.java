@@ -222,9 +222,10 @@ public class StoreCheckout extends AnimatedAndObservable{
 			// TODO Auto-generated method stub
 			
 		}
-		
-
-		
 
 
+	@Override
+	public void update(long currentTimeMilliseconds) {
+
+	}
 }

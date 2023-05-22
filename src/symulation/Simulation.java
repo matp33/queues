@@ -8,6 +8,7 @@ import java.util.List;
 
 import constants.ClientPositionType;
 import constants.SimulationEventType;
+import events.ClientEventsHandler;
 import otherFunctions.ClientAction;
 import otherFunctions.Pair;
 import visualComponents.Client;
@@ -171,7 +172,8 @@ public class Simulation {
     }           
     // Sorting events by ascending times
     sortEvents(listOfEvents);
-    painter.setEventsList(listOfEvents);
+	ClientEventsHandler clientEventsHandler = applicationConfiguration.getClientEventsHandler();
+	clientEventsHandler.setEventsList(listOfEvents);
 
 
     for (int i=0; i<listOfEvents.size();i++){

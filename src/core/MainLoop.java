@@ -17,7 +17,7 @@ public class MainLoop {
 
     private Client client;
 
-    private List<AnimatedObject> objectsToPaint = new ArrayList<>();
+    private List<ChangeableObject> changeableObjects = new ArrayList<>();
 
     private static MainLoop instance = null;
 
@@ -39,9 +39,11 @@ public class MainLoop {
         timer.scheduleAtFixedRate(mainLoopTask(),0, DELTA_TIME);
     }
 
-    public void addObject (AnimatedObject object){
-        objectsToPaint.add(object);
-        painter.addObject(object);
+    public void addObject (ChangeableObject object){
+        changeableObjects.add(object);
+        if (object instanceof AnimatedObject){
+            painter.addObject((AnimatedObject) object);
+        }
     }
 
     public void pause (){
@@ -57,9 +59,9 @@ public class MainLoop {
             @Override
             public void run() {
                 if (!isPaused){
-                    objectsToPaint.forEach(AnimatedObject::update);
-                    painter.repaint();
                     timePassedMilliseconds +=  DELTA_TIME;
+                    changeableObjects.forEach(changeableObject -> changeableObject.update(timePassedMilliseconds));
+                    painter.repaint();
                     painter.updateTime((double)timePassedMilliseconds/1000);
                 }
 

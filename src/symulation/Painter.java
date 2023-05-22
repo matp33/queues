@@ -62,8 +62,6 @@ public class Painter extends JPanel {
 
 
     private static Painter instance = null;
-    private List<ClientAction> listOfEvents;
-    private Thread clientMovementThread;
 
     private final UIEventQueue uIEventQueue = new UIEventQueue();
 
@@ -77,7 +75,7 @@ public class Painter extends JPanel {
     private Painter()  {
 
         applicationConfiguration = ApplicationConfiguration.getInstance();
-        objects= new ArrayList <AnimatedObject>();
+        objects= new ArrayList <>();
         window = new JFrame();
         decFormat = new DecimalFormat("0.00");
 
@@ -312,20 +310,29 @@ public class Painter extends JPanel {
         if (fromZero) instance.setTimePassed(0);
         instance.resume();
         repaint();
-        startThreadForClientPositionUpdates();
         resumeSprites();
         setButtonStopToPaused();
 
     }
 
+    public void pauseSimulationAndAskQuestion (){
+        pause();
+        SwingUtilities.invokeLater(()->{
+            boolean b=askQuestion(Simulation.NO_MORE_ARRIVALS,
+                    Simulation.TITLE_NO_MORE_ARRIVALS);
+            if (!b){
+                finishSimulation(true);
+            }
+            else{
+                resume(false);
+            }
+        });
+    }
+
     public void pause() {
-
-
         setButtonStopToResume();
         stopSprites();
         MainLoop.getInstance().pause();
-
-
     }
 
     public void resumeSprites(){
@@ -353,99 +360,6 @@ public class Painter extends JPanel {
     public void clean (){
         while (objects.size()>0)
             objects.remove(0);
-    }
-
-
-    public void setEventsList(List<ClientAction> listOfEvents) {
-        this.listOfEvents = listOfEvents;
-    }
-
-    public void startThreadForClientPositionUpdates() {
-
-        Runnable r = new Runnable (){
-            @Override
-            public void run (){
-                loop();
-
-            }
-
-            private void loop()  {
-                MainLoop mainLoop = MainLoop.getInstance();
-                while (!listOfEvents.isEmpty() && !mainLoop.isPaused()){
-
-                    ClientAction clientAction=listOfEvents.get(0);
-                    double actionTime=clientAction.getTime();
-
-                    synchronized (listOfEvents){
-                        double timePassed = (double) mainLoop.getTimePassedMilliseconds() / 1000;
-                        if (timePassed < actionTime){
-                            try {
-                                Thread.sleep((long)actionTime *1000-(long)timePassed * 1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    System.out.print("###### ");
-                    Thread.getAllStackTraces().keySet().stream().map(Thread::getName).sorted().peek(s-> System.out.print(", ")).forEach(System.out::print);
-                    System.out.println();
-                    if (mainLoop.isPaused()){
-                        System.out.println("returned");
-                        return;
-                    }
-
-                    listOfEvents.remove(0);
-
-                    SimulationEventType action=clientAction.getAction();
-                    Client client=clientAction.getClient();
-
-                    switch (action){
-                        case ARRIVAL:
-//		                     	    System.out.println("arrival");
-                            client.moveToWaitingRoom();
-                            client.startDrawingMe();
-                            break;
-                        case APPEAR_IN_POSITION:
-                            client.moveToQueue();
-                            client.startDrawingMe();
-//		                     	   System.out.println("appear");
-                            break;
-                        case DEPARTURE:
-//		                     	    System.out.println("exit "+client.abc);
-                            client.moveToExit();
-                            break;
-                        case PAUSE:
-                            pause();
-                            boolean b=askQuestion(Simulation.NO_MORE_ARRIVALS,
-                                    Simulation.TITLE_NO_MORE_ARRIVALS);
-                            if (b==false){
-                                finishSimulation(true);
-                            }
-                            else{
-                                resume(false);
-                                return;
-                            }
-                            break;
-                    }
-
-//		                    System.out.println("delete 1; left: "+listOfEvents.size());
-
-                }
-            }
-        };
-
-        System.out.println("calle"+listOfEvents.size());
-        double[] eventsTimes = new double [listOfEvents.size()];
-
-        for (int i=0; i<listOfEvents.size();i++){
-            eventsTimes[i]=listOfEvents.get(i).getTime();
-            if (listOfEvents.get(i).getClient()!=null)
-                System.out.println("!"+listOfEvents.get(i).getClient().id);
-        }
-
-        clientMovementThread =new Thread(r);
-        clientMovementThread.start();
-
     }
 
     public void finishSimulation(boolean skipMsg){
