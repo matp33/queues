@@ -3,18 +3,18 @@
 package listeners;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import constants.TypeOfTimeEvent;
 import events.UIEventQueue;
-import otherFunctions.TimeTable;
-import otherFunctions.ArrayOperations;
 import symulation.Painter;
+import symulation.SimulationEvent;
 
 public class ListenerExtraction extends ListenerOpenFile{
 	private String title = "Choosing queue number.";
@@ -24,12 +24,12 @@ public class ListenerExtraction extends ListenerOpenFile{
     }
     
     @Override 
-    protected TimeTable processTimeTable(TimeTable tt){
+    protected SortedSet<SimulationEvent> processTimeTable(SortedSet<SimulationEvent> timetable){
     	
-    	int number=findMaxNumber(tt);
-    	List<Integer> numbers=makeDialog(number);
-    	tt=extractQueues(tt,numbers);
-    	return tt;
+    	int number= findLastQueueIndex(timetable);
+    	List<Integer> chosenQueues=makeDialog(number);
+    	timetable=extractQueues(timetable,chosenQueues);
+    	return timetable;
     	
     }
     
@@ -64,47 +64,14 @@ public class ListenerExtraction extends ListenerOpenFile{
     	return numbers;
     }
     
-    private TimeTable extractQueues(TimeTable table, List<Integer> checkoutsAmount){
-    	double [][] arrivals = new double [table.arrivals.length][2];
-    	double [][] departs = new double [table.departures.length][2];
-    	int j=0;
-    	for (int i=0; i<table.arrivals.length; i++){
-    		if (checkoutsAmount.contains((int)table.arrivals[i][1])){
-    			arrivals[j][0]=table.arrivals[i][0];
-    			
-    			arrivals[j][1]=table.arrivals[i][1];
-    			System.out.println("#arr time: "+arrivals[j][0] +" queue "+arrivals[j][1]);
-    			
-    			j++;
-    		}
-    	}
-    	
-    	j=0;
-    	for (int i=0; i<table.departures.length; i++){
-    		if (checkoutsAmount.contains((int)table.departures[i][1])){
-    			departs[j][0]=table.departures[i][0];
-    			departs[j][1]=table.departures[i][1];
-    			System.out.println("#dep time"+departs[j][0] +" queue "+departs[j][1]);
-    			j++;
-    		}
-    	}
-    	System.out.println("j2@ "+j);
-    	double [][] newArr = ArrayOperations.removeZeros(arrivals,j);
-    	double [][] newDep = ArrayOperations.removeZeros(departs,j);
-    	
-    	
-    	return new TimeTable(newArr,newDep);
+    private SortedSet<SimulationEvent> extractQueues(SortedSet<SimulationEvent> table, List<Integer> chosenQueues){
+
+
+		return table.stream().filter(event->chosenQueues.contains( event.getQueueNumber())).collect(Collectors.toCollection(()->new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime))));
     }
     
-    private int findMaxNumber(TimeTable timeTable){
-    	double [][] arrivals = timeTable.arrivals; // same result we would get if we would take departs instead
-    	double max=0;
-    	for (int i=0; i<arrivals.length; i++){
-    		if (arrivals[i][1]>max){
-    			max=arrivals[i][1];
-    		}
-    	}
-    	return (int)max+1;
+    private int findLastQueueIndex(SortedSet<SimulationEvent> timeTable){
+    	return timeTable.stream().filter(event -> event.getSimulationEventType().equals(TypeOfTimeEvent.ARRIVAL)).max(Comparator.comparing(SimulationEvent::getQueueNumber)).map(SimulationEvent::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"))+1;
     }
 
 }

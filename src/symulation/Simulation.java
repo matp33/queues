@@ -2,12 +2,12 @@
 package symulation;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 
 import constants.ClientPositionType;
 import constants.SimulationEventType;
+import constants.TypeOfTimeEvent;
 import events.ClientEventsHandler;
 import otherFunctions.ClientAction;
 import otherFunctions.Pair;
@@ -23,7 +23,6 @@ public class Simulation {
     public static final String SIMULATION_FINISHED = "Simulation has been finished.";
     
     private final Painter painter;
-    private List <Pair<Double,Integer>> queueEvents; // Map time to queue number
 
 	private ApplicationConfiguration applicationConfiguration;
 
@@ -33,196 +32,77 @@ public class Simulation {
 		this.applicationConfiguration = ApplicationConfiguration.getInstance();
 		this.painter=applicationConfiguration.getPainter();
 
-
-                
     }
 
-    public void prepareSimulation(double initialTime,double [][] arrivals,
-                          double [][] departures)  {
+    public void prepareSimulation(double initialTime, SortedSet<SimulationEvent> simulationEvents)  {
 
-    	queueEvents=new ArrayList <Pair<Double,Integer>>();
-    
-    
-    int peopleInQueue []=new int [applicationConfiguration.getNumberOfQueues()];
-//    System.out.println("queue numbers "+numberOfQueues);
-
-
-    ClientAction clientAction;
+		ClientAction clientAction;
    
-    int departIndex=0;
 
-    while(departIndex<departures.length){
-    	if (departures[departIndex][0]<initialTime){
-    		departIndex++;
-    	}
-    	else{
-    		break;
-    	}
-    }
-    int arriveIndex=departIndex; // we start at same indexes because for any i: arrivals[i] and 
-    
-    //departures[i] describe same client
+		Map<Integer, List<Client>> queueIndexToClientsInQueueMap = new HashMap<>();
+		List<ClientAction> clientActions = new ArrayList<>();
+		SimulationEvent lastArrival =  simulationEvents.stream().filter(event -> event.getSimulationEventType().equals(TypeOfTimeEvent.ARRIVAL)).max(Comparator.comparing(SimulationEvent::getEventTime)).orElseThrow(()->new IllegalArgumentException("simulation events empty"));
+		for (SimulationEvent event : simulationEvents) {
+			double arrivalTime = event.getEventTime();
+			int queueNumber = event.getQueueNumber();
+			TypeOfTimeEvent eventType = event.getSimulationEventType();
+			SimulationEventType action;
+			double time;
+			if (eventType.equals(TypeOfTimeEvent.ARRIVAL)) {
+				List<Client> clients = queueIndexToClientsInQueueMap.computeIfAbsent(queueNumber, index -> new ArrayList<>());
+				Client client = new Client(
+						painter.getQueue(queueNumber), clients.size(),
+						arrivalTime);
+				clients.add(client);
 
-    List<ClientAction> listOfEvents = new ArrayList<>();
-    while ((arriveIndex<arrivals.length || departIndex<departures.length)){   	
+				if (arrivalTime <= initialTime) {
+					action = SimulationEventType.APPEAR_IN_POSITION;
+					time = initialTime;
+				} else {
+					Pair<Double, SimulationEventType> result = calculateAppearTime(queueNumber, arrivalTime, initialTime,
+							clients.size());
+					time = result.getObject1();
 
-		// departIndex>=departures.length ??? why is this needed
-        if (departIndex>=departures.length ||(arriveIndex<arrivals.length  &&
-                arrivals[arriveIndex][0]<departures[departIndex][0])){
+					action = result.getObject2();
+				}
 
+				Point clientPosition;
+				ClientPositionType positionType;
+				if (action == SimulationEventType.ARRIVAL) {
+					positionType = ClientPositionType.ARRIVAL; // TODO client should appear in positionType = "Arrival"
+					clientPosition = painter.calculateClientDestinationCoordinates(0, 0, positionType);
 
-			double arrivalTime=arrivals[arriveIndex][0];
-
-        	
-        	
-        	if (!queueEvents.isEmpty() && arrivalTime>=(Double)queueEvents.get(0).getObject1()){
-
-        		System.out.println("OOOO"+arriveIndex);
-        		int queueNumber=(int)queueEvents.get(0).getObject2();
-        		peopleInQueue[queueNumber]--;        		   
-        		queueEvents.remove(0);     
-        	}
-        	
-
-            
-            int queueNumber=(int)arrivals[arriveIndex][1]; 
-            SimulationEventType action;
-            double time;
-//            System.out.println("current time "+currentTime +" in queue "+peopleInQueue[queueNumber]);
-            
-            	if (arrivalTime<=initialTime){
-            		action=SimulationEventType.APPEAR_IN_POSITION;
-            		time=initialTime;
-            	}
-            	else{
-            		Pair <Double,SimulationEventType> result=calculateAppearTime(queueNumber, arrivalTime,initialTime,
-							 peopleInQueue[queueNumber]);
-            		time=result.getObject1();
-            		
-            		action=result.getObject2();
-            	}
-            	
-            	
-            	
-//            int clientNumber=arriveIndex-departIndex;	
-//            System.out.println(arrivalTime+"at "+peopleInQueue[queueNumber]);
-            Client client=new Client(
-            		painter.getQueue(queueNumber),peopleInQueue[queueNumber],
-            		arrivalTime);
-	        Point clientPosition;
-			ClientPositionType positionType;
-            if (action== SimulationEventType.ARRIVAL){
-            	positionType=ClientPositionType.ARRIVAL; // TODO client should appear in positionType = "Arrival"
-            	clientPosition=painter.calculateClientDestinationCoordinates(0, 0, positionType);
-            	
-            }
-            else{
-            	Pair <Point, ClientPositionType> pair= calculatePosition(queueNumber,arrivalTime,initialTime,
-						peopleInQueue[queueNumber]);
-            	clientPosition= pair.getObject1();
-                positionType=pair.getObject2();
-            }
-            
-            client.saveInformation(clientPosition,positionType);
-			client.startDrawingMe();
-            clientAction=new ClientAction(time,action, client);
-            listOfEvents.add(clientAction); 
-                        
-	            if (arriveIndex==arrivals.length-1 && arrivalTime>initialTime){
-	                clientAction=new ClientAction(arrivalTime,
-							SimulationEventType.PAUSE,null);
-	                listOfEvents.add(clientAction);
-	            }
-            
-            peopleInQueue[queueNumber]++;
-            arriveIndex++;
-//            System.out.println("after "+client.clientNumber);
-            continue;
-            
-        }
-        
-        if ( arriveIndex>=arrivals.length || (departIndex<departures.length &&
-                                    departures[departIndex][0]<=arrivals[arriveIndex][0]) ){ 	
-        	
-            double departureTime=departures[departIndex][0];
-            int queueNumber=(int)departures[departIndex][1];
-            Client c=findFirstClient(departIndex, listOfEvents);
-            int delay=0;
-            if (c!=null){
-            	delay=calculateTotalDelay(c.getQueueNumber(), listOfEvents, departIndex);
-            }
-//            System.out.println("delay "+delay+" depart "+currentTime);
-            
-            // TODO check if delay is calculated right
-            
-            
-            queueEvents.add(new Pair<>(departureTime + (double) delay / 1000, queueNumber));
-            clientAction=new ClientAction(departureTime, SimulationEventType.DEPARTURE,
-            			c);
-            listOfEvents.add(clientAction);   
-              
-            departIndex++;
-            
-            // Solution: don't create new client action, instead just replace the values
-            
-            // TODO Check pattern: prototype
-        }
-        
-        
-    }           
-    // Sorting events by ascending times
-    sortEvents(listOfEvents);
-	ClientEventsHandler clientEventsHandler = applicationConfiguration.getClientEventsHandler();
-	clientEventsHandler.setEventsList(listOfEvents);
-
-
-    for (int i=0; i<listOfEvents.size();i++){
-    	if (listOfEvents.get(i).getClient()!=null)
-    	System.out.println(" time: "+listOfEvents.get(i).getTime()+
-    			" action "+listOfEvents.get(i).getAction()+" id "+listOfEvents.get(i).getClient().id);
-    }
-
-    System.out.println("done");
-
-    }
-
-
-    private Client findFirstClient(int index, List<ClientAction>
-    								events) {
-    	
-    	// TODO test it now
-    	int j=0;
-		for (int i=0; i<events.size();i++){
-			Client c=events.get(i).getClient();
-					
-			if (c!=null && (events.get(i).getAction()==SimulationEventType.ARRIVAL || events.get(i).getAction()==SimulationEventType.APPEAR_IN_POSITION)
-//					&& c.queueNumber==queueNumber
-					){
-				j++;
-			}
-			if (j>index){
-				return c;
-			}	
-			
-		}
-		return null;
-	}
-
-	private void sortEvents(List <ClientAction> listOfEvents){
-    	Collections.sort(listOfEvents, (m1, m2) -> {
-
-			if (m1.getTime() < m2.getTime()) {
-				return -1;
-			}
-			if (m1.getTime() > m2.getTime()) {
-				return 1;
+				} else {
+					Pair<Point, ClientPositionType> pair = calculatePosition(queueNumber, arrivalTime, initialTime,
+							clients.size());
+					clientPosition = pair.getObject1();
+					positionType = pair.getObject2();
+				}
+				client.saveInformation(clientPosition, positionType);
+				client.startDrawingMe();
+				clientAction = new ClientAction(time, action, client);
+				clientActions.add(clientAction);
+				if (event == lastArrival) {
+					clientAction = new ClientAction(arrivalTime,
+							SimulationEventType.PAUSE, null);
+					clientActions.add(clientAction);
+				}
 			} else {
-				return 0;
+				List<Client> clients = queueIndexToClientsInQueueMap.get(queueNumber);
+				double departureTime = event.getEventTime();
+				clientAction = new ClientAction(departureTime, SimulationEventType.DEPARTURE,
+						clients.get(0));
+				clients.remove(0);
+				clientActions.add(clientAction);
 			}
+		}
+		ClientEventsHandler clientEventsHandler = applicationConfiguration.getClientEventsHandler();
+		clientEventsHandler.setEventsList(clientActions);
 
-		});
     }
-    
+
+
+
     private Pair <Double,SimulationEventType> calculateAppearTime(int queueNumber, double eventTime, double initialTime,
     													int peopleInQueue){
     				
@@ -251,31 +131,6 @@ public class Simulation {
 		}
 		return new Pair<>(time, action);
     }
-
-    private int calculateTotalDelay(int queueNumber, List<ClientAction> events,
-    				int desiredIndex) {
-    	
-    	int totalDelay=0;
-    	int index=0;
-		for (int i=1; i<events.size(); i++){
-			Client client = events.get(i).getClient();
-			
-			if (client!=null && client.getQueueNumber()==queueNumber){
-//				System.out.println("delay "+client.getQueueDelay());
-				
-				if (index<desiredIndex){
-					index++;
-				}
-				else{
-					totalDelay+=client.getQueueDelay();
-				}
-				
-			}
-		}
-
-		return totalDelay;
-		
-	}
 
 	public Pair <Point,ClientPositionType> calculatePosition(int queueNumber, double arrivalTime,
 					double initialTime, int peopleInQueue){

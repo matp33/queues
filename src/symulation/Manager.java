@@ -7,6 +7,8 @@ import interfaces.AnimatedObject;
 import java.awt.*;
 import java.io.*;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.swing.JOptionPane;
 
@@ -23,7 +25,7 @@ public class Manager implements EventSubscriber {
 
 	private Simulation simulation;
 	private Painter painter;
-	private TimeTable timeTable;
+	private SortedSet<SimulationEvent> timeTable = new TreeSet<>();
 
 	public OutsideWorld outside;
 	public StoreCheckout[] storeCheckouts;
@@ -53,7 +55,6 @@ public class Manager implements EventSubscriber {
 		 System.out.println("IIIIIIIIIII"+i);
 
 		this.numberOfQueues=applicationConfiguration.getNumberOfQueues();
-		 timeTable=new TimeTable();
 		 simulation=new Simulation();
 
 	}
@@ -68,9 +69,8 @@ public class Manager implements EventSubscriber {
 		}
 	}
 
-	public void setTimeTable(double [][] arrivals, double [][] departures){
-        timeTable.arrivals=arrivals;
-        timeTable.departures=departures;
+	public void setTimeTable(SortedSet<SimulationEvent> simulationEvents){
+        this.timeTable = simulationEvents;
     }
 
 	public void restart(double time) {
@@ -95,20 +95,17 @@ public class Manager implements EventSubscriber {
     	waitingRoomIndicator.clear();
     	
         painter.setButtonRestartToActive();
-        simulation.prepareSimulation(time,timeTable.arrivals,timeTable.departures);
+        simulation.prepareSimulation(time,timeTable);
 
         painter.resume(false);
 //        System.out.println("resume");
     }
 
 	public boolean isTimeTableNotEmpty(){
-        return timeTable.arrivals!=null;
+        return !timeTable.isEmpty();
     }
 
-    public boolean isTimeWithinSimulationRange(double time){
-        return isTimeTableNotEmpty() && time<=timeTable.departures[timeTable.departures.length-1][0];
-    }
-    
+
     public boolean isStoreCheckoutNumberSame(int numbOfQueues) {
         return numbOfQueues==numberOfQueues;
     }
@@ -170,9 +167,9 @@ public class Manager implements EventSubscriber {
     }
 
 	@Override
-	public void handleNewTimetable(TimeTable event) {
-		setTimeTable(event.arrivals, event.departures);
-		painter.setTimeTable(event. arrivals, event.departures);
+	public void handleNewTimetable(SortedSet<SimulationEvent> simulationEvents) {
+		setTimeTable(simulationEvents);
+		painter.setTimeTable(simulationEvents);
 		restart(0);
 	}
 

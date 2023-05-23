@@ -1,17 +1,15 @@
 
 package tests;
 
-import symulation.ApplicationConfiguration;
-import symulation.Manager;
-import symulation.Painter;
+import constants.TypeOfTimeEvent;
+import symulation.*;
 import visualComponents.Client;
 
-import java.util.Random;
+import java.util.*;
 
 
 public class RegularTests {
 
-//    static int nrKolejki=;
     static int arrivalDelay=700;
 
     public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws InterruptedException {
@@ -32,21 +30,16 @@ public class RegularTests {
                     ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
                     applicationConfiguration.setNumberOfQueues(numberOfQueues);
 
-                    double [][] arrivals= new double [numberOfClients][2];
-                    double [][] departures = new double [numberOfClients][2];
+                    SortedSet<SimulationEvent> simulationEvents = new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime));
 
                     for (int i=0; i<numberOfClients;i++){
                         int queueNumber = new Random().nextInt(numberOfQueues);
-                        arrivals[i][0]=i*(double)arrivalDelay/1000;
-                        departures[i][0]=i*(double)arrivalDelay/1000+5;
-                        departures[i][1]=queueNumber;
-                        arrivals[i][1]= queueNumber;
-                        System.out.println("---- "+arrivals[i][0]);
-//                        System.out.println("---- "+departures[i][0]);
+                        simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.ARRIVAL, i*(double)arrivalDelay/1000, queueNumber));
+                        simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, i*(double)arrivalDelay/1000+5, queueNumber));
                     }
-                    applicationConfiguration.getPainter().setTimeTable(arrivals, departures);
+                    applicationConfiguration.getPainter().setTimeTable(simulationEvents);
                     Manager manager = applicationConfiguration.getManager();
-                    manager.setTimeTable(arrivals, departures);
+                    manager.setTimeTable(simulationEvents);
                     manager.doSimulation();
 
 
@@ -57,16 +50,13 @@ public class RegularTests {
     	double time = 1.5;
         ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
         applicationConfiguration.setNumberOfQueues(numberOfQueues);
-    	double [][] arrivals = new double [numberOfQueues][2];
-    	double [][] departs = new double [numberOfQueues][2];
-    	
-    	
-    	for (int i=0; i<numberOfQueues; i++){
-    		arrivals[i][0]=time;
-    		arrivals[i][1]=i;
-    		departs[i][0]=time+1;
-    		departs[i][1]=i;
-    	}
+        SortedSet<SimulationEvent> simulationEvents = new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime));
+
+        for (int i=0; i<numberOfQueues; i++){
+            simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.ARRIVAL, time, i));
+            simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, time + 1, i));
+
+        }
 //    	for (int i=4; i<6; i++){
 //    		arrivals[i-4][0]=time;
 //    		arrivals[i-4][1]=i;
@@ -75,20 +65,20 @@ public class RegularTests {
 //    	}
 
         Manager manager = applicationConfiguration.getManager();
-        manager.setTimeTable(arrivals, departs);
-    	applicationConfiguration.getPainter().setTimeTable(arrivals, departs);
+        manager.setTimeTable(simulationEvents);
+    	applicationConfiguration.getPainter().setTimeTable(simulationEvents);
 
         manager.doSimulation();
 
     }
 
-    public static void testQueueUpdating (int queueNumber, int delay)  {
+    public static void testQueueUpdating (int numberOfQueues, int delay)  {
         ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
-        applicationConfiguration.setNumberOfQueues(queueNumber);
+        applicationConfiguration.setNumberOfQueues(numberOfQueues);
         int insertedClients=2;
         
         for (int i=0; i<insertedClients;i++){
-//            painter.simulation.insertClient(queueNumber-1);
+//            painter.simulation.insertClient(numberOfQueues-1);
 //
         }
 //        try{
@@ -102,25 +92,24 @@ public class RegularTests {
 //            ex.printStackTrace();
 //        }
         int arrivingClients=2;
-        double [][] arrivals= new double [arrivingClients][2];
-        double [][] departures = new double [arrivingClients+2][2];
-        departures[0][0]=1;
-        departures[0][1]=queueNumber-1;
-        departures[1][0]=2.5;
-        departures[1][1]=queueNumber-1;
+        SortedSet<SimulationEvent> simulationEvents = new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime));
+        simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, 1, numberOfQueues-1));
+        simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, 2.5, numberOfQueues-1));
+
+
             for (int i=0; i<arrivingClients;i++){
-                arrivals[i][0]=6+i*(double)arrivalDelay/1000;
-                departures[i+2][0]=8+(5*i+1)*(double)arrivalDelay/1000+delay/1000+
-                                    Client.waitRoomDelay/1000;
-                departures[i+2][1]=queueNumber-1;
-                arrivals[i][1]=queueNumber-1;
+                simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.ARRIVAL, 6+i*(double)arrivalDelay/1000, numberOfQueues-1));
+                simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, 8+(5*i+1)*(double)arrivalDelay/1000+delay/1000+
+                        Client.waitRoomDelay/1000, numberOfQueues-1));
+
             }
 
-        applicationConfiguration.getManager().setTimeTable(arrivals, departures);
-        applicationConfiguration.getPainter().setTimeTable(arrivals, departures);
+        applicationConfiguration.getManager().setTimeTable(simulationEvents);
         applicationConfiguration.getManager().doSimulation();
+        applicationConfiguration.getPainter().setTimeTable(simulationEvents);
 
-        
+
+
 
 
     }

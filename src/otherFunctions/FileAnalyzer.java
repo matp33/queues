@@ -2,18 +2,22 @@
 
 package otherFunctions;
 
+import constants.TypeOfTimeEvent;
+import symulation.SimulationEvent;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class FileAnalyzer {
 
-    public static TimeTable analyze(File file) throws IOException{
+    public static SortedSet<SimulationEvent> analyze(File file) throws IOException{
         
         Scanner s=new Scanner(file);
 
         ArrayList <double[]> timeTable= new ArrayList <double[]> ();
+        SortedSet<SimulationEvent> simulationEvents = new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime));
+
         if (!s.hasNextLine()){
         	s.close();
             throw new IllegalArgumentException ("Choosen file is not a text file or is empty..");
@@ -47,19 +51,16 @@ public class FileAnalyzer {
         }
 
         int amount=timeTable.size();
-        double [][] arrivals = new double [amount][2];
-        double [][] departures = new double [amount][2];
 
         for (int i=0; i<amount;i++){            
             double [] words =  timeTable.get(i);
-            arrivals[i][0] =words[0];
-            arrivals[i][1]=words[1];
-            departures[i][0]=words[2];
-            departures[i][1]=words[1];
+            simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.ARRIVAL, words[0], (int)words[1]));
+            simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, words[2], (int)words[1]));
+
         }
 
         s.close();
-        return new TimeTable (arrivals,departures);
+        return simulationEvents;
         
         
     }

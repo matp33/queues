@@ -6,16 +6,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
 
+import constants.TypeOfTimeEvent;
 import core.MainLoop;
 import events.UIEventQueue;
 import otherFunctions.FileAnalyzer;
-import otherFunctions.TimeTable;
 import symulation.ApplicationConfiguration;
-import symulation.Manager;
 import symulation.Painter;
+import symulation.SimulationEvent;
 
 public class ListenerOpenFile implements ActionListener{
     
@@ -63,48 +66,39 @@ private ApplicationConfiguration applicationConfiguration;
     private void analyze(ActionEvent e) {
     	
     	File selectedFile = fileChoosingWindow.getSelectedFile();                 
-        TimeTable timeTable= new TimeTable();
+        SortedSet<SimulationEvent> timeTable= new TreeSet<>();
         
-            try {
-         	   timeTable = FileAnalyzer.analyze(selectedFile);
-            }
-            catch (IOException i){
-                i.printStackTrace();
-                painter.displayMessage("File opening failed");
-            }
-            catch (NumberFormatException ex){
-               ex.printStackTrace();
-                painter.displayMessage("Invalid file format!");
-               actionPerformed(e);                   
-            }
+        try {
+           timeTable = FileAnalyzer.analyze(selectedFile);
+        }
+        catch (IOException i){
+            i.printStackTrace();
+            painter.displayMessage("File opening failed");
+        }
+        catch (NumberFormatException ex){
+           ex.printStackTrace();
+            painter.displayMessage("Invalid file format!");
+           actionPerformed(e);
+        }
          
-         double [][] arrivals=timeTable.arrivals;
-         double [][] departures=timeTable.departures;
-         int maximum=Integer.MIN_VALUE;
-         
-             for (int i=0; i<arrivals.length;i++){
-                 if ((int)arrivals[i][1]>maximum){
-                     maximum=(int)arrivals[i][1];
-                 }
-             }
-             
-         maximum++; // counters are counted from 0
+
+
+        Integer lastQueueIndex = timeTable.stream().filter(event -> event.getSimulationEventType().equals(TypeOfTimeEvent.ARRIVAL)).max(Comparator.comparing(SimulationEvent::getQueueNumber)).map(SimulationEvent::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"));
+
          timeTable=processTimeTable(timeTable);
-         arrivals=timeTable.arrivals; // TODO reconsider it; we taking 2 times arrivals and departures from timeTable
-         departures=timeTable.departures;
-         
-             if(applicationConfiguration.getNumberOfQueues() != maximum){
+
+             if(applicationConfiguration.getNumberOfQueues() != lastQueueIndex){
                  MainLoop.getInstance().pause();
-                 applicationConfiguration.setNumberOfQueues(maximum);
+                 applicationConfiguration.setNumberOfQueues(lastQueueIndex);
                  painter.initiate();
              }
                           
 
-         UIEventQueue.publishNewTimetableEvent(new TimeTable(arrivals, departures));
+         UIEventQueue.publishNewTimetableEvent(timeTable);
     }
     
     // method to be overriden if we wanna do something on the time table
-    protected TimeTable processTimeTable(TimeTable tt) {
+    protected SortedSet<SimulationEvent> processTimeTable(SortedSet<SimulationEvent> tt) {
     	return tt;
     }
 

@@ -10,7 +10,7 @@ import interfaces.AnimatedObject;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +39,7 @@ public class Painter extends JPanel {
     public static final String BUTTON_EXTRACT="Extract queue";
     private static final String MAX_VISIBLE_TIME_VALUE="+99";
 
-    private TimeTable timeTable = new TimeTable();
+    private SortedSet<SimulationEvent> timeTable = new TreeSet<>();
     private JFrame window;
 
     private JButton btnRestart;
@@ -95,7 +95,7 @@ public class Painter extends JPanel {
     }
 
     public boolean isTimeWithinSimulationRange(double time){
-        return timeTable.departures.length>0 && time<=timeTable.departures[timeTable.departures.length-1][0];
+        return timeTable.last().getEventTime() <= time;
     }
 
     public void initiateWindow() {
@@ -114,9 +114,8 @@ public class Painter extends JPanel {
         uIEventQueue.addSubscriber(eventSubscriber);
     }
 
-    public void setTimeTable(double [][] arrivals, double [][] departures){
-        timeTable.arrivals=arrivals;
-        timeTable.departures=departures;
+    public void setTimeTable(SortedSet<SimulationEvent> timeTable){
+        this.timeTable = timeTable;
     }
 
     private void initiateButtons() {

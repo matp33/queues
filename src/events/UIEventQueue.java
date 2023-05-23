@@ -1,9 +1,10 @@
 package events;
 
-import otherFunctions.TimeTable;
+import symulation.SimulationEvent;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 public class UIEventQueue {
 
@@ -13,7 +14,7 @@ public class UIEventQueue {
         observers.add(o);
     }
 
-    public void publishNewTimetableEvent(TimeTable timeTable){
+    public void publishNewTimetableEvent(SortedSet<SimulationEvent> timeTable){
         observers.forEach(subscriber->subscriber.handleNewTimetable(timeTable));
     }
 
