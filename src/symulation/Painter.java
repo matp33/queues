@@ -1,7 +1,6 @@
 package symulation;
 
 import constants.ClientPositionType;
-import constants.SimulationEventType;
 import core.MainLoop;
 import events.UIEventQueue;
 import events.EventSubscriber;
@@ -12,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -22,8 +20,6 @@ import listeners.ListenerExtraction;
 import listeners.ListenerFromTheStart;
 import listeners.ListenerOpenFile;
 import listeners.ListenerStopStart;
-import otherFunctions.ClientAction;
-import otherFunctions.TimeTable;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;

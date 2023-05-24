@@ -6,11 +6,9 @@ import java.util.*;
 import java.util.List;
 
 import constants.ClientPositionType;
-import constants.SimulationEventType;
 import constants.TypeOfTimeEvent;
 import events.ClientEventsHandler;
 import otherFunctions.ClientAction;
-import otherFunctions.Pair;
 import visualComponents.Client;
 
 public class Simulation {
@@ -31,10 +29,9 @@ public class Simulation {
 
 		this.applicationConfiguration = ApplicationConfiguration.getInstance();
 		this.painter=applicationConfiguration.getPainter();
-
     }
 
-    public void prepareSimulation(double initialTime, SortedSet<SimulationEvent> simulationEvents)  {
+    public void prepareSimulation(double simulationStartTime, SortedSet<SimulationEvent> simulationEvents)  {
 
 		ClientAction clientAction;
    
@@ -46,8 +43,6 @@ public class Simulation {
 			double arrivalTime = event.getEventTime();
 			int queueNumber = event.getQueueNumber();
 			TypeOfTimeEvent eventType = event.getSimulationEventType();
-			SimulationEventType action;
-			double time;
 			if (eventType.equals(TypeOfTimeEvent.ARRIVAL)) {
 				List<Client> clients = queueIndexToClientsInQueueMap.computeIfAbsent(queueNumber, index -> new ArrayList<>());
 				Client client = new Client(
@@ -55,42 +50,21 @@ public class Simulation {
 						arrivalTime);
 				clients.add(client);
 
-				if (arrivalTime <= initialTime) {
-					action = SimulationEventType.APPEAR_IN_POSITION;
-					time = initialTime;
-				} else {
-					Pair<Double, SimulationEventType> result = calculateAppearTime(queueNumber, arrivalTime, initialTime,
-							clients.size());
-					time = result.getObject1();
 
-					action = result.getObject2();
-				}
+				clientAction = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,
+						clients.size());
 
-				Point clientPosition;
-				ClientPositionType positionType;
-				if (action == SimulationEventType.ARRIVAL) {
-					positionType = ClientPositionType.ARRIVAL; // TODO client should appear in positionType = "Arrival"
-					clientPosition = painter.calculateClientDestinationCoordinates(0, 0, positionType);
-
-				} else {
-					Pair<Point, ClientPositionType> pair = calculatePosition(queueNumber, arrivalTime, initialTime,
-							clients.size());
-					clientPosition = pair.getObject1();
-					positionType = pair.getObject2();
-				}
-				client.saveInformation(clientPosition, positionType);
 				client.startDrawingMe();
-				clientAction = new ClientAction(time, action, client);
 				clientActions.add(clientAction);
 				if (event == lastArrival) {
 					clientAction = new ClientAction(arrivalTime,
-							SimulationEventType.PAUSE, null);
+							ClientPositionType.PAUSE, null);
 					clientActions.add(clientAction);
 				}
 			} else {
 				List<Client> clients = queueIndexToClientsInQueueMap.get(queueNumber);
 				double departureTime = event.getEventTime();
-				clientAction = new ClientAction(departureTime, SimulationEventType.DEPARTURE,
+				clientAction = new ClientAction(departureTime, ClientPositionType.EXITING,
 						clients.get(0));
 				clients.remove(0);
 				clientActions.add(clientAction);
@@ -101,69 +75,52 @@ public class Simulation {
 
     }
 
-
-
-    private Pair <Double,SimulationEventType> calculateAppearTime(int queueNumber, double eventTime, double initialTime,
-    													int peopleInQueue){
-    				
-		Point pointWaitPlace=painter.calculateClientDestinationCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
-		Point pointInQueue=painter.calculateClientDestinationCoordinates(peopleInQueue, queueNumber,
-				ClientPositionType.GOING_TO_QUEUE);
-                           	
-//		System.out.println(queues[queueNumber].
-//				findNumberOfLastClient()+"in queue");
-      
-		double timeToQueue=Client.calculateTimeToGetToQueue(pointInQueue, pointWaitPlace);
-		double totalTime=timeToQueue+//timeToWaitPlace+ // TODO add it
-				Client.waitRoomDelay/1000;
-		
-      System.out.println("event "+eventTime+" ppl "+peopleInQueue); //TODO problem with ppl in queue
-
-		SimulationEventType action;
-		double time;
-		if (totalTime<=eventTime-initialTime){
-			action= SimulationEventType.ARRIVAL;
-			time=eventTime-totalTime;
-		}
-		else{
-			time=initialTime;
-			action=SimulationEventType.APPEAR_IN_POSITION;
-		}
-		return new Pair<>(time, action);
-    }
-
-	public Pair <Point,ClientPositionType> calculatePosition(int queueNumber, double arrivalTime,
-					double initialTime, int peopleInQueue){
+	public ClientAction createClientAction(Client client, int queueNumber, double arrivalTime,
+										   double simulationStartTime, int peopleInQueue){
 	
 		// TODO this is too similar method to calculateAppearTime check it
 		
 		
 		Point pointInitial=painter.calculateClientDestinationCoordinates(0, 0, ClientPositionType.ARRIVAL);
+		Point pointWaitPlace=painter.calculateClientDestinationCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
+
 		Point pointInQueue=painter.calculateClientDestinationCoordinates(peopleInQueue,
                              queueNumber, ClientPositionType.GOING_TO_QUEUE);
         Point calculatedPosition = Client.calculateCoordinates(pointInQueue, pointInitial,
         								arrivalTime);
-        
-        	if (calculatedPosition.equals(pointInQueue)){
-//        		System.out.println("same"+arrivalTime+"?"+queueNumber);
-        		return new Pair <>(calculatedPosition,ClientPositionType.WAITING_IN_QUEUE);
-        	}
+
+		double timeNeededToMoveToQueue=Client.calculateTimeToGetToQueue(pointInQueue, pointWaitPlace);
+		double totalTime=timeNeededToMoveToQueue+//timeToWaitPlace+  TODO add it
+				Client.waitRoomDelay/1000;
+
+		ClientPositionType positionType;
+		if (calculatedPosition.equals(pointInQueue)){
+			positionType = ClientPositionType.WAITING_IN_QUEUE;
+			client.saveInformation(calculatedPosition, positionType);
+			return new ClientAction(arrivalTime, positionType, client);
+		}
 		
 	    if (arrivalTime<0){
 	    	arrivalTime=0;
 	    }  	    	    
 	    
-	    ClientPositionType positionType;
-	    
-	    if (arrivalTime<=initialTime){
+		double time;
+
+	    if ( totalTime + simulationStartTime >= arrivalTime){
 	    	positionType=ClientPositionType.WAITING_IN_QUEUE;
 	    	calculatedPosition=pointInQueue;
+			time = simulationStartTime;
 	    }
-	    else{
-	    	positionType=ClientPositionType.GOING_TO_QUEUE;
+	    else if (totalTime <= arrivalTime - simulationStartTime){
+			positionType= ClientPositionType.ARRIVAL;
+			time=arrivalTime-totalTime;
+			calculatedPosition = pointInitial;
 	    }
-//	    System.out.println(calculatedPosition+"time "+arrivalTime);
-	    return new Pair<>(calculatedPosition, positionType);
+		else{
+			throw new IllegalArgumentException("Unexpected situation happened");
+		}
+		client.saveInformation(calculatedPosition, positionType);
+		return new ClientAction(time, positionType, client);
 	}
 
 

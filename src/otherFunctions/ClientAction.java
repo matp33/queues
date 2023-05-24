@@ -1,18 +1,18 @@
 package otherFunctions;
 
 
-import constants.SimulationEventType;
+import constants.ClientPositionType;
 import visualComponents.Client;
 
 public class ClientAction {
     private double time;
-    private SimulationEventType  action;
+    private ClientPositionType clientPositionType;
     private Client client;
    
 
-    public ClientAction (double time, SimulationEventType action, Client client){
+    public ClientAction (double time, ClientPositionType clientPositionType, Client client){
         this.time=time;
-        this.action=action;
+        this.clientPositionType = clientPositionType;
         this.client=client;
     }
 
@@ -20,8 +20,8 @@ public class ClientAction {
         return time;
     }
 
-    public SimulationEventType getAction (){
-        return action;
+    public ClientPositionType getClientPositionType(){
+        return clientPositionType;
     }
     public Client getClient(){
         return client;

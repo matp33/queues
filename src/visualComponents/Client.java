@@ -500,6 +500,11 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
 		timerDelay.schedule(tt, (int)(1000*delay));
 	}
 
+	@Override
+	public String toString (){
+		return "" + id;
+	}
+
 
 
 }

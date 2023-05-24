@@ -1,6 +1,5 @@
 package symulation;
 
-import constants.SimulationEventType;
 import constants.TypeOfTimeEvent;
 
 public class SimulationEvent {

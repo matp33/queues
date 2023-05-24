@@ -1,6 +1,6 @@
 package events;
 
-import constants.SimulationEventType;
+import constants.ClientPositionType;
 import core.ChangeableObject;
 import otherFunctions.ClientAction;
 import symulation.ApplicationConfiguration;
@@ -38,7 +38,7 @@ public class ClientEventsHandler implements ChangeableObject {
 
         listOfEvents.remove(0);
 
-        SimulationEventType action=clientAction.getAction();
+        ClientPositionType action=clientAction.getClientPositionType();
         Client client=clientAction.getClient();
 
         switch (action){
@@ -46,11 +46,11 @@ public class ClientEventsHandler implements ChangeableObject {
                 client.moveToWaitingRoom();
                 client.startDrawingMe();
                 break;
-            case APPEAR_IN_POSITION:
+            case WAITING_IN_QUEUE:
                 client.moveToQueue();
                 client.startDrawingMe();
                 break;
-            case DEPARTURE:
+            case EXITING:
                 client.moveToExit();
                 break;
             case PAUSE:
