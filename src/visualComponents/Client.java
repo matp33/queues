@@ -13,8 +13,6 @@ import otherFunctions.ClientMovement;
 import sprites.SpriteManager;
 import sprites.SpriteType;
 import symulation.ApplicationConfiguration;
-import symulation.Manager;
-import symulation.Painter;
 import animations.Animation;
 import sprites.Sprite;
 
@@ -27,7 +25,7 @@ import java.util.TimerTask;
 
 public class Client extends AnimatedAndObservable implements Observer {
 
-private double destinationTime;	
+private double arrivalTime;
 private double timeSupposed=0;
 private int clientNumber;
 private ClientPositionType positionType;
@@ -70,7 +68,7 @@ public final int id;
 private boolean isWaiting;
 private SpriteManager spriteManager;
 
-public Client(StoreCheckout storeCheckout, int clientNumber,  double destinationTime)  {
+public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime)  {
 
 		super(SpriteType.CLIENT);
 		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
@@ -79,7 +77,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
 		nr++;
 		id=nr;
 		this.queueDelay=createDelay();
-    	this.destinationTime=destinationTime;
+    	this.arrivalTime =arrivalTime;
 		Sprite spriteClient = spriteManager.getSprite(SpriteType.CLIENT);
 
 		moveDown=new Animation(spriteClient.getSprite(0),frameTime);
@@ -200,7 +198,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
         timeSupposed=MainLoop.getInstance().getTimePassedMilliseconds()+trajectory.size()*movementDelay+ waitRoomDelay;
     }
 
-    public void moveToQueue(){     
+    public void moveToQueue(){
     	storeCheckout.addClient(this);
     	setPositionType(ClientPositionType.GOING_TO_QUEUE);
         calculateTrajectory();
@@ -209,8 +207,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
 
 
     public void moveToExit()  {
-    	
-    	storeCheckout.getClientsList().remove(this);
+		storeCheckout.getClientsList().remove(this);
     	
     	setPositionType(ClientPositionType.EXITING);
     	calculateTrajectory();
@@ -387,6 +384,9 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
 			if (getPositionType()==ClientPositionType.OUTSIDE_VIEW ){
 				painter.removeObject(this);
 				objectObservedByMe.removeObserver(this);
+			}
+			if (getPositionType()== ClientPositionType.WAITING_ROOM && arrivalTime + waitRoomDelay <=timePassed){
+				moveToQueue();
 			}
 		}
 

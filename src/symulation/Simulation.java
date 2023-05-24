@@ -75,7 +75,7 @@ public class Simulation {
 
     }
 
-	public ClientAction createClientAction(Client client, int queueNumber, double arrivalTime,
+	private ClientAction createClientAction(Client client, int queueNumber, double arrivalTime,
 										   double simulationStartTime, int peopleInQueue){
 	
 		// TODO this is too similar method to calculateAppearTime check it

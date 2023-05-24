@@ -18,7 +18,7 @@ public class Start {
 			instance.setNumberOfQueues(numberOfQueues);
 			instance.initialize();
 //            	RegularTests.test1ClientPerQueue(8);
-            	RegularTests.testMultipleClientsWithMultipleQueues(numberOfQueues,8);
+            	RegularTests.testMultipleClientsWithMultipleQueues(numberOfQueues,15);
 //            	new Painter(1,10.0,new WindowFrame());
 
 //                Painter painter = Painter.getInstance();
