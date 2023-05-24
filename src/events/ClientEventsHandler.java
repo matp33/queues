@@ -50,9 +50,6 @@ public class ClientEventsHandler implements ChangeableObject {
                 client.moveToQueue();
                 client.startDrawingMe();
                 break;
-            case EXITING:
-                client.moveToExit();
-                break;
             case PAUSE:
                 painter.pauseSimulationAndAskQuestion();
                 break;

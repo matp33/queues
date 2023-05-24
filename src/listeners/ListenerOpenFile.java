@@ -18,7 +18,7 @@ import events.UIEventQueue;
 import otherFunctions.FileAnalyzer;
 import symulation.ApplicationConfiguration;
 import symulation.Painter;
-import symulation.SimulationEvent;
+import symulation.ClientArrivalEvent;
 
 public class ListenerOpenFile implements ActionListener{
     
@@ -66,7 +66,7 @@ private ApplicationConfiguration applicationConfiguration;
     private void analyze(ActionEvent e) {
     	
     	File selectedFile = fileChoosingWindow.getSelectedFile();                 
-        SortedSet<SimulationEvent> timeTable= new TreeSet<>();
+        SortedSet<ClientArrivalEvent> timeTable= new TreeSet<>();
         
         try {
            timeTable = FileAnalyzer.analyze(selectedFile);
@@ -83,13 +83,13 @@ private ApplicationConfiguration applicationConfiguration;
          
 
 
-        Integer lastQueueIndex = timeTable.stream().filter(event -> event.getSimulationEventType().equals(TypeOfTimeEvent.ARRIVAL)).max(Comparator.comparing(SimulationEvent::getQueueNumber)).map(SimulationEvent::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"));
+        Integer lastQueueIndex = timeTable.stream().max(Comparator.comparing(ClientArrivalEvent::getQueueNumber)).map(ClientArrivalEvent::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"));
 
          timeTable=processTimeTable(timeTable);
 
              if(applicationConfiguration.getNumberOfQueues() != lastQueueIndex){
                  MainLoop.getInstance().pause();
-                 applicationConfiguration.setNumberOfQueues(lastQueueIndex);
+                 applicationConfiguration.setNumberOfQueues(lastQueueIndex+1);
                  painter.initiate();
              }
                           
@@ -98,7 +98,7 @@ private ApplicationConfiguration applicationConfiguration;
     }
     
     // method to be overriden if we wanna do something on the time table
-    protected SortedSet<SimulationEvent> processTimeTable(SortedSet<SimulationEvent> tt) {
+    protected SortedSet<ClientArrivalEvent> processTimeTable(SortedSet<ClientArrivalEvent> tt) {
     	return tt;
     }
 

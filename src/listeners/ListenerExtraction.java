@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import constants.TypeOfTimeEvent;
 import events.UIEventQueue;
 import symulation.Painter;
-import symulation.SimulationEvent;
+import symulation.ClientArrivalEvent;
 
 public class ListenerExtraction extends ListenerOpenFile{
 	private String title = "Choosing queue number.";
@@ -24,7 +24,7 @@ public class ListenerExtraction extends ListenerOpenFile{
     }
     
     @Override 
-    protected SortedSet<SimulationEvent> processTimeTable(SortedSet<SimulationEvent> timetable){
+    protected SortedSet<ClientArrivalEvent> processTimeTable(SortedSet<ClientArrivalEvent> timetable){
     	
     	int number= findLastQueueIndex(timetable);
     	List<Integer> chosenQueues=makeDialog(number);
@@ -64,14 +64,14 @@ public class ListenerExtraction extends ListenerOpenFile{
     	return numbers;
     }
     
-    private SortedSet<SimulationEvent> extractQueues(SortedSet<SimulationEvent> table, List<Integer> chosenQueues){
+    private SortedSet<ClientArrivalEvent> extractQueues(SortedSet<ClientArrivalEvent> table, List<Integer> chosenQueues){
 
 
-		return table.stream().filter(event->chosenQueues.contains( event.getQueueNumber())).collect(Collectors.toCollection(()->new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime))));
+		return table.stream().filter(event->chosenQueues.contains( event.getQueueNumber())).collect(Collectors.toCollection(()->new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime))));
     }
     
-    private int findLastQueueIndex(SortedSet<SimulationEvent> timeTable){
-    	return timeTable.stream().filter(event -> event.getSimulationEventType().equals(TypeOfTimeEvent.ARRIVAL)).max(Comparator.comparing(SimulationEvent::getQueueNumber)).map(SimulationEvent::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"))+1;
+    private int findLastQueueIndex(SortedSet<ClientArrivalEvent> timeTable){
+    	return timeTable.stream().max(Comparator.comparing(ClientArrivalEvent::getQueueNumber)).map(ClientArrivalEvent::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"))+1;
     }
 
 }

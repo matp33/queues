@@ -35,7 +35,7 @@ public class Painter extends JPanel {
     public static final String BUTTON_EXTRACT="Extract queue";
     private static final String MAX_VISIBLE_TIME_VALUE="+99";
 
-    private SortedSet<SimulationEvent> timeTable = new TreeSet<>();
+    private SortedSet<ClientArrivalEvent> timeTable = new TreeSet<>();
     private JFrame window;
 
     private JButton btnRestart;
@@ -91,7 +91,7 @@ public class Painter extends JPanel {
     }
 
     public boolean isTimeWithinSimulationRange(double time){
-        return timeTable.last().getEventTime() <= time;
+        return timeTable.last().getArrivalTime() <= time;
     }
 
     public void initiateWindow() {
@@ -110,7 +110,7 @@ public class Painter extends JPanel {
         uIEventQueue.addSubscriber(eventSubscriber);
     }
 
-    public void setTimeTable(SortedSet<SimulationEvent> timeTable){
+    public void setTimeTable(SortedSet<ClientArrivalEvent> timeTable){
         this.timeTable = timeTable;
     }
 

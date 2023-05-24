@@ -50,6 +50,10 @@ private Point position;
 
 private AppLogger logger;
 
+private double timeEnteringCheckout;
+
+private boolean isInCheckout;
+
 public final int queueDelay; // delay before client moves when he sees that another client moved
 private static final int frameTime=20; // so many steps before animation changes to next
 
@@ -68,9 +72,12 @@ public final int id;
 private boolean isWaiting;
 private SpriteManager spriteManager;
 
-public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime)  {
+private double timeInCheckout;
+
+public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime, double timeInCheckout)  {
 
 		super(SpriteType.CLIENT);
+		this.timeInCheckout = timeInCheckout;
 		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
 		spriteManager = applicationConfiguration.getSpriteManager();
 		logger = applicationConfiguration.getAppLogger();
@@ -377,6 +384,10 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 			position=new Point(point.x, point.y);
 		}
 		else{
+
+			if (getPositionType() == ClientPositionType.GOING_TO_QUEUE){
+				setPositionType(ClientPositionType.WAITING_IN_QUEUE);
+			}
 			if (getPositionType()==ClientPositionType.EXITING  ){
 				if (painter.getDoor().isFirst(this))
 					painter.getDoor().doOpening();
@@ -385,8 +396,17 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 				painter.removeObject(this);
 				objectObservedByMe.removeObserver(this);
 			}
+			if (getPositionType().equals(ClientPositionType.WAITING_IN_QUEUE) && storeCheckout.isFirst(this) && !isInCheckout){
+				timeEnteringCheckout = (double)timePassed/1000;
+
+				isInCheckout = true;
+			}
 			if (getPositionType()== ClientPositionType.WAITING_ROOM && arrivalTime + waitRoomDelay <=timePassed){
 				moveToQueue();
+			}
+			if (isInCheckout && (double)timePassed/1000 >=timeEnteringCheckout + timeInCheckout){
+				moveToExit();
+				isInCheckout = false;
 			}
 		}
 

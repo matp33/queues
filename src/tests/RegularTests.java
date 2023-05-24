@@ -27,34 +27,41 @@ public class RegularTests {
 
     public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients)  {
 
-                    ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
-                    applicationConfiguration.setNumberOfQueues(numberOfQueues);
+            ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
+            applicationConfiguration.setNumberOfQueues(numberOfQueues);
 
-                    SortedSet<SimulationEvent> simulationEvents = new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime));
+            SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
 
-                    for (int i=0; i<numberOfClients;i++){
-                        int queueNumber = new Random().nextInt(numberOfQueues);
-                        simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.ARRIVAL, i*(double)arrivalDelay/1000, queueNumber));
-                        simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, i*(double)arrivalDelay/1000+5, queueNumber));
-                    }
-                    applicationConfiguration.getPainter().setTimeTable(simulationEvents);
-                    Manager manager = applicationConfiguration.getManager();
-                    manager.setTimeTable(simulationEvents);
-                    manager.doSimulation();
+            for (int i=0; i<numberOfClients;i++){
+                int queueNumber = new Random().nextInt(numberOfQueues);
+                double timeInQueue = generateRandomTimeInQueue();
+                clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i*(double)arrivalDelay/1000, queueNumber));
+            }
+            applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);
+            Manager manager = applicationConfiguration.getManager();
+            manager.setTimeTable(clientArrivalEvents);
+            manager.doSimulation();
 
 
 
     }
-        
+
+    private static double generateRandomTimeInQueue() {
+        Random random = new Random();
+        int maxTimeInQueue = 3;
+        int minTimeInQueue = 1;
+        return random.nextDouble() * (maxTimeInQueue-minTimeInQueue) + minTimeInQueue;
+    }
+
     public static void test1ClientPerQueue(int numberOfQueues) {
     	double time = 1.5;
         ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
         applicationConfiguration.setNumberOfQueues(numberOfQueues);
-        SortedSet<SimulationEvent> simulationEvents = new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime));
+        SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
 
         for (int i=0; i<numberOfQueues; i++){
-            simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.ARRIVAL, time, i));
-            simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, time + 1, i));
+            double timeInQueue = generateRandomTimeInQueue();
+            clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, time, i));
 
         }
 //    	for (int i=4; i<6; i++){
@@ -65,8 +72,8 @@ public class RegularTests {
 //    	}
 
         Manager manager = applicationConfiguration.getManager();
-        manager.setTimeTable(simulationEvents);
-    	applicationConfiguration.getPainter().setTimeTable(simulationEvents);
+        manager.setTimeTable(clientArrivalEvents);
+    	applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);
 
         manager.doSimulation();
 
@@ -92,21 +99,16 @@ public class RegularTests {
 //            ex.printStackTrace();
 //        }
         int arrivingClients=2;
-        SortedSet<SimulationEvent> simulationEvents = new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime));
-        simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, 1, numberOfQueues-1));
-        simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, 2.5, numberOfQueues-1));
+        SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
+        double timeInQueue = generateRandomTimeInQueue();
 
+        for (int i=0; i<arrivingClients;i++){
+            clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, 6+i*(double)arrivalDelay/1000, numberOfQueues-1));
+        }
 
-            for (int i=0; i<arrivingClients;i++){
-                simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.ARRIVAL, 6+i*(double)arrivalDelay/1000, numberOfQueues-1));
-                simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, 8+(5*i+1)*(double)arrivalDelay/1000+delay/1000+
-                        Client.waitRoomDelay/1000, numberOfQueues-1));
-
-            }
-
-        applicationConfiguration.getManager().setTimeTable(simulationEvents);
+        applicationConfiguration.getManager().setTimeTable(clientArrivalEvents);
         applicationConfiguration.getManager().doSimulation();
-        applicationConfiguration.getPainter().setTimeTable(simulationEvents);
+        applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);
 
 
 

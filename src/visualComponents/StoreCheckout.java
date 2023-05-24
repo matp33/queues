@@ -56,7 +56,8 @@ public class StoreCheckout extends AnimatedAndObservable{
             	c.setObjectObserved(this);
             }
                        	
-        	getClientsArriving().add(c);        
+        	getClientsArriving().add(c);
+			clientsInQueue.add(c);
                 
             return c;
         }
@@ -88,6 +89,10 @@ public class StoreCheckout extends AnimatedAndObservable{
         	else
 			return getClientsList().get(getClientsList().size()-1)==client;
 		}
+
+	public boolean isFirst(Client client) {
+		return getClientsList().indexOf(client) == 0;
+	}
 
         public Client findNumberOfLastClient(){
             

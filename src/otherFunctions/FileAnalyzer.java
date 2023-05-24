@@ -3,7 +3,7 @@
 package otherFunctions;
 
 import constants.TypeOfTimeEvent;
-import symulation.SimulationEvent;
+import symulation.ClientArrivalEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +11,12 @@ import java.util.*;
 
 public class FileAnalyzer {
 
-    public static SortedSet<SimulationEvent> analyze(File file) throws IOException{
+    public static SortedSet<ClientArrivalEvent> analyze(File file) throws IOException{
         
         Scanner s=new Scanner(file);
 
         ArrayList <double[]> timeTable= new ArrayList <double[]> ();
-        SortedSet<SimulationEvent> simulationEvents = new TreeSet<>(Comparator.comparing(SimulationEvent::getEventTime));
+        SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
 
         if (!s.hasNextLine()){
         	s.close();
@@ -54,13 +54,12 @@ public class FileAnalyzer {
 
         for (int i=0; i<amount;i++){            
             double [] words =  timeTable.get(i);
-            simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.ARRIVAL, words[0], (int)words[1]));
-            simulationEvents.add(new SimulationEvent(TypeOfTimeEvent.DEPARTURE, words[2], (int)words[1]));
+            clientArrivalEvents.add(new ClientArrivalEvent(words[2], words[0], (int)words[1]));
 
         }
 
         s.close();
-        return simulationEvents;
+        return clientArrivalEvents;
         
         
     }

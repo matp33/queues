@@ -1,12 +1,11 @@
 package events;
 
-import otherFunctions.TimeTable;
-import symulation.SimulationEvent;
+import symulation.ClientArrivalEvent;
 
 import java.util.SortedSet;
 
 public interface EventSubscriber {
-    void handleNewTimetable(SortedSet<SimulationEvent> simulationEvents);
+    void handleNewTimetable(SortedSet<ClientArrivalEvent> clientArrivalEvents);
 
     void handleRestart (double time);
 }

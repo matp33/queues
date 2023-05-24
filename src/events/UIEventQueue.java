@@ -1,6 +1,6 @@
 package events;
 
-import symulation.SimulationEvent;
+import symulation.ClientArrivalEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +14,7 @@ public class UIEventQueue {
         observers.add(o);
     }
 
-    public void publishNewTimetableEvent(SortedSet<SimulationEvent> timeTable){
+    public void publishNewTimetableEvent(SortedSet<ClientArrivalEvent> timeTable){
         observers.forEach(subscriber->subscriber.handleNewTimetable(timeTable));
     }
 

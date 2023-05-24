@@ -31,42 +31,32 @@ public class Simulation {
 		this.painter=applicationConfiguration.getPainter();
     }
 
-    public void prepareSimulation(double simulationStartTime, SortedSet<SimulationEvent> simulationEvents)  {
+    public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
 
 		ClientAction clientAction;
    
 
 		Map<Integer, List<Client>> queueIndexToClientsInQueueMap = new HashMap<>();
 		List<ClientAction> clientActions = new ArrayList<>();
-		SimulationEvent lastArrival =  simulationEvents.stream().filter(event -> event.getSimulationEventType().equals(TypeOfTimeEvent.ARRIVAL)).max(Comparator.comparing(SimulationEvent::getEventTime)).orElseThrow(()->new IllegalArgumentException("simulation events empty"));
-		for (SimulationEvent event : simulationEvents) {
-			double arrivalTime = event.getEventTime();
+		ClientArrivalEvent lastArrival =  clientArrivalEvents.stream().max(Comparator.comparing(ClientArrivalEvent::getArrivalTime)).orElseThrow(()->new IllegalArgumentException("simulation events empty"));
+		for (ClientArrivalEvent event : clientArrivalEvents) {
+			double arrivalTime = event.getArrivalTime();
 			int queueNumber = event.getQueueNumber();
-			TypeOfTimeEvent eventType = event.getSimulationEventType();
-			if (eventType.equals(TypeOfTimeEvent.ARRIVAL)) {
-				List<Client> clients = queueIndexToClientsInQueueMap.computeIfAbsent(queueNumber, index -> new ArrayList<>());
-				Client client = new Client(
-						painter.getQueue(queueNumber), clients.size(),
-						arrivalTime);
-				clients.add(client);
+			List<Client> clients = queueIndexToClientsInQueueMap.computeIfAbsent(queueNumber, index -> new ArrayList<>());
+			Client client = new Client(
+					painter.getQueue(queueNumber), clients.size(),
+					arrivalTime, event.getTimeInCheckout());
+			clients.add(client);
 
 
-				clientAction = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,
-						clients.size());
+			clientAction = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,
+					clients.size());
 
-				client.startDrawingMe();
-				clientActions.add(clientAction);
-				if (event == lastArrival) {
-					clientAction = new ClientAction(arrivalTime,
-							ClientPositionType.PAUSE, null);
-					clientActions.add(clientAction);
-				}
-			} else {
-				List<Client> clients = queueIndexToClientsInQueueMap.get(queueNumber);
-				double departureTime = event.getEventTime();
-				clientAction = new ClientAction(departureTime, ClientPositionType.EXITING,
-						clients.get(0));
-				clients.remove(0);
+			client.startDrawingMe();
+			clientActions.add(clientAction);
+			if (event == lastArrival) {
+				clientAction = new ClientAction(arrivalTime,
+						ClientPositionType.PAUSE, null);
 				clientActions.add(clientAction);
 			}
 		}

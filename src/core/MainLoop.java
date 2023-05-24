@@ -21,7 +21,7 @@ public class MainLoop {
 
     private static MainLoop instance = null;
 
-    private boolean isPaused;
+    private boolean isPaused = true;
 
     private long timePassedMilliseconds = 0;
 

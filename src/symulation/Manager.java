@@ -5,7 +5,6 @@ import events.EventSubscriber;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
-import java.io.*;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -13,7 +12,6 @@ import java.util.TreeSet;
 import javax.swing.JOptionPane;
 
 import otherFunctions.ClientAction;
-import otherFunctions.TimeTable;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.Indicator;
@@ -25,7 +23,7 @@ public class Manager implements EventSubscriber {
 
 	private Simulation simulation;
 	private Painter painter;
-	private SortedSet<SimulationEvent> timeTable = new TreeSet<>();
+	private SortedSet<ClientArrivalEvent> timeTable = new TreeSet<>();
 
 	public OutsideWorld outside;
 	public StoreCheckout[] storeCheckouts;
@@ -69,8 +67,8 @@ public class Manager implements EventSubscriber {
 		}
 	}
 
-	public void setTimeTable(SortedSet<SimulationEvent> simulationEvents){
-        this.timeTable = simulationEvents;
+	public void setTimeTable(SortedSet<ClientArrivalEvent> clientArrivalEvents){
+        this.timeTable = clientArrivalEvents;
     }
 
 	public void restart(double time) {
@@ -167,9 +165,9 @@ public class Manager implements EventSubscriber {
     }
 
 	@Override
-	public void handleNewTimetable(SortedSet<SimulationEvent> simulationEvents) {
-		setTimeTable(simulationEvents);
-		painter.setTimeTable(simulationEvents);
+	public void handleNewTimetable(SortedSet<ClientArrivalEvent> clientArrivalEvents) {
+		setTimeTable(clientArrivalEvents);
+		painter.setTimeTable(clientArrivalEvents);
 		restart(0);
 	}
 
