@@ -46,7 +46,7 @@ public class Manager implements EventSubscriber {
 
 
 		outside = new OutsideWorld();
-		 waitingRoomIndicator=new Indicator(painter);
+		 waitingRoomIndicator=new Indicator();
 		 Point point=painter.getDoorPosition();
 		 int i=0;
 		 while (painter.getCheckoutPosition(i).x<point.x){
@@ -60,12 +60,12 @@ public class Manager implements EventSubscriber {
 	}
 
 	public void initializeStaticObjects (){
-		Door door = new Door(painter, 0);
+		Door door = new Door(0);
 		door.initializePosition();
 		int numberOfQueues = applicationConfiguration.getNumberOfQueues();
 		storeCheckouts =new StoreCheckout[numberOfQueues];
 		for (int i=0;i<numberOfQueues;i++){
-			storeCheckouts[i]=new StoreCheckout(painter,i);
+			storeCheckouts[i]=new StoreCheckout(i);
 		}
 	}
 

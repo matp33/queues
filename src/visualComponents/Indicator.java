@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.JComponent;
 
+import symulation.ApplicationConfiguration;
 import symulation.Painter;
 
 // ******* This class is used to show how many clients are not shown due to limits of size *********
@@ -14,10 +15,10 @@ public class Indicator extends JComponent {
 private static final long serialVersionUID = 1L;
 public int clientsOverLimit,x,y;
 
-    public Indicator(Painter painter){
+    public Indicator(){
 
 	    clientsOverLimit=0;
-	    Point position = painter.calculateWaitingRoomIndicatorPosition();
+	    Point position = ApplicationConfiguration.getInstance().getPainter().calculateWaitingRoomIndicatorPosition();
 	    this.x=position.x;
 	    this.y=position.y;
 

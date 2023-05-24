@@ -29,8 +29,8 @@ public class Door extends AnimatedAndObservable  {
 
 	private TimerTask currentAnimationTask;
 	
-	public Door(Painter painter, int indexOfQueueClosestToTheLeftOfDoor){
-		super(SpriteType.DOOR,painter);
+	public Door(int indexOfQueueClosestToTheLeftOfDoor){
+		super(SpriteType.DOOR);
 			
 		state=STATE_NEUTRAL;
 		observers = new ArrayList <Observer>();

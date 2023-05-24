@@ -72,7 +72,7 @@ private SpriteManager spriteManager;
 
 public Client(StoreCheckout storeCheckout, int clientNumber,  double destinationTime)  {
 
-		super(SpriteType.CLIENT,ApplicationConfiguration.getInstance().getPainter());
+		super(SpriteType.CLIENT);
 		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
 		spriteManager = applicationConfiguration.getSpriteManager();
 		logger = applicationConfiguration.getAppLogger();
@@ -210,12 +210,8 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
 
     public void moveToExit()  {
     	
-//    	if (id==12){
-//    		manager.pause();
-//    	}
     	storeCheckout.getClientsList().remove(this);
     	
-//    	System.out.println("Exit "+id);
     	setPositionType(ClientPositionType.EXITING);
     	calculateTrajectory();
     	setObjectObserved(painter.getDoor());
@@ -226,8 +222,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
     }
     
     public void moveOutside(){
-//    	red=true;
-//    	System.out.println("outside: "+id);
     	setPositionType(ClientPositionType.OUTSIDE_VIEW);
     	calculateTrajectory();
     }
@@ -240,51 +234,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
     }
 
 
-    private void move() {
-
-        if (MainLoop.getInstance().isPaused()){
-            stopMoving();
-            return;
-        }
-        
-        if (trajectory.isEmpty()){ // stopped
-
-        	if (MainLoop.getInstance().getTimePassedMilliseconds()<destinationTime){ // client came before his arrival time, so he waits
-        		double d=0;
-        		stopMoving();  
-        		createDelay(d);        		 
-//        		System.out.println("waiting"+id);
-        		return;
-        	} // TODO if get time == destinationTime jump to queue 
-        	
-
-            // Opening client 3, but moving outside: 1, 1 should open not 3
-            
-            stopMoving();
-        }
-        
-        if (!trajectory.isEmpty()){
-
-        	
-            if (getPositionType()==ClientPositionType.WAITING_ROOM && isMoving()==false){
-            	setPositionType(ClientPositionType.GOING_TO_QUEUE);
-            }
-            
-            if (getPositionType()==ClientPositionType.ARRIVAL && isMoving()==false){
-            	setPositionType(ClientPositionType.WAITING_ROOM);
-            }
-            
-
-            Point point=trajectory.get(0);
-            trajectory.remove(0);
-            chooseDirection(point);
-            currentAnimation.start();
-            currentAnimation.updateFrame();
-            position=new Point(point.x, point.y);
-            
-        }
-
-    }
 
     public static double calculateTimeToGetToQueue(Point queuePosition,
                                              Point waitingRoomPosition){
@@ -315,16 +264,11 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
                 
         if (point.y>startingPosition.y){
         	int diff=point.y-startingPosition.y;
-//        	point.setSize(point.x+signumForX*diff, point.y-signumForY*diff);
         }
         
         return point;
 
     }    
-
-	public int getQueueDelay() {
-		return queueDelay;
-	}
 
 	public void saveInformation(Point point, ClientPositionType type) {
 		position=point;
@@ -356,9 +300,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
 		this.positionType = positionType;
 	}
 
-	public boolean isMoving() {
-		return isMoving;
-	}
 
 	public int getClientNumber() {
 		return clientNumber;
@@ -457,10 +398,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
 	}
 
 	
-	public Observable getObjectObserved(){
-		return objectObservedByMe;
-	}
-	
+
 	
 	@Override
     public void paintComponent(Graphics g) {
@@ -468,37 +406,10 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double destination
     	int x = position.x;
     	int y = position.y;
         Graphics2D g2d = (Graphics2D) g;
-//        if (red){
-//        	g2d.setColor(Color.red);
-//        }
-        g2d.drawImage(currentAnimation.getSprite(),x,y,null); 
-//        if (!trajectory.isEmpty())
+        g2d.drawImage(currentAnimation.getSprite(),x,y,null);
         g2d.drawString(""+id, x+getSize().width, y+getSize().height);
               
     }
-	
-	
-	private void scheduleGoingToQueue(int delay){
-		TimerTask tt = new TimerTask (){
-			@Override
-			public void run(){
-				moveToQueue();
-				isWaiting=false;
-			}
-		};
-		timerDelay.schedule(tt, delay);
-		isWaiting=true;
-	}
-	
-	public void createDelay(double delay){
-		TimerTask tt = new TimerTask (){
-			@Override
-			public void run(){
-				scheduleMoving();
-			}
-		};
-		timerDelay.schedule(tt, (int)(1000*delay));
-	}
 
 	@Override
 	public String toString (){

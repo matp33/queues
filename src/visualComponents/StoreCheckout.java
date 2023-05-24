@@ -22,9 +22,9 @@ public class StoreCheckout extends AnimatedAndObservable{
 	private List<Client> clientsExiting;
 	private List <Client> clientsInQueue;
         
-        public StoreCheckout(Painter painter, int checkoutIndex){
+        public StoreCheckout(int checkoutIndex){
             
-        	super(SpriteType.STORE_CHECKOUT, painter);
+        	super(SpriteType.STORE_CHECKOUT);
         	maxClients=painter.maxClientsVisibleInQueue;
             clientsAboveLimit=0;
             setClientsList(new ArrayList <Client>());
