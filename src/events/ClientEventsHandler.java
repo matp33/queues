@@ -12,7 +12,7 @@ import java.util.*;
 
 public class ClientEventsHandler implements ChangeableObject {
 
-    private List<ClientAction> listOfEvents = new ArrayList<>();
+    private SortedSet<ClientAction> setOfEvents = new TreeSet<>();
 
     private Painter painter;
 
@@ -23,22 +23,23 @@ public class ClientEventsHandler implements ChangeableObject {
         objectsManager = ApplicationConfiguration.getInstance().getObjectsStateHandler();
     }
 
-    public void setEventsList(List<ClientAction> listOfEvents) {
-        this.listOfEvents = listOfEvents;
+    public void setEventsList(SortedSet<ClientAction> setOfEvents) {
+        this.setOfEvents = setOfEvents;
     }
     @Override
     public void update(double currentTime) {
-        if (listOfEvents.isEmpty()){
+        if (setOfEvents.isEmpty()){
             return;
         }
-        ClientAction clientAction=listOfEvents.get(0);
+        Iterator<ClientAction> iterator = setOfEvents.iterator();
+        ClientAction clientAction = iterator.next();
         double actionTime=clientAction.getTime();
 
         if (currentTime < actionTime){
             return;
         }
 
-        listOfEvents.remove(0);
+        iterator.remove();
 
         ClientPositionType action=clientAction.getClientPositionType();
         Client client=clientAction.getClient();
@@ -66,8 +67,7 @@ public class ClientEventsHandler implements ChangeableObject {
             case WAITING_IN_QUEUE: //TODO WAITING IN QUEUE SHOULD BE DELETED
                 if (objectsManager.isClientInCheckout(client)){
                     ClientAction clientAction = new ClientAction(timePassed + client.getTimeInCheckout(), ClientPositionType.EXITING, client);
-                    listOfEvents.add(clientAction); //TODO should be a sorted collection
-                    listOfEvents.sort(Comparator.comparing(ClientAction::getTime));
+                    setOfEvents.add(clientAction);
                 }
                 break;
             case EXITING:
@@ -81,8 +81,7 @@ public class ClientEventsHandler implements ChangeableObject {
                 break;
             case WAITING_ROOM:
                 ClientAction clientAction = new ClientAction(client.calculateTimeOfMovingToQueue(), ClientPositionType.GOING_TO_QUEUE, client);
-                listOfEvents.add(clientAction);
-                listOfEvents.sort(Comparator.comparing(ClientAction::getTime));
+                setOfEvents.add(clientAction);
                 break;
 
 

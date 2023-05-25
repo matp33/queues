@@ -184,10 +184,7 @@ public class Door extends AnimatedAndObservable  {
         		if ( observers.get(i) instanceof Client){
         			Client cd = (Client) observers.get(i);
 
-        			System.out.println("client "+c.id+"trajjectory "+c.getTrajectory().size()+" vs client "+cd.id+"tra"+
-        					cd.getTrajectory().size());
         				if (c.getTrajectory().size()<cd.getTrajectory().size()){
-        					System.out.println("adding client "+c.id+ "+ to place "+i);
         					observers.add(i, c);
         					return;
         				}

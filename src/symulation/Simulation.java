@@ -37,7 +37,7 @@ public class Simulation {
    
 
 		Map<Integer, List<Client>> queueIndexToClientsInQueueMap = new HashMap<>();
-		List<ClientAction> clientActions = new ArrayList<>();
+		SortedSet<ClientAction> clientActions = new TreeSet<>();
 		ClientArrivalEvent lastArrival =  clientArrivalEvents.stream().max(Comparator.comparing(ClientArrivalEvent::getArrivalTime)).orElseThrow(()->new IllegalArgumentException("simulation events empty"));
 		for (ClientArrivalEvent event : clientArrivalEvents) {
 			double arrivalTime = event.getArrivalTime();

@@ -68,7 +68,7 @@ private static final int maxMovementDelay=700; // max value for queue delay
 private static final long serialVersionUID = 1L;
 public static final double waitRoomDelay = 1;
 public static int nr;
-public final int id; 
+private final int id;
 
 private boolean isWaiting;
 private SpriteManager spriteManager;
@@ -113,6 +113,10 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 //        red = false;
                 
     }
+
+	public int getId() {
+		return id;
+	}
 
 	public double calculateTimeOfMovingToQueue() {
 		return arrivalTime + waitRoomDelay;

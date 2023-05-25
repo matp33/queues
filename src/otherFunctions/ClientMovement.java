@@ -40,7 +40,7 @@ private List <AnimatedObject> objects;
     List <AnimatedObject> objectsOnTheWay = new ArrayList <AnimatedObject>();
     Rectangle clientTrajectory = new Rectangle(minOfRangeX, minOfRangeY, rectangleWidth, rectangleHeight);
     Direction movingDirection = chooseWhichWayToGo(new Point (newXCoord, newYCoord), coordinates);
-    int i=client.id;
+    int i=client.getId();
     
     for (AnimatedObject object: objects){
     	if (object instanceof StoreCheckout){
