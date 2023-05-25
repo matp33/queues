@@ -116,7 +116,6 @@ public class CustomLayout {
 
        switch (position){
            case GOING_TO_QUEUE:
-           case WAITING_IN_QUEUE:
                if (clientNumber< maximumNumberOfClientsInQueue){
                    y= checkoutYPosition + checkoutHeight +clientsHeight*(clientNumber);
                }

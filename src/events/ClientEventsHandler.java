@@ -48,7 +48,6 @@ public class ClientEventsHandler implements ChangeableObject {
             case ARRIVAL:
                 moveClientToWaitingRoom(client);
                 break;
-            case WAITING_IN_QUEUE:
             case GOING_TO_QUEUE:
                 moveClientToQueue(client);
                 break;
@@ -64,7 +63,6 @@ public class ClientEventsHandler implements ChangeableObject {
     public void handleClientStoppedMoving(Client client, double timePassed) {
         switch (client.getPositionType()){
             case GOING_TO_QUEUE:
-            case WAITING_IN_QUEUE: //TODO WAITING IN QUEUE SHOULD BE DELETED
                 if (objectsManager.isClientInCheckout(client)){
                     ClientAction clientAction = new ClientAction(timePassed + client.getTimeInCheckout(), ClientPositionType.EXITING, client);
                     setOfEvents.add(clientAction);

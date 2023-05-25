@@ -179,7 +179,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 	protected void decreaseNumberOfClientsInQueue() {
 		if ((
-				getPositionType()==ClientPositionType.WAITING_IN_QUEUE && storeCheckout.isClientLastVisible(this))){
+				storeCheckout.isClientLastVisible(this))){
 			storeCheckout.decreaseClientsAboveLimit();
 			
 		}
@@ -288,7 +288,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         storeCheckout.getClientsArriving().remove(this);
         isSavedInLog=true;
         logger.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedSeconds());
-        setPositionType(ClientPositionType.WAITING_IN_QUEUE);
 	}
 	
 	public Point getPosition(){

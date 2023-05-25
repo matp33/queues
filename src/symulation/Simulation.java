@@ -85,7 +85,7 @@ public class Simulation {
 
 		ClientPositionType positionType;
 		if (calculatedPosition.equals(pointInQueue)){
-			positionType = ClientPositionType.WAITING_IN_QUEUE;
+			positionType = ClientPositionType.GOING_TO_QUEUE;
 			client.saveInformation(calculatedPosition, positionType);
 			return new ClientAction(arrivalTime, positionType, client);
 		}
@@ -97,7 +97,7 @@ public class Simulation {
 		double time;
 
 	    if ( totalTime + simulationStartTime >= arrivalTime){
-	    	positionType=ClientPositionType.WAITING_IN_QUEUE;
+	    	positionType=ClientPositionType.GOING_TO_QUEUE;
 	    	calculatedPosition=pointInQueue;
 			time = simulationStartTime;
 	    }
