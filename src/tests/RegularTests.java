@@ -10,7 +10,7 @@ import java.util.*;
 
 public class RegularTests {
 
-    static int arrivalDelay=700;
+    static double arrivalDelay=0.7;
 
     public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws InterruptedException {
 
@@ -35,7 +35,7 @@ public class RegularTests {
             for (int i=0; i<numberOfClients;i++){
                 int queueNumber = new Random().nextInt(numberOfQueues);
                 double timeInQueue = generateRandomTimeInQueue();
-                clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i*(double)arrivalDelay/1000, queueNumber));
+                clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i*arrivalDelay, queueNumber));
             }
             applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);
             Manager manager = applicationConfiguration.getManager();
@@ -103,7 +103,7 @@ public class RegularTests {
         double timeInQueue = generateRandomTimeInQueue();
 
         for (int i=0; i<arrivingClients;i++){
-            clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, 6+i*(double)arrivalDelay/1000, numberOfQueues-1));
+            clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, 6+i*arrivalDelay, numberOfQueues-1));
         }
 
         applicationConfiguration.getManager().setTimeTable(clientArrivalEvents);

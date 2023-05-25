@@ -259,7 +259,7 @@ public class Door extends AnimatedAndObservable  {
 
 
 	@Override
-	public void update(long currentTimeMilliseconds) {
+	public void update(double currentTimeSeconds) {
 
 	}
 }

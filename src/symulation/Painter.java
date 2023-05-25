@@ -91,7 +91,7 @@ public class Painter extends JPanel {
     }
 
     public boolean isTimeWithinSimulationRange(double time){
-        return timeTable.last().getArrivalTime() <= time;
+        return timeTable.last().getArrivalTime() >= time;
     }
 
     public void initiateWindow() {
@@ -335,6 +335,7 @@ public class Painter extends JPanel {
             objects.get(i).scheduleMoving();
             if (objects.get(i) instanceof Client){
                 Client c=(Client)objects.get(i);
+                c.resetTimerObject();
 //				System.out.println("@@"+c.id);
             }
         }

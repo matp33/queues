@@ -60,7 +60,6 @@ public class ApplicationConfiguration {
         spriteManager.loadSprites();
         painter.initiateWindow();
         manager.initializeStaticObjects();
-        MainLoop.getInstance().addObject(clientEventsHandler);
     }
 
     public SpriteManager getSpriteManager() {

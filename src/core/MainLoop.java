@@ -11,11 +11,9 @@ import java.util.TimerTask;
 
 public class MainLoop {
 
-    public static final int DELTA_TIME = 20;
+    public static final double DELTA_TIME = 0.02;
     private Timer timer;
     private Painter painter;
-
-    private Client client;
 
     private List<ChangeableObject> changeableObjects = new ArrayList<>();
 
@@ -23,7 +21,7 @@ public class MainLoop {
 
     private boolean isPaused = true;
 
-    private long timePassedMilliseconds = 0;
+    private double timePassedSeconds = 0;
 
     public static MainLoop getInstance() {
         if (instance == null){
@@ -36,7 +34,7 @@ public class MainLoop {
     private MainLoop(Painter painter) {
         timer = new Timer();
         this.painter = painter;
-        timer.scheduleAtFixedRate(mainLoopTask(),0, DELTA_TIME);
+        timer.scheduleAtFixedRate(mainLoopTask(),0, (int)(DELTA_TIME*1000));
     }
 
     public void addObject (ChangeableObject object){
@@ -59,10 +57,10 @@ public class MainLoop {
             @Override
             public void run() {
                 if (!isPaused){
-                    timePassedMilliseconds +=  DELTA_TIME;
-                    changeableObjects.forEach(changeableObject -> changeableObject.update(timePassedMilliseconds));
+                    timePassedSeconds +=  DELTA_TIME;
+                    changeableObjects.forEach(changeableObject -> changeableObject.update(timePassedSeconds));
                     painter.repaint();
-                    painter.updateTime((double)timePassedMilliseconds/1000);
+                    painter.updateTime( timePassedSeconds);
                 }
 
             }
@@ -73,11 +71,15 @@ public class MainLoop {
         return isPaused;
     }
 
-    public long getTimePassedMilliseconds() {
-        return timePassedMilliseconds;
+    public double getTimePassedSeconds() {
+        return timePassedSeconds;
     }
 
-    public void setTimePassed(long timePassedMilliseconds) {
-        this.timePassedMilliseconds = timePassedMilliseconds;
+    public void setTimePassed(double timePassedSeconds) {
+        this.timePassedSeconds = timePassedSeconds;
+    }
+
+    public void removeObjects() {
+        changeableObjects.clear();
     }
 }

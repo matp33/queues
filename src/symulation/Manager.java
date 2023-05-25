@@ -65,6 +65,7 @@ public class Manager implements EventSubscriber {
 		for (int i=0;i<numberOfQueues;i++){
 			storeCheckouts[i]=new StoreCheckout(i);
 		}
+		ApplicationConfiguration.getInstance().getClientEventsHandler().addToLoop();
 	}
 
 	public void setTimeTable(SortedSet<ClientArrivalEvent> clientArrivalEvents){
@@ -80,6 +81,7 @@ public class Manager implements EventSubscriber {
 	
 	public void clean(){
 		painter.clean();
+		MainLoop.getInstance().removeObjects();
 	}
 
     public void doSimulation ()  {
@@ -89,7 +91,7 @@ public class Manager implements EventSubscriber {
 
 	public void doSimulation (double time)  {
     	Client.nr=0;
-		MainLoop.getInstance().setTimePassed ((long)time * 1000);
+		MainLoop.getInstance().setTimePassed (time);
     	waitingRoomIndicator.clear();
     	
         painter.setButtonRestartToActive();

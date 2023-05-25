@@ -81,7 +81,7 @@ public class Simulation {
 
 		double timeNeededToMoveToQueue=Client.calculateTimeToGetToQueue(pointInQueue, pointWaitPlace);
 		double totalTime=timeNeededToMoveToQueue+//timeToWaitPlace+  TODO add it
-				Client.waitRoomDelay/1000;
+				Client.waitRoomDelay;
 
 		ClientPositionType positionType;
 		if (calculatedPosition.equals(pointInQueue)){

@@ -2,6 +2,7 @@ package events;
 
 import constants.ClientPositionType;
 import core.ChangeableObject;
+import core.MainLoop;
 import otherFunctions.ClientAction;
 import symulation.ApplicationConfiguration;
 import symulation.Painter;
@@ -24,15 +25,14 @@ public class ClientEventsHandler implements ChangeableObject {
         this.listOfEvents = listOfEvents;
     }
     @Override
-    public void update(long currentTimeMilliseconds) {
+    public void update(double currentTime) {
         if (listOfEvents.isEmpty()){
             return;
         }
         ClientAction clientAction=listOfEvents.get(0);
         double actionTime=clientAction.getTime();
 
-        double timePassed = (double) currentTimeMilliseconds / 1000;
-        if (timePassed < actionTime){
+        if (currentTime < actionTime){
             return;
         }
 
@@ -54,5 +54,9 @@ public class ClientEventsHandler implements ChangeableObject {
                 painter.pauseSimulationAndAskQuestion();
                 break;
         }
+    }
+
+    public void addToLoop() {
+        MainLoop.getInstance().addObject(this);
     }
 }

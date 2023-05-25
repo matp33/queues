@@ -65,7 +65,7 @@ public static final double movementDelay=0.01; // seconds
 private static final int minMovementDelay=600; // min value for queue delay
 private static final int maxMovementDelay=700; // max value for queue delay
 private static final long serialVersionUID = 1L;
-public static final int waitRoomDelay = 1000;
+public static final double waitRoomDelay = 1;
 public static int nr;
 public final int id; 
 
@@ -106,7 +106,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         delayWaited=0;
         observers=new ArrayList <Observer>();
 		timer=new Timer();
-		timerDelay=new Timer();
 //        red = false;
                 
     }
@@ -148,7 +147,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         else{
         	timerDelay.schedule(tt, 0);
         }
-        delayStartTime=(int)(MainLoop.getInstance().getTimePassedMilliseconds()); //TODO this is too complicated I guess
+        delayStartTime=(int)(MainLoop.getInstance().getTimePassedSeconds()); //TODO this is too complicated I guess
         isWaiting=true;
         
     	
@@ -176,7 +175,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     	    	
     	if (isWaiting){
     		
-    		delayWaited+=(int)(MainLoop.getInstance().getTimePassedMilliseconds())-delayStartTime; // no negative values allowed
+    		delayWaited+=(int)(MainLoop.getInstance().getTimePassedSeconds())-delayStartTime; // no negative values allowed
 //    		System.out.println("delay wait: "+delayWaited+"abc"+abc);
     		timerDelay.cancel();
 			timer.cancel();
@@ -202,7 +201,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     public void moveToWaitingRoom()  {
     	setPositionType(ClientPositionType.WAITING_ROOM);
         calculateTrajectory();
-        timeSupposed=MainLoop.getInstance().getTimePassedMilliseconds()+trajectory.size()*movementDelay+ waitRoomDelay;
+        timeSupposed=MainLoop.getInstance().getTimePassedSeconds()+trajectory.size()*movementDelay+ waitRoomDelay;
     }
 
     public void moveToQueue(){
@@ -283,7 +282,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 		if (storeCheckout.isClientOutOfSight(this)) storeCheckout.increaseNumber();
         storeCheckout.getClientsArriving().remove(this);
         isSavedInLog=true;
-        logger.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedMilliseconds());
+        logger.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedSeconds());
         setPositionType(ClientPositionType.WAITING_IN_QUEUE);
 	}
 	
@@ -373,7 +372,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 	}
 
 	@Override
-	public void update(long timePassed) {
+	public void update(double timePassed) {
 
 		if (!trajectory.isEmpty()){
 			Point point=trajectory.get(0);
@@ -397,14 +396,14 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 				objectObservedByMe.removeObserver(this);
 			}
 			if (getPositionType().equals(ClientPositionType.WAITING_IN_QUEUE) && storeCheckout.isFirst(this) && !isInCheckout){
-				timeEnteringCheckout = (double)timePassed/1000;
+				timeEnteringCheckout = timePassed;
 
 				isInCheckout = true;
 			}
 			if (getPositionType()== ClientPositionType.WAITING_ROOM && arrivalTime + waitRoomDelay <=timePassed){
 				moveToQueue();
 			}
-			if (isInCheckout && (double)timePassed/1000 >=timeEnteringCheckout + timeInCheckout){
+			if (isInCheckout && timePassed >=timeEnteringCheckout + timeInCheckout){
 				moveToExit();
 				isInCheckout = false;
 			}
@@ -433,10 +432,12 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 	@Override
 	public String toString (){
-		return "" + id;
+		return "" + id + " pos: " +positionType;
 	}
 
 
-
+	public void resetTimerObject() {
+		timerDelay = new Timer();
+	}
 }
 
