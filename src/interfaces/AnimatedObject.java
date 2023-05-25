@@ -52,7 +52,6 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 		}
 		max=animations.length;
 		currentAnimation=animations[0];
-		MainLoop.getInstance().addObject(this);
 
 	}
 		

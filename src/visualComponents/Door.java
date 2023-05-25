@@ -10,6 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import sprites.SpriteType;
+import symulation.ApplicationConfiguration;
 import symulation.Painter;
 
 public class Door extends AnimatedAndObservable  {
@@ -103,7 +104,6 @@ public class Door extends AnimatedAndObservable  {
 				if ((state==STATE_OPENING && currentAnimation.isFinalFrame())
 						|| (state==STATE_CLOSING && currentAnimation.isInitialFrame())){
 					currentAnimationTask.cancel();
-					currentAnimationTask = null;
 //					timer=null;
 					if (state==STATE_OPENING){
 						doClosing();
@@ -129,7 +129,7 @@ public class Door extends AnimatedAndObservable  {
 	 public void notifyClients(){ 
 		 
 	     	Client c1=(Client)observers.get(0);
-	     	c1.moveOutside();
+		 	ApplicationConfiguration.getInstance().getClientEventsHandler().moveOutside(c1);
 	     	
 	     	if (!observers.isEmpty()){
 	     		Client c=(Client)observers.get(0);

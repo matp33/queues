@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.List;
 
 import constants.ClientPositionType;
-import constants.TypeOfTimeEvent;
+import core.MainLoop;
 import events.ClientEventsHandler;
 import otherFunctions.ClientAction;
 import visualComponents.Client;
@@ -52,7 +52,7 @@ public class Simulation {
 			clientAction = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,
 					clients.size());
 
-			client.startDrawingMe();
+			MainLoop.getInstance().addObject(client);
 			clientActions.add(clientAction);
 			if (event == lastArrival) {
 				clientAction = new ClientAction(arrivalTime,

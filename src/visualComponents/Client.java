@@ -2,6 +2,7 @@ package visualComponents;
 
 import constants.ClientPositionType;
 import core.MainLoop;
+import events.ClientEventsHandler;
 import interfaces.AnimatedAndObservable;
 import interfaces.Observable;
 import interfaces.Observer;
@@ -74,6 +75,8 @@ private SpriteManager spriteManager;
 
 private double timeInCheckout;
 
+private ClientEventsHandler clientEventsHandler;
+
 public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime, double timeInCheckout)  {
 
 		super(SpriteType.CLIENT);
@@ -106,15 +109,31 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         delayWaited=0;
         observers=new ArrayList <Observer>();
 		timer=new Timer();
+		clientEventsHandler = ApplicationConfiguration.getInstance().getClientEventsHandler();
 //        red = false;
                 
     }
-    
-    private int createDelay(){
+
+	public double calculateTimeOfMovingToQueue() {
+		return arrivalTime + waitRoomDelay;
+	}
+
+	public double getTimeInCheckout() {
+		return timeInCheckout;
+	}
+
+	public Observable getObjectObservedByMe() {
+		return objectObservedByMe;
+	}
+
+	private int createDelay(){
     	Random random=new Random();
-        int queueDelay=random.nextInt(maxMovementDelay-minMovementDelay+1)+minMovementDelay;
-        return queueDelay;
+		return random.nextInt(maxMovementDelay-minMovementDelay+1)+minMovementDelay;
     }
+
+
+
+
     
     @Override
     public void moveUpInQueue()  {
@@ -198,36 +217,18 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     	}
     }
 
-    public void moveToWaitingRoom()  {
-    	setPositionType(ClientPositionType.WAITING_ROOM);
-        calculateTrajectory();
-        timeSupposed=MainLoop.getInstance().getTimePassedSeconds()+trajectory.size()*movementDelay+ waitRoomDelay;
-    }
 
-    public void moveToQueue(){
-    	storeCheckout.addClient(this);
-    	setPositionType(ClientPositionType.GOING_TO_QUEUE);
-        calculateTrajectory();
-        timeSupposed+=trajectory.size()*movementDelay;        
-    }
+	public void calculateExpectedTimeInWaitingRoom() {
+		timeSupposed=MainLoop.getInstance().getTimePassedSeconds()+trajectory.size()*movementDelay+ waitRoomDelay;
+	}
 
 
-    public void moveToExit()  {
-		storeCheckout.getClientsList().remove(this);
-    	
-    	setPositionType(ClientPositionType.EXITING);
-    	calculateTrajectory();
-    	setObjectObserved(painter.getDoor());
-                
-        notifyClients();    
-        
-        
-    }
-    
-    public void moveOutside(){
-    	setPositionType(ClientPositionType.OUTSIDE_VIEW);
-    	calculateTrajectory();
-    }
+	public void calculateExpectedTimeInQueue() {
+		timeSupposed+=trajectory.size()*movementDelay;
+	}
+
+
+
 
     public void calculateTrajectory(){
     	
@@ -299,7 +300,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 		return positionType;
 	}
 	
-	private void setPositionType(ClientPositionType positionType) {
+	public void setPositionType(ClientPositionType positionType) {
 		this.positionType = positionType;
 	}
 
@@ -381,31 +382,8 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 			currentAnimation.start();
 			currentAnimation.updateFrame();
 			position=new Point(point.x, point.y);
-		}
-		else{
-
-			if (getPositionType() == ClientPositionType.GOING_TO_QUEUE){
-				setPositionType(ClientPositionType.WAITING_IN_QUEUE);
-			}
-			if (getPositionType()==ClientPositionType.EXITING  ){
-				if (painter.getDoor().isFirst(this))
-					painter.getDoor().doOpening();
-			}
-			if (getPositionType()==ClientPositionType.OUTSIDE_VIEW ){
-				painter.removeObject(this);
-				objectObservedByMe.removeObserver(this);
-			}
-			if (getPositionType().equals(ClientPositionType.WAITING_IN_QUEUE) && storeCheckout.isFirst(this) && !isInCheckout){
-				timeEnteringCheckout = timePassed;
-
-				isInCheckout = true;
-			}
-			if (getPositionType()== ClientPositionType.WAITING_ROOM && arrivalTime + waitRoomDelay <=timePassed){
-				moveToQueue();
-			}
-			if (isInCheckout && timePassed >=timeEnteringCheckout + timeInCheckout){
-				moveToExit();
-				isInCheckout = false;
+			if (trajectory.isEmpty()){
+				clientEventsHandler.handleClientStoppedMoving(this, timePassed);
 			}
 		}
 

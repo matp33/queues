@@ -2,6 +2,7 @@ package symulation;
 
 import core.MainLoop;
 import events.ClientEventsHandler;
+import events.ObjectsManager;
 import otherFunctions.AppLogger;
 import sprites.SpriteManager;
 
@@ -18,11 +19,13 @@ public class ApplicationConfiguration {
 
     private AppLogger appLogger;
 
-    private ClientEventsHandler clientEventsHandler;
+    private ObjectsManager objectsManager;
 
     private static ApplicationConfiguration applicationConfiguration;
 
     private int numberOfQueues;
+
+    private ClientEventsHandler clientEventsHandler;
 
     private ApplicationConfiguration() {
     }
@@ -40,10 +43,15 @@ public class ApplicationConfiguration {
         applicationConfiguration.painter = Painter.getInstance();
         applicationConfiguration.manager = new Manager();
         applicationConfiguration.appLogger = new AppLogger();
+        applicationConfiguration.objectsManager = new ObjectsManager();
         applicationConfiguration.clientEventsHandler = new ClientEventsHandler();
     }
 
-    public ClientEventsHandler getClientEventsHandler() {
+    public ObjectsManager getObjectsStateHandler() {
+        return objectsManager;
+    }
+
+    public ClientEventsHandler getClientEventsHandler (){
         return clientEventsHandler;
     }
 
@@ -59,7 +67,8 @@ public class ApplicationConfiguration {
     public void initialize () throws IOException {
         spriteManager.loadSprites();
         painter.initiateWindow();
-        manager.initializeStaticObjects();
+        objectsManager.initializeObjects();
+        MainLoop.getInstance().addObject(clientEventsHandler);
     }
 
     public SpriteManager getSpriteManager() {
