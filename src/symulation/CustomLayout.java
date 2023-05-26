@@ -5,12 +5,15 @@ package symulation;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Deque;
 
 import javax.swing.JPanel;
 
 import constants.ClientPositionType;
 import sprites.SpriteManager;
 import sprites.SpriteType;
+import visualComponents.Client;
+import visualComponents.Door;
 
 public class CustomLayout {
 
@@ -156,6 +159,21 @@ public class CustomLayout {
 
        return new Point(x,y);
 
+   }
+
+   public static Client getClientClosestToDoor (Deque<Client> clientsMovingToExit, Door door){
+       Client clientClosestToDoor = null;
+       Point doorPosition = door.getPosition();
+       double minDistance = Double.MAX_VALUE;
+       for (Client client : clientsMovingToExit) {
+           Point thisClientPosition = client.getPosition();
+           double distance = doorPosition.distance(thisClientPosition);
+           if (distance < minDistance){
+               minDistance = distance;
+               clientClosestToDoor = client;
+           }
+       }
+       return clientClosestToDoor;
    }
    
    private boolean isQueueLeftSideOfDoors(int checkoutIndex){

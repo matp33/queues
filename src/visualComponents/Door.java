@@ -26,7 +26,7 @@ public class Door extends AnimatedAndObservable  {
 	public static int STATE_NEUTRAL=0; // nothing
 	public static int STATE_OPENING=1;
 	
-	private boolean isNotified;
+	private boolean isOpened;
 
 	private TimerTask currentAnimationTask;
 	
@@ -35,7 +35,6 @@ public class Door extends AnimatedAndObservable  {
 			
 		state=STATE_NEUTRAL;
 		observers = new ArrayList <Observer>();
-		isNotified=false;
 		this.indexOfQueueClosestToTheLeftOfDoor =indexOfQueueClosestToTheLeftOfDoor;
 		startDrawingMe();
 		timer = new Timer();
@@ -48,7 +47,6 @@ public class Door extends AnimatedAndObservable  {
 		
 	public void doOpening(){	
 		
-		isNotified=false;
 		state=STATE_OPENING;
 		currentAnimation.normalDirection();
 		currentAnimation.start();		
@@ -91,14 +89,17 @@ public class Door extends AnimatedAndObservable  {
 			currentAnimationTask.cancel();
 //			timer=null;
 		}
-		
+
 		currentAnimationTask = new TimerTask(){
 			public void run(){		
 				
 				currentAnimation.updateFrame();
-				if (canClientEnter() && isNotified==false){
+				if (canClientEnter() ){
 					notifyClients();					
-					isNotified=true;
+					isOpened=true;
+				}
+				else{
+					isOpened = false;
 				}
 				
 				if ((state==STATE_OPENING && currentAnimation.isFinalFrame())
@@ -128,27 +129,7 @@ public class Door extends AnimatedAndObservable  {
 	
 	 public void notifyClients(){ 
 		 
-	     	Client c1=(Client)observers.get(0);
-		 	ApplicationConfiguration.getInstance().getClientEventsHandler().moveOutside(c1);
-	     	
-	     	if (!observers.isEmpty()){
-	     		Client c=(Client)observers.get(0);
-	     		int dir = chooseLeftOrRight(c);
-	     		c.setClientNumber(c.getClientNumber()-1);
-     			c.calculateTrajectory();
-//     			System.out.println("cid "+c.id+" dir "+dir);
-     			
-	     		for (int i=1; i<observers.size();i++){
-	     			Client c2=(Client)observers.get(i);
-	     			
-	     			if (c2.getClientNumber()>0 && chooseLeftOrRight(c2)==dir){ 	     				
-		     			c2.setClientNumber(c2.getClientNumber()-1);
-		     			c2.calculateTrajectory();
-	     			}
-	     		}
-	     		
-	     	}
-	     	
+
 	     	
      }
 	     
@@ -178,20 +159,6 @@ public class Door extends AnimatedAndObservable  {
 //    		 return;
 //    	 }
     	 
-    	 if (client instanceof Client){
-    		 Client c=(Client)client;
-        	 for (int i=0; i<observers.size();i++){
-        		if ( observers.get(i) instanceof Client){
-        			Client cd = (Client) observers.get(i);
-
-        				if (c.getTrajectory().size()<cd.getTrajectory().size()){
-        					observers.add(i, c);
-        					return;
-        				}
-        			
-        		}
-        	 }
-    	 }
     	 Client c = (Client )client;
 //    	 System.out.println("adding client "+c.id+ "+ as last ");
     	 observers.add(client);
@@ -230,14 +197,7 @@ public class Door extends AnimatedAndObservable  {
 		
 	}
 	
-	public Observer getFirstObserver (){
-		if (!observers.isEmpty())
-			return observers.get(0);
-		else{
-			return null;
-		}
-	}
-	
+
 	public int chooseLeftOrRight(Client c){
 		if (c.getQueueNumber()>= indexOfQueueClosestToTheLeftOfDoor){
 			return 1; //right
@@ -258,5 +218,9 @@ public class Door extends AnimatedAndObservable  {
 	@Override
 	public void update(double currentTimeSeconds) {
 
+	}
+
+	public boolean isOpened() {
+		return isOpened;
 	}
 }

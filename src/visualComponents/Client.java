@@ -4,6 +4,7 @@ import constants.ClientPositionType;
 import core.MainLoop;
 import events.ClientEventsHandler;
 import interfaces.AnimatedAndObservable;
+import interfaces.AnimatedObject;
 import interfaces.Observable;
 import interfaces.Observer;
 
@@ -24,7 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Client extends AnimatedAndObservable implements Observer {
+public class Client extends AnimatedObject {
 
 private double arrivalTime;
 private double timeSupposed=0;
@@ -33,12 +34,13 @@ private ClientPositionType positionType;
 private int delayWaited;
 private int delayStartTime;
 
+private Point lookAtPoint;
+
 private boolean isMoving;
 private boolean isSavedInLog; 
 
 private ClientMovement movement;
 private List <Point> trajectory = new ArrayList<>();
-private List <Observer> observers;
 private StoreCheckout storeCheckout;
 
 private Timer timer;
@@ -46,7 +48,6 @@ private Timer timerDelay; // timer for moving inside queue connected to clients 
 
 private TimerTask movingTask;
 private Animation currentAnimation,moveLeft,moveRight,moveDown,moveUp;
-private Observable objectObservedByMe;
 private Point position;
 
 private AppLogger logger;
@@ -107,7 +108,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         currentAnimation.start();    
         this.storeCheckout = storeCheckout;
         delayWaited=0;
-        observers=new ArrayList <Observer>();
 		timer=new Timer();
 		clientEventsHandler = ApplicationConfiguration.getInstance().getClientEventsHandler();
 //        red = false;
@@ -126,9 +126,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 		return timeInCheckout;
 	}
 
-	public Observable getObjectObservedByMe() {
-		return objectObservedByMe;
-	}
 
 	private int createDelay(){
     	Random random=new Random();
@@ -139,7 +136,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 
     
-    @Override
     public void moveUpInQueue()  {
     	
 //    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
@@ -158,7 +154,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 	            	if (getPositionType().ordinal()>ClientPositionType.WAITING_ROOM.ordinal()){
 	            		calculateTrajectory();    
 	            	}
-				notifyClients();
 			}
         };
         
@@ -215,10 +210,8 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 		}
     	isMoving=false;
     	currentAnimation.setLastFrame();
-    	if (objectObservedByMe!=null){
-    		chooseDirection(objectObservedByMe.getPosition());
+		chooseDirection(lookAtPoint);
 //    		System.out.println("o o is null: "+clientNumber);
-    	}
     }
 
 
@@ -236,9 +229,9 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
     public void calculateTrajectory(){
     	
-       Point destination=painter.calculateClientDestinationCoordinates(getClientNumber(), getQueueNumber(), positionType);
+       lookAtPoint=painter.calculateClientDestinationCoordinates(getClientNumber(), getQueueNumber(), positionType);
        
-       trajectory=movement.moveClient(destination);  
+       trajectory=movement.moveClient(lookAtPoint);
     }
 
 
@@ -320,30 +313,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 		return trajectory;
 	}
 
-	public void addObserver(Observer o){
-		observers.add(o);
-	}
-	
-	public void removeObserver(Observer o){
-		observers.remove(o);
-	}
-	
-	public void notifyClients ()  {
-		
-		for (int i=0; i<observers.size();i++){
-			observers.get(i).moveUpInQueue();
-		}
-	}
-	
-	public void setObjectObserved (Observable o){
-		if (objectObservedByMe!=null){
-			objectObservedByMe.removeObserver(this);
-		}
-		
-		objectObservedByMe=o;		
-		o.addObserver(this);	
-	}
-	
+
 	private void chooseDirection (Point destination){
 		
 		if (destination==null){

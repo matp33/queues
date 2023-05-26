@@ -1,6 +1,7 @@
 package events;
 
 import symulation.ApplicationConfiguration;
+import symulation.CustomLayout;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;
@@ -15,6 +16,10 @@ public class ObjectsManager {
 
     private Map<Integer, Deque<Client>> clientsInQueue = new HashMap<>();
 
+    private Deque<Client> clientsMovingToExit = new ArrayDeque<>();
+
+    private Client clientByTheDoor;
+
     public void initializeObjects (){
         this.door = new Door(0);
         door.initializePosition();
@@ -25,8 +30,20 @@ public class ObjectsManager {
         }
     }
 
+    public void setClientByTheDoor(Client clientByTheDoor) {
+        this.clientByTheDoor = clientByTheDoor;
+    }
+
+    public Client getClientByTheDoor() {
+        return clientByTheDoor;
+    }
+
     public Deque<Client> getClientsInQueue (int queueNumber){
         return clientsInQueue.get(queueNumber);
+    }
+
+    public Deque<Client> getClientsMovingToExit() {
+        return clientsMovingToExit;
     }
 
     public Door getDoor() {
@@ -36,6 +53,11 @@ public class ObjectsManager {
 
     public boolean isClientInCheckout (Client client){
         return clientsInQueue.get(client.getQueueNumber()).getFirst().equals(client);
+    }
+
+    public Client getClientClosestToDoor (){
+        return CustomLayout.getClientClosestToDoor( clientsMovingToExit, door);
+
     }
 
 }

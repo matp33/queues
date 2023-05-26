@@ -42,26 +42,7 @@ public class StoreCheckout extends AnimatedAndObservable{
 
         }
 
-        public Client addClient (Client c){
 
-        	
-            Client client=findNumberOfLastClient();
-                        
-            if (client!=null){
-//            	System.out.println("client "+c.abc+" -> "+client.abc);
-            	c.setClientNumber(client.getClientNumber()+1);
-                c.setObjectObserved(client);
-            }
-            else{
-            	c.setObjectObserved(this);
-            }
-                       	
-        	getClientsArriving().add(c);
-			clientsInQueue.add(c);
-                
-            return c;
-        }
-        
         public List<Client> getClientsArriving() {			
 			return clientsArriving;
 		}

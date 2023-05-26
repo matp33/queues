@@ -31,6 +31,12 @@ public class ClientEventsHandler implements ChangeableObject {
         if (setOfEvents.isEmpty()){
             return;
         }
+        if (objectsManager.getDoor().isOpened()){
+            Client clientByTheDoor = objectsManager.getClientByTheDoor();
+            if (clientByTheDoor.getPositionType().equals(ClientPositionType.EXITING)){
+                moveOutside(clientByTheDoor);
+            }
+        }
         Iterator<ClientAction> iterator = setOfEvents.iterator();
         ClientAction clientAction = iterator.next();
         double actionTime=clientAction.getTime();
@@ -51,9 +57,6 @@ public class ClientEventsHandler implements ChangeableObject {
             case GOING_TO_QUEUE:
                 moveClientToQueue(client);
                 break;
-            case PAUSE:
-                painter.pauseSimulationAndAskQuestion();
-                break;
             case EXITING:
                 moveClientToExit(client);
                 break;
@@ -70,12 +73,17 @@ public class ClientEventsHandler implements ChangeableObject {
                 break;
             case EXITING:
                 Door door = objectsManager.getDoor();
-                if (door.isFirst(client))
+                if (objectsManager.getClientClosestToDoor().equals(client)){
                     door.doOpening();
+                    objectsManager.setClientByTheDoor(client);
+                    objectsManager.getClientsMovingToExit().remove(client);
+                }
                 break;
             case OUTSIDE_VIEW:
                 painter.removeObject(client);
-                client.getObjectObservedByMe().removeObserver(client); //TODO remove this field object observed by me
+                Deque<Client> clientsMovingToExit = objectsManager.getClientsMovingToExit();
+                clientsMovingToExit.remove(client);
+                clientsMovingToExit.forEach(Client::calculateTrajectory);
                 break;
             case WAITING_ROOM:
                 ClientAction clientAction = new ClientAction(client.calculateTimeOfMovingToQueue(), ClientPositionType.GOING_TO_QUEUE, client);
@@ -91,10 +99,10 @@ public class ClientEventsHandler implements ChangeableObject {
 
         client.setPositionType(ClientPositionType.EXITING);
         client.calculateTrajectory();
-        client.setObjectObserved(objectsManager.getDoor());
         Deque<Client> clientsInQueue = objectsManager.getClientsInQueue(queueNumber);
         clientsInQueue.removeFirst();
         clientsInQueue.forEach(Client::moveUpInQueue);
+        objectsManager.getClientsMovingToExit().addLast(client);
 
     }
 
@@ -113,8 +121,7 @@ public class ClientEventsHandler implements ChangeableObject {
         client.calculateExpectedTimeInWaitingRoom();
     }
 
-    //TODO should be private
-    public void moveOutside(Client client){
+    private void moveOutside(Client client){
         client.setPositionType(ClientPositionType.OUTSIDE_VIEW);
         client.calculateTrajectory();
     }
