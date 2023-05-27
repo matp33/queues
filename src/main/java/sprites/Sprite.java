@@ -5,6 +5,8 @@ package sprites;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class Sprite {
@@ -26,7 +28,8 @@ public class Sprite {
                                                             throws IOException{
     	
     	System.out.println(spriteFileName +" wi "+width +" he "+height);
-        spriteFile=ImageIO.read(new File("./src/images"+spriteFileName));
+        URL resource = getClass().getResource("/images" + spriteFileName);
+        spriteFile=ImageIO.read(new File(resource.getPath()));
         numberOfColumns=spriteFile.getWidth()/width;
         numberOfRows=spriteFile.getHeight()/height;
         SPRITE_DIMENSION_HORIZONTAL=width;

@@ -6,13 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
 
-import constants.TypeOfTimeEvent;
 import core.MainLoop;
 import events.UIEventQueue;
 import otherFunctions.FileAnalyzer;
@@ -23,7 +23,7 @@ import symulation.ClientArrivalEvent;
 public class ListenerOpenFile implements ActionListener{
     
 private JFileChooser fileChoosingWindow = new JFileChooser();
-private static final String TXT_FILES_DIR = "./src/txtFiles";
+private static final String TXT_FILES_DIR = "/txtFiles";
 
 protected Painter painter;
 
@@ -33,7 +33,8 @@ private ApplicationConfiguration applicationConfiguration;
 
     public ListenerOpenFile ( Painter painter, UIEventQueue UIEventQueue)  {
     	JFileChooser fileChooser=new JFileChooser();
-    	File txtFilesDirectory = new File(TXT_FILES_DIR);
+        URL resource = getClass().getResource(TXT_FILES_DIR);
+        File txtFilesDirectory = new File(resource.getPath());
         fileChooser.setCurrentDirectory(txtFilesDirectory);
         
         fileChoosingWindow=fileChooser;         

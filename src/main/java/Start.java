@@ -1,5 +1,3 @@
-package main;
-
 import symulation.ApplicationConfiguration;
 import tests.RegularTests;
 
