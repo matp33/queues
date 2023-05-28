@@ -34,6 +34,7 @@ private ApplicationConfiguration applicationConfiguration;
     public ListenerOpenFile ( Painter painter, UIEventQueue UIEventQueue)  {
     	JFileChooser fileChooser=new JFileChooser();
         URL resource = getClass().getResource(TXT_FILES_DIR);
+        assert resource != null;
         File txtFilesDirectory = new File(resource.getPath());
         fileChooser.setCurrentDirectory(txtFilesDirectory);
         

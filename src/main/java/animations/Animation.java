@@ -18,8 +18,11 @@ public class Animation {
     private boolean isStopped;
     private List<Frame> framesList= new ArrayList<Frame>();
 
-    public Animation(BufferedImage [] frames, int delay) {
+    private String name;
 
+    public Animation(String name, BufferedImage [] frames, int delay) {
+
+        this.name = name;
         this.frameDelay=delay;
         isStopped=true;
 
@@ -99,10 +102,10 @@ public class Animation {
                 frameCounter=0;
                 currentFrame+=animationDirection;
                 if(currentFrame>numberOfFrames-1){
-                    currentFrame=0;
+                    isStopped = true;
                 }
-                else if (currentFrame<0){
-                    currentFrame=numberOfFrames-1;
+                else if (currentFrame==0){
+                    isStopped = true;
                 }
             }
         }

@@ -4,12 +4,19 @@ package symulation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Deque;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NavigableSet;
+import java.util.Optional;
 
 import javax.swing.JPanel;
 
 import constants.ClientPositionType;
+import constants.PositionInQueueToExit;
+import dto.ClientToExitDTO;
+import dto.PointWithTimeAndQueueIndexDTO;
+import dto.PointWithTimeDTO;
+import otherFunctions.ClientMovement;
 import sprites.SpriteManager;
 import sprites.SpriteType;
 import visualComponents.Client;
@@ -137,16 +144,6 @@ public class CustomLayout {
                x=(buttonsPanel.getWidth()-clientsWidth)/2;
                y=buttonsPanel.getLocation().y-clientsHeight;
                break;
-           case EXITING:
-               int direction=1;
-               if (isQueueLeftSideOfDoors(queueNumber)){
-                   direction=-1;
-               }
-
-               Point point= calculateDoorPosition();
-               y=point.y+20;
-               x=point.x+clientNumber*clientsWidth*direction;
-               break;
            case OUTSIDE_VIEW:
                Point doorPosition= calculateDoorPosition();
                y=doorPosition.y;
@@ -161,7 +158,100 @@ public class CustomLayout {
 
    }
 
-   public static Client getClientClosestToDoor (Deque<Client> clientsMovingToExit, Door door){
+   //TODO multiple responsibilities detected, static method
+   public static void calculateTimeOfArrivingToDoorOrQueueForDoorAndMoveThere(Client client, NavigableSet<ClientToExitDTO> clientsMovingToExit){
+       PointWithTimeDTO positionDoorWithTimeToGetThere = ClientMovement.calculateTimeToGetToDoor(client);
+       ClientToExitDTO newClientData;
+       if (clientsMovingToExit.isEmpty() ){
+           newClientData = new ClientToExitDTO(client, PositionInQueueToExit.AT_DOOR,positionDoorWithTimeToGetThere.getTime(), 0 );
+           clientsMovingToExit.add(newClientData);
+           shiftClients(clientsMovingToExit, newClientData);
+           client.moveToPoint(positionDoorWithTimeToGetThere.getPoint());
+           System.out.println("client: "+client.getId());
+           System.out.println("client moving to exit, coords: "+positionDoorWithTimeToGetThere.getPoint() +" time " + positionDoorWithTimeToGetThere.getTime());
+       } else if (positionDoorWithTimeToGetThere.getTime() < clientsMovingToExit.first().getEstimatedTimeAtDestination()) {
+           ClientToExitDTO clientThatWasFirst = clientsMovingToExit.first();
+           clientsMovingToExit.remove(clientThatWasFirst);
+
+           clientThatWasFirst = pickQueueCloserToClient(clientThatWasFirst.getClient(), clientsMovingToExit);
+           newClientData = new ClientToExitDTO(client, PositionInQueueToExit.AT_DOOR,positionDoorWithTimeToGetThere.getTime(), 0 );
+           clientsMovingToExit.add(newClientData);
+           client.moveToPoint(positionDoorWithTimeToGetThere.getPoint());
+           shiftClients(clientsMovingToExit, clientThatWasFirst);
+
+       } else{
+           PointWithTimeDTO destinationPositionAndTimeOfArrival;
+           boolean addedToCollection = false;
+           for (ClientToExitDTO clientMovingToExit : clientsMovingToExit) {
+               destinationPositionAndTimeOfArrival = ClientMovement.calculateTimeToGetToPosition(client, clientMovingToExit.getIndexInPosition(), clientMovingToExit.getPositionInQueueToExit());
+               if (destinationPositionAndTimeOfArrival.getTime() < clientMovingToExit.getEstimatedTimeAtDestination()){
+                   newClientData = new ClientToExitDTO(client, clientMovingToExit.getPositionInQueueToExit(), destinationPositionAndTimeOfArrival.getTime(), clientMovingToExit.getIndexInPosition() );
+                   clientsMovingToExit.add(newClientData);
+                   client.moveToPoint(destinationPositionAndTimeOfArrival.getPoint());
+                   addedToCollection = true;
+
+                   shiftClients( clientsMovingToExit, newClientData);
+                   break;
+               }
+           }
+           if (!addedToCollection){
+               pickQueueCloserToClient(client, clientsMovingToExit);
+           }
+       }
+   }
+
+    private static ClientToExitDTO pickQueueCloserToClient(Client client, NavigableSet<ClientToExitDTO> clientsMovingToExit) {
+        PointWithTimeAndQueueIndexDTO positionAndTimeToGetToLeftSide = getPositionAndTimeToGetToQueue(client, clientsMovingToExit, PositionInQueueToExit.LEFT);
+        PointWithTimeAndQueueIndexDTO positionAndTimeToGetToRightSide = getPositionAndTimeToGetToQueue(client, clientsMovingToExit, PositionInQueueToExit.RIGHT);
+        ClientToExitDTO clientToExitDTO;
+        Point destinationPoint;
+        if (positionAndTimeToGetToLeftSide.getTime()< positionAndTimeToGetToRightSide.getTime()){
+            System.out.println("client "+ client.getId() +" picked left side");
+            clientToExitDTO = createClientToExitDTO(client, positionAndTimeToGetToLeftSide, PositionInQueueToExit.LEFT);
+            destinationPoint = positionAndTimeToGetToLeftSide.getPoint();
+        }
+        else{
+            System.out.println("client "+ client.getId() +" picked right side");
+            clientToExitDTO = createClientToExitDTO(client, positionAndTimeToGetToRightSide, PositionInQueueToExit.RIGHT);
+            destinationPoint = positionAndTimeToGetToRightSide.getPoint();
+        }
+        clientsMovingToExit.add(clientToExitDTO);
+        client.moveToPoint(destinationPoint);
+        return clientToExitDTO;
+    }
+
+    private static void shiftClients(NavigableSet<ClientToExitDTO> clientsMovingToExit, ClientToExitDTO clientAfterWhichWeShouldShift) {
+        for (ClientToExitDTO clientToShift : clientsMovingToExit.tailSet(clientAfterWhichWeShouldShift, false)) {
+            if (clientToShift.getPositionInQueueToExit().equals(clientAfterWhichWeShouldShift.getPositionInQueueToExit())){
+                clientToShift.setIndexInPosition(clientToShift.getIndexInPosition()+1);
+                PointWithTimeDTO destinationPositionAndTime = ClientMovement.calculateTimeToGetToPosition(clientToShift.getClient(), clientToShift.getIndexInPosition(), clientToShift.getPositionInQueueToExit());
+                clientToShift.setEstimatedTimeAtDestination(destinationPositionAndTime.getTime());
+                clientToShift.getClient().moveToPoint(destinationPositionAndTime.getPoint());
+            }
+        }
+    }
+
+    private static ClientToExitDTO createClientToExitDTO(Client client, PointWithTimeAndQueueIndexDTO positionAndTimeToGetToLeftSide, PositionInQueueToExit positionInQueueToExit) {
+        return new ClientToExitDTO(client, positionInQueueToExit, positionAndTimeToGetToLeftSide.getTime(), positionAndTimeToGetToLeftSide.getIndexInQueue());
+    }
+
+    private static PointWithTimeAndQueueIndexDTO getPositionAndTimeToGetToQueue(Client client, NavigableSet<ClientToExitDTO> clientsMovingToExit, PositionInQueueToExit positionInQueueToExit) {
+        Optional<ClientToExitDTO> lastInQueueToLeftSide = clientsMovingToExit.stream().filter(clientDTO -> clientDTO.getPositionInQueueToExit().equals(PositionInQueueToExit.LEFT)).max(Comparator.naturalOrder());
+        PointWithTimeDTO positionWithTime;
+        int indexInPosition;
+        if (lastInQueueToLeftSide.isPresent()){
+            indexInPosition = lastInQueueToLeftSide.get().getIndexInPosition();
+            indexInPosition++;
+            positionWithTime = ClientMovement.calculateTimeToGetToPosition(client,indexInPosition, positionInQueueToExit);
+        }
+        else{
+            indexInPosition = 1;
+            positionWithTime = ClientMovement.calculateTimeToGetToPosition(client,indexInPosition, positionInQueueToExit);
+        }
+        return new PointWithTimeAndQueueIndexDTO(positionWithTime.getPoint(), positionWithTime.getTime(), indexInPosition);
+    }
+
+    public static Client getClientClosestToDoor (List<Client> clientsMovingToExit, Door door){
        Client clientClosestToDoor = null;
        Point doorPosition = door.getPosition();
        double minDistance = Double.MAX_VALUE;

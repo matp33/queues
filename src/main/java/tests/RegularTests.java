@@ -33,8 +33,8 @@ public class RegularTests {
             SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
 
             for (int i=0; i<numberOfClients;i++){
-                int queueNumber = new Random().nextInt(numberOfQueues);
-                double timeInQueue = generateRandomTimeInQueue();
+                int queueNumber = i%2==0? 0: 1; // new Random().nextInt(numberOfQueues);
+                double timeInQueue = 2; //generateRandomTimeInQueue();
                 clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i*arrivalDelay, queueNumber));
             }
             applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);

@@ -4,6 +4,7 @@ import constants.ClientPositionType;
 import core.ChangeableObject;
 import otherFunctions.ClientAction;
 import symulation.ApplicationConfiguration;
+import symulation.CustomLayout;
 import symulation.Painter;
 import visualComponents.Client;
 import visualComponents.Door;
@@ -28,14 +29,16 @@ public class ClientEventsHandler implements ChangeableObject {
     }
     @Override
     public void update(double currentTime) {
-        if (setOfEvents.isEmpty()){
-            return;
-        }
-        if (objectsManager.getDoor().isOpened()){
+        if (objectsManager.getDoor().isOpened()){ //TODO not sure if its right place, maybe another class should handle it
             Client clientByTheDoor = objectsManager.getClientByTheDoor();
             if (clientByTheDoor.getPositionType().equals(ClientPositionType.EXITING)){
                 moveOutside(clientByTheDoor);
+                objectsManager.removeClientFromQueueToExit(clientByTheDoor);
+
             }
+        }
+        if (setOfEvents.isEmpty()){
+            return;
         }
         Iterator<ClientAction> iterator = setOfEvents.iterator();
         ClientAction clientAction = iterator.next();
@@ -73,17 +76,15 @@ public class ClientEventsHandler implements ChangeableObject {
                 break;
             case EXITING:
                 Door door = objectsManager.getDoor();
-                if (objectsManager.getClientClosestToDoor().equals(client)){
+                if (objectsManager.getClientClosestToDoor()
+                        .map(clientDTO->clientDTO.getClient().equals(client)).orElse(true)){
                     door.doOpening();
                     objectsManager.setClientByTheDoor(client);
-                    objectsManager.getClientsMovingToExit().remove(client);
                 }
                 break;
             case OUTSIDE_VIEW:
                 painter.removeObject(client);
-                Deque<Client> clientsMovingToExit = objectsManager.getClientsMovingToExit();
-                clientsMovingToExit.remove(client);
-                clientsMovingToExit.forEach(Client::calculateTrajectory);
+                objectsManager.shiftClientsInQueueToExit(client);
                 break;
             case WAITING_ROOM:
                 ClientAction clientAction = new ClientAction(client.calculateTimeOfMovingToQueue(), ClientPositionType.GOING_TO_QUEUE, client);
@@ -98,11 +99,10 @@ public class ClientEventsHandler implements ChangeableObject {
         int queueNumber = client.getQueueNumber();
 
         client.setPositionType(ClientPositionType.EXITING);
-        client.calculateTrajectory();
         Deque<Client> clientsInQueue = objectsManager.getClientsInQueue(queueNumber);
         clientsInQueue.removeFirst();
         clientsInQueue.forEach(Client::moveUpInQueue);
-        objectsManager.getClientsMovingToExit().addLast(client);
+        CustomLayout.calculateTimeOfArrivingToDoorOrQueueForDoorAndMoveThere(client, objectsManager.getClientsMovingToExit());
 
     }
 

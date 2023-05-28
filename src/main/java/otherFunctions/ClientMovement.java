@@ -2,28 +2,58 @@
 
 package otherFunctions;
 
+import constants.PositionInQueueToExit;
+import core.MainLoop;
+import dto.PointWithTimeDTO;
+import events.ObjectsManager;
 import interfaces.AnimatedObject;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import symulation.ApplicationConfiguration;
 import visualComponents.Client;
+import visualComponents.Door;
 import visualComponents.StoreCheckout;
 
 public class ClientMovement {
-    
-private Client client;
-private List <AnimatedObject> objects;
 
-    public ClientMovement (Client client, List <AnimatedObject> objects){
-        this.client=client;
-        this.objects=objects;
+    public static final int DISTANCE_TO_DOOR_VERTICAL = 20;
+    public static final int OFFSET_CLIENT_HORIZONTAL = 40;
+
+    public static PointWithTimeDTO calculateTimeToGetToDoor(Client client){
+        Point belowDoor = calculatePositionNextToDoor();
+        List<Point> trajectory = moveClient(belowDoor, client);
+        return new PointWithTimeDTO(belowDoor, MainLoop.getInstance().getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
+
     }
 
-    public List <Point> moveClient (Point coordinates){
+    private static Point calculatePositionNextToDoor() {
+        ObjectsManager objectsStateHandler = ApplicationConfiguration.getInstance().getObjectsStateHandler();
+        Door door = objectsStateHandler.getDoor();
+        Point doorPosition = door.getPosition();
+        System.out.println("door position: "+doorPosition);
+        return new Point(doorPosition.x, doorPosition.y + DISTANCE_TO_DOOR_VERTICAL);
+    }
+
+    public static PointWithTimeDTO calculateTimeToGetToPosition(Client client, int indexInPosition, PositionInQueueToExit positionInQueueToExit) {
+        Point destinationPosition = calculatePositionNextToDoor();
+        switch (positionInQueueToExit){
+            case LEFT:
+                destinationPosition.x-= indexInPosition * client.getWidth() + OFFSET_CLIENT_HORIZONTAL;
+                break;
+            case RIGHT:
+                destinationPosition.x+= indexInPosition * client.getWidth() + OFFSET_CLIENT_HORIZONTAL;
+                break;
+        }
+        List<Point> trajectory = moveClient(destinationPosition, client);
+        return new PointWithTimeDTO(destinationPosition, MainLoop.getInstance().getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
+    }
+
+    public static List <Point> moveClient (Point coordinates, Client client){
 
     
     int newXCoord=client.getPosition().x;
@@ -37,23 +67,23 @@ private List <AnimatedObject> objects;
     int rectangleWidth=maxOfRangeX-minOfRangeX;
     int rectangleHeight=maxOfRangeY-minOfRangeY;
     
-    List <AnimatedObject> objectsOnTheWay = new ArrayList <AnimatedObject>();
+    List <StoreCheckout> objectsOnTheWay = new ArrayList <>();
     Rectangle clientTrajectory = new Rectangle(minOfRangeX, minOfRangeY, rectangleWidth, rectangleHeight);
     Direction movingDirection = chooseWhichWayToGo(new Point (newXCoord, newYCoord), coordinates);
     int i=client.getId();
-    
-    for (AnimatedObject object: objects){
-    	if (object instanceof StoreCheckout){
-    		StoreCheckout q = (StoreCheckout)object;
-    		Rectangle checkoutArea = new Rectangle (q.getPosition().x, q.getPosition().y, q.getSize().width,
-    				q.getSize().height);
-    			if (checkoutArea.intersects(clientTrajectory)){
-    				objectsOnTheWay.add(object);
-    			}
 
-    	}
-    }    
-    
+        Set<StoreCheckout> storeCheckouts = ApplicationConfiguration.getInstance().getObjectsStateHandler().getStoreCheckouts();
+
+
+    for (StoreCheckout q: storeCheckouts){
+        Rectangle checkoutArea = new Rectangle (q.getPosition().x, q.getPosition().y, q.getSize().width,
+                q.getSize().height);
+            if (checkoutArea.intersects(clientTrajectory)){
+                objectsOnTheWay.add(q);
+            }
+
+    }
+
     List <Point> newCoords = new ArrayList <> ();
     int counter=1;           
     int horizontalStep;
@@ -138,7 +168,7 @@ private List <AnimatedObject> objects;
 
 
 
-    public Direction chooseWhichWayToGo (Point start, Point end){
+    public static Direction chooseWhichWayToGo (Point start, Point end){
     	
     	int horizontalDirection;
     	int verticalDirection;

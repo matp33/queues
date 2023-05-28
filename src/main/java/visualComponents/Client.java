@@ -36,11 +36,7 @@ private int delayStartTime;
 
 private Point lookAtPoint;
 
-private boolean isMoving;
-private boolean isSavedInLog; 
-
-private ClientMovement movement;
-private List <Point> trajectory = new ArrayList<>();
+	private List <Point> trajectory = new ArrayList<>();
 private StoreCheckout storeCheckout;
 
 private Timer timer;
@@ -51,10 +47,6 @@ private Animation currentAnimation,moveLeft,moveRight,moveDown,moveUp;
 private Point position;
 
 private AppLogger logger;
-
-private double timeEnteringCheckout;
-
-private boolean isInCheckout;
 
 public final int queueDelay; // delay before client moves when he sees that another client moved
 private static final int frameTime=20; // so many steps before animation changes to next
@@ -91,18 +83,15 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     	this.arrivalTime =arrivalTime;
 		Sprite spriteClient = spriteManager.getSprite(SpriteType.CLIENT);
 
-		moveDown=new Animation(spriteClient.getSprite(0),frameTime);
-		moveUp=new Animation(spriteClient.getSprite(3),frameTime);
-		moveLeft=new Animation(spriteClient.getSprite(1),frameTime);
-		moveRight=new Animation(spriteClient.getSprite(2),frameTime);
+		moveDown=new Animation(spriteClient.getSpriteFileName(), spriteClient.getSprite(0),frameTime);
+		moveUp=new Animation(spriteClient.getSpriteFileName(),spriteClient.getSprite(3),frameTime);
+		moveLeft=new Animation(spriteClient.getSpriteFileName(),spriteClient.getSprite(1),frameTime);
+		moveRight=new Animation(spriteClient.getSpriteFileName(),spriteClient.getSprite(2),frameTime);
 
         isWaiting=false;
-        isMoving=false;
-        isSavedInLog=false;
-        
-        this.painter=applicationConfiguration.getPainter();
+
+		this.painter=applicationConfiguration.getPainter();
         this.clientNumber=clientNumber;
-        movement=new ClientMovement(this, new ArrayList<>());
 //        positionType=Client.POSITION_WAITING_ROOM;
         currentAnimation=moveUp;
         currentAnimation.start();    
@@ -208,8 +197,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     	if (movingTask!=null){
 			movingTask.cancel();
 		}
-    	isMoving=false;
-    	currentAnimation.setLastFrame();
+		currentAnimation.setLastFrame();
 		chooseDirection(lookAtPoint);
 //    		System.out.println("o o is null: "+clientNumber);
     }
@@ -231,8 +219,13 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     	
        lookAtPoint=painter.calculateClientDestinationCoordinates(getClientNumber(), getQueueNumber(), positionType);
        
-       trajectory=movement.moveClient(lookAtPoint);
+       trajectory=ClientMovement.moveClient(lookAtPoint, this);
     }
+
+	public void moveToPoint (Point p){
+		lookAtPoint = p;
+		trajectory = ClientMovement.moveClient(p, this);
+	}
 
 
 
@@ -279,8 +272,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 	public void saveMeInLog()  {
 		if (storeCheckout.isClientOutOfSight(this)) storeCheckout.increaseNumber();
         storeCheckout.getClientsArriving().remove(this);
-        isSavedInLog=true;
-        logger.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedSeconds());
+		logger.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedSeconds());
 	}
 	
 	public Point getPosition(){
