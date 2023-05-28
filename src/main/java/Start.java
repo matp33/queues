@@ -12,7 +12,7 @@ public class Start {
         if (args.length == 0) {
 
 			ApplicationConfiguration instance = ApplicationConfiguration.getInstance();
-			int numberOfQueues = 2;
+			int numberOfQueues = 4;
 			instance.setNumberOfQueues(numberOfQueues);
 			instance.initialize();
 //            	RegularTests.test1ClientPerQueue(8);

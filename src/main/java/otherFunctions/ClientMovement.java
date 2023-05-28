@@ -35,7 +35,6 @@ public class ClientMovement {
         ObjectsManager objectsStateHandler = ApplicationConfiguration.getInstance().getObjectsStateHandler();
         Door door = objectsStateHandler.getDoor();
         Point doorPosition = door.getPosition();
-        System.out.println("door position: "+doorPosition);
         return new Point(doorPosition.x, doorPosition.y + DISTANCE_TO_DOOR_VERTICAL);
     }
 

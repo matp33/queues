@@ -167,13 +167,20 @@ public class CustomLayout {
            clientsMovingToExit.add(newClientData);
            shiftClients(clientsMovingToExit, newClientData);
            client.moveToPoint(positionDoorWithTimeToGetThere.getPoint());
-           System.out.println("client: "+client.getId());
-           System.out.println("client moving to exit, coords: "+positionDoorWithTimeToGetThere.getPoint() +" time " + positionDoorWithTimeToGetThere.getTime());
        } else if (positionDoorWithTimeToGetThere.getTime() < clientsMovingToExit.first().getEstimatedTimeAtDestination()) {
            ClientToExitDTO clientThatWasFirst = clientsMovingToExit.first();
            clientsMovingToExit.remove(clientThatWasFirst);
 
-           clientThatWasFirst = pickQueueCloserToClient(clientThatWasFirst.getClient(), clientsMovingToExit);
+           PositionInQueueToExit position = pickQueueCloserToClientCheckFirstInQueue(clientThatWasFirst.getClient(),
+                   clientsMovingToExit);
+           int indexInQueue = 1;
+           PointWithTimeDTO pointWithTimeDTO = ClientMovement.calculateTimeToGetToPosition(clientThatWasFirst.getClient(), indexInQueue, position);
+           clientThatWasFirst.setPositionInQueueToExit(position);
+           clientThatWasFirst.setEstimatedTimeAtDestination(pointWithTimeDTO.getTime());
+           clientThatWasFirst.setIndexInPosition(indexInQueue);
+           clientThatWasFirst.getClient().moveToPoint(pointWithTimeDTO.getPoint());
+           clientsMovingToExit.add(clientThatWasFirst);
+
            newClientData = new ClientToExitDTO(client, PositionInQueueToExit.AT_DOOR,positionDoorWithTimeToGetThere.getTime(), 0 );
            clientsMovingToExit.add(newClientData);
            client.moveToPoint(positionDoorWithTimeToGetThere.getPoint());
@@ -200,18 +207,32 @@ public class CustomLayout {
        }
    }
 
+    private static PositionInQueueToExit pickQueueCloserToClientCheckFirstInQueue(Client client, NavigableSet<ClientToExitDTO> clientsMovingToExit) {
+        PointWithTimeDTO leftQueuePointAndTime = ClientMovement.calculateTimeToGetToPosition(client, 1, PositionInQueueToExit.LEFT);
+        PointWithTimeDTO rightQueuePointAndTime = ClientMovement.calculateTimeToGetToPosition(client, 1, PositionInQueueToExit.RIGHT);
+        Double timeAtLeft = clientsMovingToExit.stream().filter(c -> c.getPositionInQueueToExit().equals(PositionInQueueToExit.LEFT)).findFirst().map(ClientToExitDTO::getEstimatedTimeAtDestination).orElse(Double.MAX_VALUE);
+        Double timeAtRight = clientsMovingToExit.stream().filter(c -> c.getPositionInQueueToExit().equals(PositionInQueueToExit.RIGHT)).findFirst().map(ClientToExitDTO::getEstimatedTimeAtDestination).orElse(Double.MAX_VALUE);
+        if (leftQueuePointAndTime.getTime()<timeAtLeft){
+            return PositionInQueueToExit.LEFT;
+        }
+        else if (rightQueuePointAndTime.getTime()<timeAtRight) {
+            return PositionInQueueToExit.RIGHT;
+        }
+        else{
+            throw new UnsupportedOperationException("Should not happen. Client can't go left or right of queue to exit");
+        }
+    }
+
     private static ClientToExitDTO pickQueueCloserToClient(Client client, NavigableSet<ClientToExitDTO> clientsMovingToExit) {
         PointWithTimeAndQueueIndexDTO positionAndTimeToGetToLeftSide = getPositionAndTimeToGetToQueue(client, clientsMovingToExit, PositionInQueueToExit.LEFT);
         PointWithTimeAndQueueIndexDTO positionAndTimeToGetToRightSide = getPositionAndTimeToGetToQueue(client, clientsMovingToExit, PositionInQueueToExit.RIGHT);
         ClientToExitDTO clientToExitDTO;
         Point destinationPoint;
         if (positionAndTimeToGetToLeftSide.getTime()< positionAndTimeToGetToRightSide.getTime()){
-            System.out.println("client "+ client.getId() +" picked left side");
             clientToExitDTO = createClientToExitDTO(client, positionAndTimeToGetToLeftSide, PositionInQueueToExit.LEFT);
             destinationPoint = positionAndTimeToGetToLeftSide.getPoint();
         }
         else{
-            System.out.println("client "+ client.getId() +" picked right side");
             clientToExitDTO = createClientToExitDTO(client, positionAndTimeToGetToRightSide, PositionInQueueToExit.RIGHT);
             destinationPoint = positionAndTimeToGetToRightSide.getPoint();
         }
@@ -236,7 +257,7 @@ public class CustomLayout {
     }
 
     private static PointWithTimeAndQueueIndexDTO getPositionAndTimeToGetToQueue(Client client, NavigableSet<ClientToExitDTO> clientsMovingToExit, PositionInQueueToExit positionInQueueToExit) {
-        Optional<ClientToExitDTO> lastInQueueToLeftSide = clientsMovingToExit.stream().filter(clientDTO -> clientDTO.getPositionInQueueToExit().equals(PositionInQueueToExit.LEFT)).max(Comparator.naturalOrder());
+        Optional<ClientToExitDTO> lastInQueueToLeftSide = clientsMovingToExit.stream().filter(clientDTO -> clientDTO.getPositionInQueueToExit().equals(positionInQueueToExit)).max(Comparator.naturalOrder());
         PointWithTimeDTO positionWithTime;
         int indexInPosition;
         if (lastInQueueToLeftSide.isPresent()){

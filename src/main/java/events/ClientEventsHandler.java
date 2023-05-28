@@ -2,6 +2,7 @@ package events;
 
 import constants.ClientPositionType;
 import core.ChangeableObject;
+import dto.ClientToExitDTO;
 import otherFunctions.ClientAction;
 import symulation.ApplicationConfiguration;
 import symulation.CustomLayout;
@@ -77,7 +78,7 @@ public class ClientEventsHandler implements ChangeableObject {
             case EXITING:
                 Door door = objectsManager.getDoor();
                 if (objectsManager.getClientClosestToDoor()
-                        .map(clientDTO->clientDTO.getClient().equals(client)).orElse(true)){
+                        .map(clientDTO->clientDTO.getClient().equals(client)).orElse(false)){
                     door.doOpening();
                     objectsManager.setClientByTheDoor(client);
                 }

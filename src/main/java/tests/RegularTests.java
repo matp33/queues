@@ -30,12 +30,12 @@ public class RegularTests {
             ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
             applicationConfiguration.setNumberOfQueues(numberOfQueues);
 
-            SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
+            SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime).thenComparing(ClientArrivalEvent::getQueueNumber));
 
             for (int i=0; i<numberOfClients;i++){
-                int queueNumber = i%2==0? 0: 1; // new Random().nextInt(numberOfQueues);
-                double timeInQueue = 2; //generateRandomTimeInQueue();
-                clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i*arrivalDelay, queueNumber));
+                int queueNumber = i%4; // new Random().nextInt(numberOfQueues);
+                double timeInQueue = 1; //generateRandomTimeInQueue();
+                clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i/4, queueNumber));
             }
             applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);
             Manager manager = applicationConfiguration.getManager();
