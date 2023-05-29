@@ -33,13 +33,13 @@ public class BeanScanner {
                     //TODO handle nested packages
                     for (File file : filesInDirectory) {
                         if (file.getName().endsWith(".class")) {
-                            Class<?> aClass = getClass(directoryName, file);
+                            Class<?> aClass = getClassFromFile(directoryName, file);
                             classes.add(aClass);
                         }
                     }
                 }
                 else{
-                    classes.add(getClass("", rootFile));
+                    classes.add(getClassFromFile("", rootFile));
                 }
 
             }
@@ -51,10 +51,9 @@ public class BeanScanner {
                     }
                 }
             }
-            System.out.println();
         }
 
-    private static Class<?> getClass(String directoryName, File file) throws ClassNotFoundException {
+    private static Class<?> getClassFromFile(String directoryName, File file) throws ClassNotFoundException {
         String className = file.getName().substring(0, file.getName().indexOf(".class"));
         return Class.forName( directoryName.isBlank()? className: directoryName +"."+className);
     }
