@@ -3,7 +3,7 @@ package dto;
 import constants.PositionInQueueToExit;
 import visualComponents.Client;
 
-import java.util.Comparator;
+import java.awt.*;
 
 public class ClientToExitDTO implements Comparable<ClientToExitDTO> {
 
@@ -15,11 +15,18 @@ public class ClientToExitDTO implements Comparable<ClientToExitDTO> {
 
     private int indexInPosition;
 
-    public ClientToExitDTO(Client client, PositionInQueueToExit positionInQueueToExit, double estimatedTimeAtDestination, int indexInPosition) {
+    private Point destinationPoint;
+
+    public ClientToExitDTO(Client client, PositionInQueueToExit positionInQueueToExit, double estimatedTimeAtDestination, int indexInPosition, Point destinationPoint) {
         this.client = client;
         this.positionInQueueToExit = positionInQueueToExit;
         this.estimatedTimeAtDestination = estimatedTimeAtDestination;
         this.indexInPosition = indexInPosition;
+        this.destinationPoint = destinationPoint;
+    }
+
+    public Point getDestinationPoint() {
+        return destinationPoint;
     }
 
     public int getIndexInPosition() {
@@ -46,6 +53,10 @@ public class ClientToExitDTO implements Comparable<ClientToExitDTO> {
         this.estimatedTimeAtDestination = estimatedTimeAtDestination;
     }
 
+    public void setDestinationPoint(Point destinationPoint) {
+        this.destinationPoint = destinationPoint;
+    }
+
     @Override
     public int compareTo(ClientToExitDTO o) {
         return Double.compare(estimatedTimeAtDestination, o.estimatedTimeAtDestination);
@@ -57,6 +68,8 @@ public class ClientToExitDTO implements Comparable<ClientToExitDTO> {
                 "client=" + client +
                 ", positionInQueueToExit=" + positionInQueueToExit +
                 ", estimatedTimeAtDestination=" + estimatedTimeAtDestination +
+                ", indexInPosition=" + indexInPosition +
+                ", destinationPoint=" + destinationPoint +
                 '}';
     }
 

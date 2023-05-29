@@ -1,11 +1,10 @@
 package events;
 
+import clienthandling.ExitQueueManager;
 import constants.ClientPositionType;
 import core.ChangeableObject;
-import dto.ClientToExitDTO;
 import otherFunctions.ClientAction;
 import symulation.ApplicationConfiguration;
-import symulation.CustomLayout;
 import symulation.Painter;
 import visualComponents.Client;
 import visualComponents.Door;
@@ -20,9 +19,12 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private ObjectsManager objectsManager;
 
+    private ExitQueueManager exitQueueManager;
+
     public ClientEventsHandler() {
         painter = ApplicationConfiguration.getInstance().getPainter();
         objectsManager = ApplicationConfiguration.getInstance().getObjectsStateHandler();
+        exitQueueManager = ApplicationConfiguration.getInstance().getExitQueueManager();
     }
 
     public void setEventsList(SortedSet<ClientAction> setOfEvents) {
@@ -103,7 +105,7 @@ public class ClientEventsHandler implements ChangeableObject {
         Deque<Client> clientsInQueue = objectsManager.getClientsInQueue(queueNumber);
         clientsInQueue.removeFirst();
         clientsInQueue.forEach(Client::moveUpInQueue);
-        CustomLayout.calculateTimeOfArrivingToDoorOrQueueForDoorAndMoveThere(client, objectsManager.getClientsMovingToExit());
+        exitQueueManager.moveClientToExit(client, objectsManager.getClientsMovingToExit());
 
     }
 

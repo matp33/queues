@@ -37,6 +37,7 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
 		spriteManager = applicationConfiguration.getSpriteManager();
 		Sprite sprite = spriteManager.getSprite(spriteType);
+		this.spriteWidth = sprite.getWidth();
 		BufferedImage b=sprite.getSprite(0, 0);
 		size=new Dimension(b.getWidth(), b.getHeight());
 		this.painter=applicationConfiguration.getPainter();

@@ -103,6 +103,11 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
                 
     }
 
+	@Override
+	public int getWidth (){
+		return spriteWidth;
+	}
+
 	public int getId() {
 		return id;
 	}

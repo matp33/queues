@@ -1,7 +1,5 @@
 package symulation;
 
-import constants.TypeOfTimeEvent;
-
 public class ClientArrivalEvent {
 
     private double arrivalTime;

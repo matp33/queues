@@ -5,7 +5,6 @@ package sprites;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import javax.imageio.ImageIO;
 
@@ -57,7 +56,11 @@ public class Sprite {
                 SPRITE_DIMENSION_HORIZONTAL, SPRITE_DIMENSION_VERTICAL);
 
     }
-    
+
+    public int getWidth() {
+        return SPRITE_DIMENSION_HORIZONTAL;
+    }
+
     public BufferedImage [] getSprite(int rowNumber) {
 
         BufferedImage [] sprites = new BufferedImage [spriteFile.getWidth()/SPRITE_DIMENSION_HORIZONTAL];

@@ -11,7 +11,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import constants.TypeOfTimeEvent;
 import events.UIEventQueue;
 import symulation.Painter;
 import symulation.ClientArrivalEvent;

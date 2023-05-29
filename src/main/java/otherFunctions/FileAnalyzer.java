@@ -2,7 +2,6 @@
 
 package otherFunctions;
 
-import constants.TypeOfTimeEvent;
 import symulation.ClientArrivalEvent;
 
 import java.io.File;

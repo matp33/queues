@@ -1,9 +1,7 @@
 
 package tests;
 
-import constants.TypeOfTimeEvent;
 import symulation.*;
-import visualComponents.Client;
 
 import java.util.*;
 

@@ -22,7 +22,6 @@ import visualComponents.StoreCheckout;
 public class ClientMovement {
 
     public static final int DISTANCE_TO_DOOR_VERTICAL = 20;
-    public static final int OFFSET_CLIENT_HORIZONTAL = 40;
 
     public static PointWithTimeDTO calculateTimeToGetToDoor(Client client){
         Point belowDoor = calculatePositionNextToDoor();
@@ -42,10 +41,10 @@ public class ClientMovement {
         Point destinationPosition = calculatePositionNextToDoor();
         switch (positionInQueueToExit){
             case LEFT:
-                destinationPosition.x-= indexInPosition * client.getWidth() + OFFSET_CLIENT_HORIZONTAL;
+                destinationPosition.x-= indexInPosition * client.getWidth();
                 break;
             case RIGHT:
-                destinationPosition.x+= indexInPosition * client.getWidth() + OFFSET_CLIENT_HORIZONTAL;
+                destinationPosition.x+= indexInPosition * client.getWidth();
                 break;
         }
         List<Point> trajectory = moveClient(destinationPosition, client);

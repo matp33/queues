@@ -1,5 +1,6 @@
 package symulation;
 
+import clienthandling.ExitQueueManager;
 import core.MainLoop;
 import events.ClientEventsHandler;
 import events.ObjectsManager;
@@ -27,6 +28,8 @@ public class ApplicationConfiguration {
 
     private ClientEventsHandler clientEventsHandler;
 
+    private ExitQueueManager exitQueueManager;
+
     private ApplicationConfiguration() {
     }
 
@@ -44,7 +47,12 @@ public class ApplicationConfiguration {
         applicationConfiguration.manager = new Manager();
         applicationConfiguration.appLogger = new AppLogger();
         applicationConfiguration.objectsManager = new ObjectsManager();
+        applicationConfiguration.exitQueueManager = new ExitQueueManager();
         applicationConfiguration.clientEventsHandler = new ClientEventsHandler();
+    }
+
+    public ExitQueueManager getExitQueueManager() {
+        return exitQueueManager;
     }
 
     public ObjectsManager getObjectsStateHandler() {
