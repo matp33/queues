@@ -75,6 +75,7 @@ public class ExitQueueManager {
                 positionAndTime = ClientMovement.calculateTimeToGetToPosition(client, clientMovingToExit.getIndexInPosition(), clientMovingToExit.getPositionInQueueToExit());
                 if (positionAndTime.getTime() < clientMovingToExit.getEstimatedTimeAtDestination()){
                     newClientData = new ClientToExitDTO(client, clientMovingToExit.getPositionInQueueToExit(), positionAndTime.getTime(), clientMovingToExit.getIndexInPosition(), positionAndTime.getPoint());
+                    addedToCollection = true;
                     break;
                 }
             }
@@ -118,16 +119,15 @@ public class ExitQueueManager {
     private Set<ClientToExitDTO> shiftClients(NavigableSet<ClientToExitDTO> clientsMovingToExit, ClientToExitDTO clientAfterWhichWeShouldShift) {
         Set<ClientToExitDTO> clientsModified = new LinkedHashSet<>();
 
-        TreeSet<ClientToExitDTO> set = clientsMovingToExit.stream().filter(client -> client.getPositionInQueueToExit().equals(clientAfterWhichWeShouldShift.getPositionInQueueToExit())).sorted(Comparator.comparing(ClientToExitDTO::getIndexInPosition)).collect(Collectors.toCollection(TreeSet::new));
-        for (ClientToExitDTO clientToShift : set) {
-            if (clientToShift.getIndexInPosition() >= clientAfterWhichWeShouldShift.getIndexInPosition()){
-                clientToShift.setIndexInPosition(clientToShift.getIndexInPosition()+1);
-                PointWithTimeDTO destinationPositionAndTime = ClientMovement.calculateTimeToGetToPosition(clientToShift.getClient(), clientToShift.getIndexInPosition(), clientToShift.getPositionInQueueToExit());
-                clientToShift.setEstimatedTimeAtDestination(destinationPositionAndTime.getTime());
-                clientToShift.setDestinationPoint(destinationPositionAndTime.getPoint());
-                clientsModified.add(clientToShift);
-            }
-        }
+        clientsMovingToExit.stream().filter(client -> client.getPositionInQueueToExit().equals(clientAfterWhichWeShouldShift.getPositionInQueueToExit()))
+                .filter(clientToShift->clientToShift.getIndexInPosition() >= clientAfterWhichWeShouldShift.getIndexInPosition()).sorted(Comparator.comparing(ClientToExitDTO::getIndexInPosition))
+                .forEach(clientToShift->{
+                    clientToShift.setIndexInPosition(clientToShift.getIndexInPosition()+1);
+                    PointWithTimeDTO destinationPositionAndTime = ClientMovement.calculateTimeToGetToPosition(clientToShift.getClient(), clientToShift.getIndexInPosition(), clientToShift.getPositionInQueueToExit());
+                    clientToShift.setEstimatedTimeAtDestination(destinationPositionAndTime.getTime());
+                    clientToShift.setDestinationPoint(destinationPositionAndTime.getPoint());
+                    clientsModified.add(clientToShift);
+                });
         return clientsModified;
     }
 
