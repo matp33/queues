@@ -39,6 +39,8 @@ private Point lookAtPoint;
 	private List <Point> trajectory = new ArrayList<>();
 private StoreCheckout storeCheckout;
 
+private ClientMovement clientMovement;
+
 private Timer timer;
 private Timer timerDelay; // timer for moving inside queue connected to clients having some delays
 
@@ -73,6 +75,7 @@ private ClientEventsHandler clientEventsHandler;
 public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime, double timeInCheckout)  {
 
 		super(SpriteType.CLIENT);
+		clientMovement = ApplicationConfiguration.getInstance().getClientMovement();
 		this.timeInCheckout = timeInCheckout;
 		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
 		spriteManager = applicationConfiguration.getSpriteManager();
@@ -224,12 +227,12 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     	
        lookAtPoint=painter.calculateClientDestinationCoordinates(getClientNumber(), getQueueNumber(), positionType);
        
-       trajectory=ClientMovement.moveClient(lookAtPoint, this);
+       trajectory= clientMovement.moveClient(lookAtPoint, this);
     }
 
 	public void moveToPoint (Point p){
 		lookAtPoint = p;
-		trajectory = ClientMovement.moveClient(p, this);
+		trajectory = clientMovement.moveClient(p, this);
 	}
 
 

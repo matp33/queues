@@ -13,10 +13,8 @@ import javax.swing.JOptionPane;
 
 import otherFunctions.ClientAction;
 import visualComponents.Client;
-import visualComponents.Door;
 import visualComponents.Indicator;
 import visualComponents.OutsideWorld;
-import visualComponents.StoreCheckout;
 
 public class Manager implements EventSubscriber {
 	
@@ -64,7 +62,7 @@ public class Manager implements EventSubscriber {
 	public void restart(double time) {
 		
 		clean();
-		ApplicationConfiguration.getInstance().getObjectsStateHandler().initializeObjects();
+		ApplicationConfiguration.getInstance().getObjectsManager().initializeObjects();
 		doSimulation(time);
 		MainLoop.getInstance().addObject(applicationConfiguration.getClientEventsHandler());
 

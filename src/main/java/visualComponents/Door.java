@@ -33,7 +33,7 @@ public class Door extends AnimatedObject {
 		startDrawingMe();
 
 	}
-	
+
 	public void initializePosition (){
 		position=painter.getDoorPosition();		
 	}

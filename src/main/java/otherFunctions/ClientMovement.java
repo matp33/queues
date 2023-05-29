@@ -23,21 +23,21 @@ public class ClientMovement {
 
     public static final int DISTANCE_TO_DOOR_VERTICAL = 20;
 
-    public static PointWithTimeDTO calculateTimeToGetToDoor(Client client){
+    public PointWithTimeDTO calculateTimeToGetToDoor(Client client){
         Point belowDoor = calculatePositionNextToDoor();
         List<Point> trajectory = moveClient(belowDoor, client);
         return new PointWithTimeDTO(belowDoor, MainLoop.getInstance().getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
 
     }
 
-    private static Point calculatePositionNextToDoor() {
-        ObjectsManager objectsStateHandler = ApplicationConfiguration.getInstance().getObjectsStateHandler();
+    private Point calculatePositionNextToDoor() {
+        ObjectsManager objectsStateHandler = ApplicationConfiguration.getInstance().getObjectsManager();
         Door door = objectsStateHandler.getDoor();
         Point doorPosition = door.getPosition();
         return new Point(doorPosition.x, doorPosition.y + DISTANCE_TO_DOOR_VERTICAL);
     }
 
-    public static PointWithTimeDTO calculateTimeToGetToPosition(Client client, int indexInPosition, PositionInQueueToExit positionInQueueToExit) {
+    public PointWithTimeDTO calculateTimeToGetToPosition(Client client, int indexInPosition, PositionInQueueToExit positionInQueueToExit) {
         Point destinationPosition = calculatePositionNextToDoor();
         switch (positionInQueueToExit){
             case LEFT:
@@ -51,7 +51,7 @@ public class ClientMovement {
         return new PointWithTimeDTO(destinationPosition, MainLoop.getInstance().getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
     }
 
-    public static List <Point> moveClient (Point coordinates, Client client){
+    public List <Point> moveClient (Point coordinates, Client client){
 
     
     int newXCoord=client.getPosition().x;
@@ -68,10 +68,7 @@ public class ClientMovement {
     List <StoreCheckout> objectsOnTheWay = new ArrayList <>();
     Rectangle clientTrajectory = new Rectangle(minOfRangeX, minOfRangeY, rectangleWidth, rectangleHeight);
     Direction movingDirection = chooseWhichWayToGo(new Point (newXCoord, newYCoord), coordinates);
-    int i=client.getId();
-
-        Set<StoreCheckout> storeCheckouts = ApplicationConfiguration.getInstance().getObjectsStateHandler().getStoreCheckouts();
-
+    Set<StoreCheckout> storeCheckouts = ApplicationConfiguration.getInstance().getObjectsManager().getStoreCheckouts();
 
     for (StoreCheckout q: storeCheckouts){
         Rectangle checkoutArea = new Rectangle (q.getPosition().x, q.getPosition().y, q.getSize().width,
@@ -164,9 +161,7 @@ public class ClientMovement {
 
     }
 
-
-
-    public static Direction chooseWhichWayToGo (Point start, Point end){
+    public Direction chooseWhichWayToGo (Point start, Point end){
     	
     	int horizontalDirection;
     	int verticalDirection;

@@ -23,7 +23,7 @@ public class ClientEventsHandler implements ChangeableObject {
 
     public ClientEventsHandler() {
         painter = ApplicationConfiguration.getInstance().getPainter();
-        objectsManager = ApplicationConfiguration.getInstance().getObjectsStateHandler();
+        objectsManager = ApplicationConfiguration.getInstance().getObjectsManager();
         exitQueueManager = ApplicationConfiguration.getInstance().getExitQueueManager();
     }
 
@@ -87,7 +87,7 @@ public class ClientEventsHandler implements ChangeableObject {
                 break;
             case OUTSIDE_VIEW:
                 painter.removeObject(client);
-                objectsManager.shiftClientsInQueueToExit(client);
+                exitQueueManager.handleClientWentOutsideView(client);
                 break;
             case WAITING_ROOM:
                 ClientAction clientAction = new ClientAction(client.calculateTimeOfMovingToQueue(), ClientPositionType.GOING_TO_QUEUE, client);

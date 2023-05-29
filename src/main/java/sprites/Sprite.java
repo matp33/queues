@@ -38,6 +38,10 @@ public class Sprite {
         SPRITE_DIMENSION_VERTICAL=height;
     }
 
+    public int getHeight() {
+        return SPRITE_DIMENSION_VERTICAL;
+    }
+
     public String getSpriteFileName() {
         return spriteFileName;
     }

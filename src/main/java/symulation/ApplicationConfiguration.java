@@ -5,6 +5,7 @@ import core.MainLoop;
 import events.ClientEventsHandler;
 import events.ObjectsManager;
 import otherFunctions.AppLogger;
+import otherFunctions.ClientMovement;
 import sprites.SpriteManager;
 
 import java.io.IOException;
@@ -30,6 +31,8 @@ public class ApplicationConfiguration {
 
     private ExitQueueManager exitQueueManager;
 
+    private ClientMovement clientMovement;
+
     private ApplicationConfiguration() {
     }
 
@@ -47,15 +50,20 @@ public class ApplicationConfiguration {
         applicationConfiguration.manager = new Manager();
         applicationConfiguration.appLogger = new AppLogger();
         applicationConfiguration.objectsManager = new ObjectsManager();
+        applicationConfiguration.clientMovement = new ClientMovement();
         applicationConfiguration.exitQueueManager = new ExitQueueManager();
         applicationConfiguration.clientEventsHandler = new ClientEventsHandler();
+    }
+
+    public ClientMovement getClientMovement() {
+        return clientMovement;
     }
 
     public ExitQueueManager getExitQueueManager() {
         return exitQueueManager;
     }
 
-    public ObjectsManager getObjectsStateHandler() {
+    public ObjectsManager getObjectsManager() {
         return objectsManager;
     }
 

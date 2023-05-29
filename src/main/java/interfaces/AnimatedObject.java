@@ -38,11 +38,13 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 		spriteManager = applicationConfiguration.getSpriteManager();
 		Sprite sprite = spriteManager.getSprite(spriteType);
 		this.spriteWidth = sprite.getWidth();
+		this.spriteHeight = sprite.getHeight();
 		BufferedImage b=sprite.getSprite(0, 0);
 		size=new Dimension(b.getWidth(), b.getHeight());
 		this.painter=applicationConfiguration.getPainter();
 		position=new Point();
 		initializePosition();
+
 
 		animations = new Animation [sprite.getNumberOfRows()*sprite.getNumberOfColumns()];
 
@@ -55,8 +57,12 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 		currentAnimation=animations[0];
 
 	}
-		
-	
+
+	@Override
+	public int getHeight() {
+		return spriteHeight;
+	}
+
 	public void update() {};
 	protected abstract void initializePosition();
 	

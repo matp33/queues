@@ -25,9 +25,6 @@ public class ObjectsManager {
 
     private Client clientByTheDoor;
 
-    private PositionInQueueToExit currentDirectionToShiftQueueToExit = PositionInQueueToExit.RIGHT;
-
-
     public void initializeObjects (){
         this.door = new Door();
         door.initializePosition();
@@ -57,45 +54,6 @@ public class ObjectsManager {
 
     public NavigableSet<ClientToExitDTO> getClientsMovingToExit() {
         return clientsMovingToExit;
-    }
-
-
-    public void shiftClientsInQueueToExit (Client client){
-        removeClientFromQueueToExit(client);
-        Set<ClientToExitDTO> clientsToShiftOldDirection = clientsMovingToExit.stream().filter(clientDTO -> clientDTO.getPositionInQueueToExit().equals(currentDirectionToShiftQueueToExit)).collect(Collectors.toSet());
-        if (currentDirectionToShiftQueueToExit.equals(PositionInQueueToExit.LEFT)){
-            currentDirectionToShiftQueueToExit = PositionInQueueToExit.RIGHT;
-        }
-        else{
-            currentDirectionToShiftQueueToExit = PositionInQueueToExit.LEFT;
-        }
-        Set<ClientToExitDTO> clientsToShiftNewDirection = clientsMovingToExit.stream().filter(clientDTO -> clientDTO.getPositionInQueueToExit().equals(currentDirectionToShiftQueueToExit)).collect(Collectors.toSet());
-
-        if (!clientsToShiftNewDirection.isEmpty()){
-            shiftClients(client, clientsToShiftNewDirection);
-        }
-        else{
-            shiftClients(client, clientsToShiftOldDirection);
-        }
-    }
-
-    private static void shiftClients(Client client, Set<ClientToExitDTO> clientsQueueToExit) {
-        for (ClientToExitDTO clientToShift : clientsQueueToExit) {
-            int indexInPosition = clientToShift.getIndexInPosition();
-            indexInPosition --;
-            clientToShift.setIndexInPosition(indexInPosition);
-            if (indexInPosition == 0){
-                clientToShift.setPositionInQueueToExit(PositionInQueueToExit.AT_DOOR);
-                PointWithTimeDTO positionDoorWithTimeToGetThere = ClientMovement.calculateTimeToGetToDoor(client);
-                clientToShift.setEstimatedTimeAtDestination(positionDoorWithTimeToGetThere.getTime());
-                clientToShift.getClient().moveToPoint(positionDoorWithTimeToGetThere.getPoint());
-            }
-            else{
-                PointWithTimeDTO positionAndTime = ClientMovement.calculateTimeToGetToPosition(client, indexInPosition, clientToShift.getPositionInQueueToExit());
-                clientToShift.setEstimatedTimeAtDestination(positionAndTime.getTime());
-                clientToShift.getClient().moveToPoint(positionAndTime.getPoint());
-            }
-        }
     }
 
     public void removeClientFromQueueToExit (Client client){
