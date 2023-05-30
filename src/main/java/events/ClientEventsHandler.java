@@ -4,11 +4,13 @@ import clienthandling.ExitQueueManager;
 import constants.ClientPositionType;
 import core.ChangeableObject;
 import otherFunctions.ClientAction;
+import otherFunctions.ClientMovement;
 import spring2.Bean;
 import symulation.Painter;
 import visualComponents.Client;
 import visualComponents.Door;
 
+import java.awt.*;
 import java.util.*;
 
 @Bean
@@ -22,10 +24,13 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private ExitQueueManager exitQueueManager;
 
-    public ClientEventsHandler(Painter painter, ObjectsManager objectsManager, ExitQueueManager exitQueueManager) {
+    private ClientMovement clientMovement;
+
+    public ClientEventsHandler(Painter painter, ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement) {
         this.painter = painter;
         this.objectsManager = objectsManager;
         this.exitQueueManager = exitQueueManager;
+        this.clientMovement = clientMovement;
     }
 
     public void setEventsList(SortedSet<ClientAction> setOfEvents) {
@@ -105,7 +110,12 @@ public class ClientEventsHandler implements ChangeableObject {
         client.setPositionType(ClientPositionType.EXITING);
         Deque<Client> clientsInQueue = objectsManager.getClientsInQueue(queueNumber);
         clientsInQueue.removeFirst();
-        clientsInQueue.forEach(client1 -> client1.moveUpInQueue(currentTime));
+        clientsInQueue.forEach(clientToMove -> {
+            clientToMove.decreaseClientsInQueue(currentTime);
+            Point lookAtPoint=painter.calculateClientDestinationCoordinates(clientToMove.getClientNumber(),
+                    clientToMove.getQueueNumber(), clientToMove.getPositionType());
+            clientMovement.calculateAndSetClientTrajectory(clientToMove, lookAtPoint);
+        });
         exitQueueManager.moveClientToExit(client, objectsManager.getClientsMovingToExit());
 
     }
@@ -115,19 +125,24 @@ public class ClientEventsHandler implements ChangeableObject {
         client.setClientNumber(clientsInQueue.size());
         clientsInQueue.offerLast(client);
         client.setPositionType(ClientPositionType.GOING_TO_QUEUE);
-        client.calculateTrajectory();
+        Point lookAtPoint=painter.calculateClientDestinationCoordinates(client.getClientNumber(), client.getQueueNumber(), client.getPositionType());
+        clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
         client.calculateExpectedTimeInQueue();
     }
 
     private void moveClientToWaitingRoom(Client client, double currentTime)  {
         client.setPositionType(ClientPositionType.WAITING_ROOM);
-        client.calculateTrajectory();
+        Point lookAtPoint=painter.calculateClientDestinationCoordinates(client.getClientNumber(),
+                client.getQueueNumber(), client.getPositionType());
+        clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
         client.calculateExpectedTimeInWaitingRoom(currentTime);
     }
 
     private void moveOutside(Client client){
         client.setPositionType(ClientPositionType.OUTSIDE_VIEW);
-        client.calculateTrajectory();
+        Point lookAtPoint=painter.calculateClientDestinationCoordinates(client.getClientNumber(),
+                client.getQueueNumber(), client.getPositionType());
+        clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
     }
 
 }

@@ -7,6 +7,7 @@ import dto.PointWithTimeDTO;
 import events.ObjectsManager;
 import otherFunctions.ClientMovement;
 import spring2.Bean;
+import symulation.Painter;
 import visualComponents.Client;
 
 import java.util.*;
@@ -21,8 +22,7 @@ public class ExitQueueManager {
 
     private ObjectsManager objectsManager;
 
-
-    public ExitQueueManager(ClientMovement clientMovement, ObjectsManager objectsManager) {
+    public ExitQueueManager(ClientMovement clientMovement, ObjectsManager objectsManager, Painter painter) {
         this.clientMovement = clientMovement;
         this.objectsManager = objectsManager;
     }
@@ -34,7 +34,10 @@ public class ExitQueueManager {
         clientsMovingToExit.add(newClientData);
         clientsModified.add(newClientData);
         clientsModified.addAll(shiftedClients);
-        clientsModified.forEach(clientDTO->clientDTO.getClient().moveToPoint(clientDTO.getDestinationPoint()));
+        clientsModified.forEach(clientDTO-> {
+            Client clientModified = clientDTO.getClient();
+            clientMovement.calculateAndSetClientTrajectory(clientModified, clientDTO.getDestinationPoint());
+        });
 
     }
 
@@ -197,12 +200,14 @@ public class ExitQueueManager {
                 clientToShift.setPositionInQueueToExit(PositionInQueueToExit.AT_DOOR);
                 PointWithTimeDTO positionDoorWithTimeToGetThere = clientMovement.calculateTimeToGetToDoor(client);
                 clientToShift.setEstimatedTimeAtDestination(positionDoorWithTimeToGetThere.getTime());
-                clientToShift.getClient().moveToPoint(positionDoorWithTimeToGetThere.getPoint());
+                Client clientShifted = clientToShift.getClient();
+                clientMovement.calculateAndSetClientTrajectory(clientShifted, positionDoorWithTimeToGetThere.getPoint());
             }
             else{
                 PointWithTimeDTO positionAndTime = clientMovement.calculateTimeToGetToPosition(client, indexInPosition, clientToShift.getPositionInQueueToExit());
                 clientToShift.setEstimatedTimeAtDestination(positionAndTime.getTime());
-                clientToShift.getClient().moveToPoint(positionAndTime.getPoint());
+                clientMovement.calculateAndSetClientTrajectory(clientToShift.getClient(), positionAndTime.getPoint());
+
             }
         }
     }

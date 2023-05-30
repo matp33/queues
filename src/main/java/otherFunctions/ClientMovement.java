@@ -183,5 +183,10 @@ public class ClientMovement {
         return new Direction (verticalDirection, horizontalDirection);
         
     }
-    
+
+    public void calculateAndSetClientTrajectory(Client client, Point lookAtPoint) {
+        List<Point> trajectory = moveClient(lookAtPoint, client);
+        client.setTrajectory(trajectory);
+        client.setLookAtPoint(lookAtPoint);
+    }
 }

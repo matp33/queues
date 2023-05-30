@@ -1,14 +1,11 @@
 package visualComponents;
 
 import constants.ClientPositionType;
-import core.MainLoop;
 import events.ClientEventsHandler;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
 
-import otherFunctions.AppLogger;
-import otherFunctions.ClientMovement;
 import spring2.BeanRegistry;
 import animations.Animation;
 import symulation.Painter;
@@ -34,16 +31,12 @@ private Point lookAtPoint;
 	private List <Point> trajectory = new ArrayList<>();
 private StoreCheckout storeCheckout;
 
-private ClientMovement clientMovement;
-
 private Timer timer;
 private Timer timerDelay; // timer for moving inside queue connected to clients having some delays
 
 private TimerTask movingTask;
 private Animation currentAnimation,moveLeft,moveRight,moveDown,moveUp;
 private Point position;
-
-private AppLogger logger;
 
 public final int queueDelay; // delay before client moves when he sees that another client moved
 private static final int frameTime=20; // so many steps before animation changes to next
@@ -70,9 +63,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 		super();
 
-		clientMovement = BeanRegistry.getBeanByClass(ClientMovement.class);
 		this.timeInCheckout = timeInCheckout;
-		logger = BeanRegistry.getBeanByClass(AppLogger.class);
 		nr++;
 		id=nr;
 		this.queueDelay=createDelay();
@@ -125,38 +116,18 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 
     
-    public void moveUpInQueue(double currentTime)  {
+    public void decreaseClientsInQueue(double currentTime)  {
     	
 //    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
     	
     	if (getPositionType().ordinal()>= ClientPositionType.EXITING.ordinal()){
     		return;
     	}
-    	
+		decreaseNumberOfClientsInQueue();
 
-        TimerTask tt=new TimerTask(){
-            @Override
-            public void run(){
-            	isWaiting=false;
-            	delayWaited=0; 
-            	decreaseNumberOfClientsInQueue();
-	            	if (getPositionType().ordinal()>ClientPositionType.WAITING_ROOM.ordinal()){
-	            		calculateTrajectory();    
-	            	}
-			}
-        };
-        
-        if (storeCheckout.getClientsList().contains(this)){ // if client is in queue
-//        	System.out.println("queue "+queueDelay+" delay "+delayWaited);
-        	timerDelay.schedule(tt, (int)(queueDelay-delayWaited));
-        			
-        }
-        else{
-        	timerDelay.schedule(tt, 0);
-        }
-        delayStartTime=(int)(currentTime); //TODO this is too complicated I guess
-        isWaiting=true;
-        
+
+
+
     	
     }
 
@@ -210,23 +181,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 	public void calculateExpectedTimeInQueue() {
 		timeSupposed+=trajectory.size()*movementDelay;
 	}
-
-
-
-
-    public void calculateTrajectory(){
-    	
-       lookAtPoint=painter.calculateClientDestinationCoordinates(getClientNumber(), getQueueNumber(), positionType);
-       
-       trajectory= clientMovement.moveClient(lookAtPoint, this);
-    }
-
-	public void moveToPoint (Point p){
-		lookAtPoint = p;
-		trajectory = clientMovement.moveClient(p, this);
-	}
-
-
 
     public static double calculateTimeToGetToQueue(Point queuePosition,
                                              Point waitingRoomPosition){
@@ -374,6 +328,14 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 	public void resetTimerObject() {
 		timerDelay = new Timer();
+	}
+
+	public void setTrajectory(List<Point> trajectory) {
+		this.trajectory = trajectory;
+	}
+
+	public void setLookAtPoint(Point lookAtPoint) {
+		this.lookAtPoint = lookAtPoint;
 	}
 }
 
