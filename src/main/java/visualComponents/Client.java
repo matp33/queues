@@ -1,5 +1,6 @@
 package visualComponents;
 
+import com.sun.tools.javac.Main;
 import constants.ClientPositionType;
 import core.MainLoop;
 import events.ClientEventsHandler;
@@ -12,11 +13,13 @@ import java.awt.*;
 
 import otherFunctions.AppLogger;
 import otherFunctions.ClientMovement;
+import spring2.BeanRegistry;
 import sprites.SpriteManager;
 import sprites.SpriteType;
 import symulation.ApplicationConfiguration;
 import animations.Animation;
 import sprites.Sprite;
+import symulation.Painter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,14 +75,17 @@ private double timeInCheckout;
 
 private ClientEventsHandler clientEventsHandler;
 
+private MainLoop mainLoop;
+
 public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime, double timeInCheckout)  {
 
 		super(SpriteType.CLIENT);
-		clientMovement = ApplicationConfiguration.getInstance().getClientMovement();
+
+		mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
+		clientMovement = BeanRegistry.getBeanByClass(ClientMovement.class);
 		this.timeInCheckout = timeInCheckout;
-		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
-		spriteManager = applicationConfiguration.getSpriteManager();
-		logger = applicationConfiguration.getAppLogger();
+		spriteManager = BeanRegistry.getBeanByClass(SpriteManager.class);
+		logger = BeanRegistry.getBeanByClass(AppLogger.class);
 		nr++;
 		id=nr;
 		this.queueDelay=createDelay();
@@ -93,7 +99,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
         isWaiting=false;
 
-		this.painter=applicationConfiguration.getPainter();
+		this.painter= BeanRegistry.getBeanByClass(Painter.class);
         this.clientNumber=clientNumber;
 //        positionType=Client.POSITION_WAITING_ROOM;
         currentAnimation=moveUp;
@@ -101,7 +107,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         this.storeCheckout = storeCheckout;
         delayWaited=0;
 		timer=new Timer();
-		clientEventsHandler = ApplicationConfiguration.getInstance().getClientEventsHandler();
+		clientEventsHandler = BeanRegistry.getBeanByClass(ClientEventsHandler.class);
 //        red = false;
                 
     }
@@ -162,7 +168,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         else{
         	timerDelay.schedule(tt, 0);
         }
-        delayStartTime=(int)(MainLoop.getInstance().getTimePassedSeconds()); //TODO this is too complicated I guess
+        delayStartTime=(int)(mainLoop.getTimePassedSeconds()); //TODO this is too complicated I guess
         isWaiting=true;
         
     	
@@ -190,7 +196,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     	    	
     	if (isWaiting){
     		
-    		delayWaited+=(int)(MainLoop.getInstance().getTimePassedSeconds())-delayStartTime; // no negative values allowed
+    		delayWaited+=(int)(mainLoop.getTimePassedSeconds())-delayStartTime; // no negative values allowed
 //    		System.out.println("delay wait: "+delayWaited+"abc"+abc);
     		timerDelay.cancel();
 			timer.cancel();
@@ -212,7 +218,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 
 	public void calculateExpectedTimeInWaitingRoom() {
-		timeSupposed=MainLoop.getInstance().getTimePassedSeconds()+trajectory.size()*movementDelay+ waitRoomDelay;
+		timeSupposed= mainLoop.getTimePassedSeconds()+trajectory.size()*movementDelay+ waitRoomDelay;
 	}
 
 
@@ -280,7 +286,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 	public void saveMeInLog()  {
 		if (storeCheckout.isClientOutOfSight(this)) storeCheckout.increaseNumber();
         storeCheckout.getClientsArriving().remove(this);
-		logger.saveEvent(getQueueNumber(),timeSupposed,MainLoop.getInstance().getTimePassedSeconds());
+		logger.saveEvent(getQueueNumber(),timeSupposed, mainLoop.getTimePassedSeconds());
 	}
 	
 	public Point getPosition(){

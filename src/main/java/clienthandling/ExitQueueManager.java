@@ -6,12 +6,13 @@ import dto.PointWithTimeAndQueueIndexDTO;
 import dto.PointWithTimeDTO;
 import events.ObjectsManager;
 import otherFunctions.ClientMovement;
-import symulation.ApplicationConfiguration;
+import spring2.Bean;
 import visualComponents.Client;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Bean
 public class ExitQueueManager {
 
     private ClientMovement clientMovement;
@@ -21,9 +22,9 @@ public class ExitQueueManager {
     private ObjectsManager objectsManager;
 
 
-    public ExitQueueManager() {
-        clientMovement = ApplicationConfiguration.getInstance().getClientMovement();
-        objectsManager = ApplicationConfiguration.getInstance().getObjectsManager();
+    public ExitQueueManager(ClientMovement clientMovement, ObjectsManager objectsManager) {
+        this.clientMovement = clientMovement;
+        this.objectsManager = objectsManager;
     }
 
     public void moveClientToExit(Client client, NavigableSet<ClientToExitDTO> clientsMovingToExit){

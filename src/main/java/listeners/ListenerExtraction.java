@@ -11,16 +11,22 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import core.MainLoop;
 import events.UIEventQueue;
+import spring2.Bean;
+import spring2.BeanRegistry;
+import symulation.ApplicationConfiguration;
 import symulation.Painter;
 import symulation.ClientArrivalEvent;
 
+@Bean
 public class ListenerExtraction extends ListenerOpenFile{
 	private String title = "Choosing queue number.";
 
-    public ListenerExtraction (Painter painter, UIEventQueue UIEventQueue){
-        super(painter, UIEventQueue);
-    }
+
+    public ListenerExtraction ( UIEventQueue UIEventQueue, ApplicationConfiguration applicationConfiguration){
+        super( UIEventQueue, applicationConfiguration);
+	}
     
     @Override 
     protected SortedSet<ClientArrivalEvent> processTimeTable(SortedSet<ClientArrivalEvent> timetable){
@@ -33,7 +39,9 @@ public class ListenerExtraction extends ListenerOpenFile{
     }
     
     private List<Integer> makeDialog(int number){
-    	JPanel p=new JPanel();
+		Painter painter = BeanRegistry.getBeanByClass(Painter.class);
+
+		JPanel p=new JPanel();
     	p.setLayout(new BorderLayout());
     	
     	JPanel panel = new JPanel();

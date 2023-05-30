@@ -1,7 +1,9 @@
 package symulation;
 
 import core.MainLoop;
+import events.ClientEventsHandler;
 import events.EventSubscriber;
+import events.ObjectsManager;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
@@ -12,10 +14,12 @@ import java.util.TreeSet;
 import javax.swing.JOptionPane;
 
 import otherFunctions.ClientAction;
+import spring2.Bean;
 import visualComponents.Client;
 import visualComponents.Indicator;
 import visualComponents.OutsideWorld;
 
+@Bean
 public class Manager implements EventSubscriber {
 	
 
@@ -32,16 +36,26 @@ public class Manager implements EventSubscriber {
 	private List<ClientAction> listOfEvents;
 
 	private ApplicationConfiguration applicationConfiguration;
-	
-	public Manager()  {
 
-		applicationConfiguration = ApplicationConfiguration.getInstance();
-		this.painter = applicationConfiguration.getPainter();
+	private final ObjectsManager objectsManager;
+
+	private final MainLoop mainLoop;
+
+	private final ClientEventsHandler clientEventsHandler;
+
+	public Manager(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, Painter painter, ObjectsManager objectsManager, MainLoop mainLoop, ClientEventsHandler clientEventsHandler)  {
+
+		this.applicationConfiguration = applicationConfiguration;
+		this.simulation = simulation;
+		this.painter = painter;
+		this.objectsManager = objectsManager;
+		this.mainLoop = mainLoop;
+		this.clientEventsHandler = clientEventsHandler;
 		painter.addEventsSubscriber(this);
 
 
 		outside = new OutsideWorld();
-		 waitingRoomIndicator=new Indicator();
+		 this.waitingRoomIndicator = waitingRoomIndicator;
 		 Point point=painter.getDoorPosition();
 		 int i=0;
 		 while (painter.getCheckoutPosition(i).x<point.x){
@@ -50,7 +64,6 @@ public class Manager implements EventSubscriber {
 		 System.out.println("IIIIIIIIIII"+i);
 
 		this.numberOfQueues=applicationConfiguration.getNumberOfQueues();
-		 simulation=new Simulation();
 
 	}
 
@@ -62,15 +75,15 @@ public class Manager implements EventSubscriber {
 	public void restart(double time) {
 		
 		clean();
-		ApplicationConfiguration.getInstance().getObjectsManager().initializeObjects();
+		objectsManager.initializeObjects();
 		doSimulation(time);
-		MainLoop.getInstance().addObject(applicationConfiguration.getClientEventsHandler());
+		mainLoop.addObject(clientEventsHandler);
 
 	}
 	
 	public void clean(){
 		painter.clean();
-		MainLoop.getInstance().removeObjects();
+		mainLoop.removeObjects();
 	}
 
     public void doSimulation ()  {
@@ -80,7 +93,7 @@ public class Manager implements EventSubscriber {
 
 	public void doSimulation (double time)  {
     	Client.nr=0;
-		MainLoop.getInstance().setTimePassed (time);
+		mainLoop.setTimePassed (time);
     	waitingRoomIndicator.clear();
     	
         painter.setButtonRestartToActive();

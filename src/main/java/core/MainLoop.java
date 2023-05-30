@@ -1,6 +1,7 @@
 package core;
 
 import interfaces.AnimatedObject;
+import spring2.Bean;
 import symulation.Painter;
 import visualComponents.Client;
 
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+@Bean
 public class MainLoop {
 
     public static final double DELTA_TIME = 0.02;
@@ -17,21 +19,12 @@ public class MainLoop {
 
     private List<ChangeableObject> changeableObjects = new ArrayList<>();
 
-    private static MainLoop instance = null;
-
     private boolean isPaused = true;
 
     private double timePassedSeconds = 0;
 
-    public static MainLoop getInstance() {
-        if (instance == null){
-            Painter painter = Painter.getInstance();
-            instance = new MainLoop(painter);
-        }
-        return instance;
-    }
 
-    private MainLoop(Painter painter) {
+    public MainLoop(Painter painter) {
         timer = new Timer();
         this.painter = painter;
         timer.scheduleAtFixedRate(mainLoopTask(),0, (int)(DELTA_TIME*1000));

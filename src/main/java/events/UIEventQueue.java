@@ -1,11 +1,13 @@
 package events;
 
+import spring2.Bean;
 import symulation.ClientArrivalEvent;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
+@Bean
 public class UIEventQueue {
 
     private Set<EventSubscriber> observers = new HashSet<>();

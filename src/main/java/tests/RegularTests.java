@@ -1,18 +1,29 @@
 
 package tests;
 
+import spring2.Bean;
 import symulation.*;
 
 import java.util.*;
 
-
+@Bean
 public class RegularTests {
 
     static double arrivalDelay=0.7;
 
-    public static void testInserting(int numberOfStoreCheckouts,int numberOfClients) throws InterruptedException {
+    private Manager manager;
 
-        Manager manager = new Manager( );
+    private final ApplicationConfiguration applicationConfiguration;
+    private  final Painter painter;
+
+    public RegularTests(Manager manager, ApplicationConfiguration applicationConfiguration, Painter painter) {
+        this.manager = manager;
+        this.applicationConfiguration = applicationConfiguration;
+        this.painter = painter;
+    }
+
+    public void testInserting(int numberOfStoreCheckouts, int numberOfClients) throws InterruptedException {
+
 
         manager.beginSimulation();
         for (int i=0; i<numberOfClients;i++){
@@ -23,9 +34,8 @@ public class RegularTests {
     
     }
 
-    public static void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients)  {
+    public void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients)  {
 
-            ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
             applicationConfiguration.setNumberOfQueues(numberOfQueues);
 
             SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime).thenComparing(ClientArrivalEvent::getQueueNumber));
@@ -35,8 +45,7 @@ public class RegularTests {
                 double timeInQueue = 1; //generateRandomTimeInQueue();
                 clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i/4, queueNumber));
             }
-            applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);
-            Manager manager = applicationConfiguration.getManager();
+            painter.setTimeTable(clientArrivalEvents);
             manager.setTimeTable(clientArrivalEvents);
             manager.doSimulation();
 
@@ -44,16 +53,15 @@ public class RegularTests {
 
     }
 
-    private static double generateRandomTimeInQueue() {
+    private double generateRandomTimeInQueue() {
         Random random = new Random();
         int maxTimeInQueue = 3;
         int minTimeInQueue = 1;
         return random.nextDouble() * (maxTimeInQueue-minTimeInQueue) + minTimeInQueue;
     }
 
-    public static void test1ClientPerQueue(int numberOfQueues) {
+    public void test1ClientPerQueue(int numberOfQueues) {
     	double time = 1.5;
-        ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
         applicationConfiguration.setNumberOfQueues(numberOfQueues);
         SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
 
@@ -69,16 +77,14 @@ public class RegularTests {
 //    		departs[i-4][1]=i;
 //    	}
 
-        Manager manager = applicationConfiguration.getManager();
         manager.setTimeTable(clientArrivalEvents);
-    	applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);
+    	painter.setTimeTable(clientArrivalEvents);
 
         manager.doSimulation();
 
     }
 
-    public static void testQueueUpdating (int numberOfQueues, int delay)  {
-        ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
+    public void testQueueUpdating (int numberOfQueues, int delay)  {
         applicationConfiguration.setNumberOfQueues(numberOfQueues);
         int insertedClients=2;
         
@@ -104,9 +110,9 @@ public class RegularTests {
             clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, 6+i*arrivalDelay, numberOfQueues-1));
         }
 
-        applicationConfiguration.getManager().setTimeTable(clientArrivalEvents);
-        applicationConfiguration.getManager().doSimulation();
-        applicationConfiguration.getPainter().setTimeTable(clientArrivalEvents);
+        manager.setTimeTable(clientArrivalEvents);
+        manager.doSimulation();
+        painter.setTimeTable(clientArrivalEvents);
 
 
 

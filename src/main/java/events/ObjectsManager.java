@@ -3,16 +3,15 @@ package events;
 import constants.PositionInQueueToExit;
 import core.MainLoop;
 import dto.ClientToExitDTO;
-import dto.PointWithTimeDTO;
-import otherFunctions.ClientMovement;
+import spring2.Bean;
 import symulation.ApplicationConfiguration;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
+@Bean
 public class ObjectsManager {
 
     private Door door;
@@ -25,11 +24,20 @@ public class ObjectsManager {
 
     private Client clientByTheDoor;
 
+    private ApplicationConfiguration applicationConfiguration;
+
+    private MainLoop mainLoop;
+
+    public ObjectsManager(ApplicationConfiguration applicationConfiguration, MainLoop mainLoop) {
+        this.applicationConfiguration = applicationConfiguration;
+        this.mainLoop = mainLoop;
+    }
+
     public void initializeObjects (){
         this.door = new Door();
         door.initializePosition();
-        MainLoop.getInstance().addObject(door);
-        int numberOfQueues = ApplicationConfiguration.getInstance().getNumberOfQueues();
+        mainLoop.addObject(door);
+        int numberOfQueues = applicationConfiguration.getNumberOfQueues();
         for (int i=0;i<numberOfQueues;i++){
             storeCheckouts.add(new StoreCheckout(i));
             clientsInQueue.put(i, new ArrayDeque<>());

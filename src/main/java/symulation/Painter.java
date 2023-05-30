@@ -20,10 +20,13 @@ import listeners.ListenerExtraction;
 import listeners.ListenerFromTheStart;
 import listeners.ListenerOpenFile;
 import listeners.ListenerStopStart;
+import spring2.Bean;
+import spring2.BeanRegistry;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;
 
+@Bean
 public class Painter extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -57,20 +60,23 @@ public class Painter extends JPanel {
     private ApplicationConfiguration applicationConfiguration;
 
 
-    private static Painter instance = null;
 
     private final UIEventQueue uIEventQueue = new UIEventQueue();
 
-    public static Painter getInstance()  {
-        if (instance == null){
-            instance = new Painter();
-        }
-        return instance;
-    }
+    private ListenerStopStart listenerStopStart;
+   private  ListenerOpenFile listenerOpen;
+    private ListenerFromTheStart listenerFromStart;
+    private ListenerExtraction listenerExtract;
 
-    private Painter()  {
+    private MainLoop mainLoop;
 
-        applicationConfiguration = ApplicationConfiguration.getInstance();
+    public Painter(ApplicationConfiguration applicationConfiguration, CustomLayout customLayout, ListenerStopStart listenerStopStart, ListenerOpenFile listenerOpen, ListenerFromTheStart listenerFromStart, ListenerExtraction listenerExtract)  {
+
+        this.applicationConfiguration = applicationConfiguration;
+        this.listenerStopStart = listenerStopStart;
+        this.listenerOpen = listenerOpen;
+        this.listenerFromStart = listenerFromStart;
+        this.listenerExtract = listenerExtract;
         objects= new ArrayList <>();
         window = new JFrame();
         decFormat = new DecimalFormat("0.00");
@@ -82,7 +88,7 @@ public class Painter extends JPanel {
         double maxFontHeight=getFontMetrics(getFont()).getHeight();
         maxTextDimensions=new Dimension((int)maxFontWidth,(int)maxFontHeight);
         bottomPanel=new JPanel();
-        layout=new CustomLayout(bottomPanel);
+        layout=customLayout;
 
     }
 
@@ -95,7 +101,7 @@ public class Painter extends JPanel {
     }
 
     public void initiateWindow() {
-        layout.initialize(applicationConfiguration.getNumberOfQueues());
+        layout.initialize(applicationConfiguration.getNumberOfQueues(), bottomPanel);
         initiateButtons();
         initiate();
 
@@ -103,6 +109,7 @@ public class Painter extends JPanel {
         window.setLocationRelativeTo(null);
         window.setResizable(false);
         window.setVisible(true);
+        mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
     }
 
 
@@ -148,10 +155,6 @@ public class Painter extends JPanel {
 
         window.add(mainPanel);
 
-        ActionListener listenerStopStart=new ListenerStopStart(this);
-        ActionListener listenerOpen = new ListenerOpenFile(this, uIEventQueue);
-        ActionListener listenerFromStart=new ListenerFromTheStart(this,uIEventQueue);
-        ActionListener listenerExtract=new ListenerExtraction (this, uIEventQueue);
 
         btnExtract.addActionListener(listenerExtract);
         btnPause.addActionListener(listenerStopStart);
@@ -301,9 +304,8 @@ public class Painter extends JPanel {
     public void resume(boolean fromZero){
 
 
-        MainLoop instance = MainLoop.getInstance();
-        if (fromZero) instance.setTimePassed(0);
-        instance.resume();
+        if (fromZero) mainLoop.setTimePassed(0);
+        mainLoop.resume();
         repaint();
         resumeSprites();
         setButtonStopToPaused();
@@ -327,7 +329,7 @@ public class Painter extends JPanel {
     public void pause() {
         setButtonStopToResume();
         stopSprites();
-        MainLoop.getInstance().pause();
+        mainLoop.pause();
     }
 
     public void resumeSprites(){

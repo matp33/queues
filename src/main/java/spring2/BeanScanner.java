@@ -12,7 +12,7 @@ public class BeanScanner {
     private BeanRegistry beanRegistry;
 
     public BeanScanner() {
-        beanRegistry = new BeanRegistry();
+        beanRegistry = BeanRegistry.getInstance();
     }
 
     public  void run () throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -25,7 +25,7 @@ public class BeanScanner {
 
             File[] files = parentFile.listFiles();
             String directoryName = "";
-            List<Class> classes = new ArrayList<>();
+            List<Class<?>> classes = new ArrayList<>();
             for (File rootFile : files) {
                 if (rootFile.isDirectory()){
                     directoryName = rootFile.getName();
@@ -43,7 +43,7 @@ public class BeanScanner {
                 }
 
             }
-            for (Class aClass : classes) {
+            for (Class<?> aClass : classes) {
                 for (Annotation annotation : aClass.getAnnotations()) {
                     if (annotation.annotationType().equals(Bean.class)){
                         beanRegistry.getBean(aClass);

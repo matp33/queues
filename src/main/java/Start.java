@@ -1,46 +1,41 @@
+import spring2.Bean;
+import spring2.BeanRegistry;
+import spring2.BeanScanner;
 import symulation.ApplicationConfiguration;
+import symulation.ApplicationInitializer;
 import tests.RegularTests;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
+@Bean
 public class Start {
 
-	public static void main(String[] args) throws IOException {
+	private final ApplicationInitializer applicationInitializer;
+	private final ApplicationConfiguration applicationConfiguration;
+
+	private final  RegularTests regularTests;
+
+	public Start(ApplicationInitializer applicationInitializer, ApplicationConfiguration applicationConfiguration, RegularTests regularTests) throws IOException {
+		this.applicationInitializer = applicationInitializer;
+		this.applicationConfiguration = applicationConfiguration;
+		this.regularTests = regularTests;
+		start();
+	}
+
+	private void start () throws IOException {
+		int numberOfQueues = 4;
+		applicationConfiguration.setNumberOfQueues(numberOfQueues);
+		applicationInitializer.initialize();
+		regularTests.testMultipleClientsWithMultipleQueues(numberOfQueues,8);
+	}
+
+	public static void main(String[] args) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
 	      		
-    	
-    	
-        if (args.length == 0) {
-
-			ApplicationConfiguration instance = ApplicationConfiguration.getInstance();
-			int numberOfQueues = 4;
-			instance.setNumberOfQueues(numberOfQueues);
-			instance.initialize();
-//            	RegularTests.test1ClientPerQueue(8);
-            	RegularTests.testMultipleClientsWithMultipleQueues(numberOfQueues,8);
-//            	new Painter(1,10.0,new WindowFrame());
-
-//                Painter painter = Painter.getInstance();
-//                Manager manager = new Manager(painter);
-//                painter.setManager(manager);
-//                StoreCheckout storeCheckout = new StoreCheckout(painter, 3);
-//
-//                Client client = new Client(storeCheckout, 0, painter, 5, manager);
-//                client.setPosition(new Point(5, 300));
-//                client.moveToQueue();
-//                manager.initializeStaticObjects();
+    	new BeanScanner().run();
 
 
 
-
-          
-}
-
-//        if (args.length>1 || args.length==0){
-//            System.out.println("Incorrect argument number. You should input only 1 argument.");
-//            //System.exit(1);
-//        }
-
-
-}
+	}
 	
 }

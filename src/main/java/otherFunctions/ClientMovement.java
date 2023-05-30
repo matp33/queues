@@ -14,25 +14,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import symulation.ApplicationConfiguration;
+import spring2.Bean;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;
 
+@Bean
 public class ClientMovement {
 
     public static final int DISTANCE_TO_DOOR_VERTICAL = 20;
 
+    private  ObjectsManager objectsManager;
+
+    private MainLoop mainLoop;
+
+    public ClientMovement(ObjectsManager objectsManager, MainLoop mainLoop) {
+        this.objectsManager = objectsManager;
+        this.mainLoop = mainLoop;
+    }
+
     public PointWithTimeDTO calculateTimeToGetToDoor(Client client){
         Point belowDoor = calculatePositionNextToDoor();
         List<Point> trajectory = moveClient(belowDoor, client);
-        return new PointWithTimeDTO(belowDoor, MainLoop.getInstance().getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
+        return new PointWithTimeDTO(belowDoor, mainLoop.getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
 
     }
 
     private Point calculatePositionNextToDoor() {
-        ObjectsManager objectsStateHandler = ApplicationConfiguration.getInstance().getObjectsManager();
-        Door door = objectsStateHandler.getDoor();
+        Door door = objectsManager.getDoor();
         Point doorPosition = door.getPosition();
         return new Point(doorPosition.x, doorPosition.y + DISTANCE_TO_DOOR_VERTICAL);
     }
@@ -48,7 +57,7 @@ public class ClientMovement {
                 break;
         }
         List<Point> trajectory = moveClient(destinationPosition, client);
-        return new PointWithTimeDTO(destinationPosition, MainLoop.getInstance().getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
+        return new PointWithTimeDTO(destinationPosition, mainLoop.getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
     }
 
     public List <Point> moveClient (Point coordinates, Client client){
@@ -68,7 +77,7 @@ public class ClientMovement {
     List <StoreCheckout> objectsOnTheWay = new ArrayList <>();
     Rectangle clientTrajectory = new Rectangle(minOfRangeX, minOfRangeY, rectangleWidth, rectangleHeight);
     Direction movingDirection = chooseWhichWayToGo(new Point (newXCoord, newYCoord), coordinates);
-    Set<StoreCheckout> storeCheckouts = ApplicationConfiguration.getInstance().getObjectsManager().getStoreCheckouts();
+    Set<StoreCheckout> storeCheckouts = objectsManager.getStoreCheckouts();
 
     for (StoreCheckout q: storeCheckouts){
         Rectangle checkoutArea = new Rectangle (q.getPosition().x, q.getPosition().y, q.getSize().width,

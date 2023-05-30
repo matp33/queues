@@ -4,6 +4,7 @@ import clienthandling.ExitQueueManager;
 import constants.ClientPositionType;
 import core.ChangeableObject;
 import otherFunctions.ClientAction;
+import spring2.Bean;
 import symulation.ApplicationConfiguration;
 import symulation.Painter;
 import visualComponents.Client;
@@ -11,6 +12,7 @@ import visualComponents.Door;
 
 import java.util.*;
 
+@Bean
 public class ClientEventsHandler implements ChangeableObject {
 
     private SortedSet<ClientAction> setOfEvents = new TreeSet<>();
@@ -21,10 +23,10 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private ExitQueueManager exitQueueManager;
 
-    public ClientEventsHandler() {
-        painter = ApplicationConfiguration.getInstance().getPainter();
-        objectsManager = ApplicationConfiguration.getInstance().getObjectsManager();
-        exitQueueManager = ApplicationConfiguration.getInstance().getExitQueueManager();
+    public ClientEventsHandler(Painter painter, ObjectsManager objectsManager, ExitQueueManager exitQueueManager) {
+        this.painter = painter;
+        this.objectsManager = objectsManager;
+        this.exitQueueManager = exitQueueManager;
     }
 
     public void setEventsList(SortedSet<ClientAction> setOfEvents) {

@@ -1,7 +1,9 @@
 package sprites;
 
-import java.io.IOException;
+import spring2.Bean;
 
+import java.io.IOException;
+@Bean
 public class SpriteManager {
 
     private Sprite clientSprite;

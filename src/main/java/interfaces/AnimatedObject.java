@@ -8,6 +8,7 @@ import javax.swing.JComponent;
 
 import core.ChangeableObject;
 import core.MainLoop;
+import spring2.BeanRegistry;
 import sprites.SpriteManager;
 import sprites.SpriteType;
 import symulation.ApplicationConfiguration;
@@ -34,14 +35,13 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 	
 	public AnimatedObject (SpriteType spriteType){
 
-		ApplicationConfiguration applicationConfiguration = ApplicationConfiguration.getInstance();
-		spriteManager = applicationConfiguration.getSpriteManager();
+		spriteManager = BeanRegistry.getBeanByClass(SpriteManager.class);
 		Sprite sprite = spriteManager.getSprite(spriteType);
 		this.spriteWidth = sprite.getWidth();
 		this.spriteHeight = sprite.getHeight();
 		BufferedImage b=sprite.getSprite(0, 0);
 		size=new Dimension(b.getWidth(), b.getHeight());
-		this.painter=applicationConfiguration.getPainter();
+		this.painter= BeanRegistry.getBeanByClass(Painter.class);
 		position=new Point();
 		initializePosition();
 

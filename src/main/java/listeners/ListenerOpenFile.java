@@ -16,32 +16,35 @@ import javax.swing.JFileChooser;
 import core.MainLoop;
 import events.UIEventQueue;
 import otherFunctions.FileAnalyzer;
+import spring2.Bean;
+import spring2.BeanRegistry;
 import symulation.ApplicationConfiguration;
 import symulation.Painter;
 import symulation.ClientArrivalEvent;
 
+@Bean
 public class ListenerOpenFile implements ActionListener{
     
 private JFileChooser fileChoosingWindow = new JFileChooser();
 private static final String TXT_FILES_DIR = "/txtFiles";
 
-protected Painter painter;
-
 private UIEventQueue UIEventQueue;
 
 private ApplicationConfiguration applicationConfiguration;
 
-    public ListenerOpenFile ( Painter painter, UIEventQueue UIEventQueue)  {
-    	JFileChooser fileChooser=new JFileChooser();
+private MainLoop mainLoop;
+private Painter painter;
+
+    public ListenerOpenFile ( UIEventQueue UIEventQueue, ApplicationConfiguration applicationConfiguration)  {
+        JFileChooser fileChooser=new JFileChooser();
         URL resource = getClass().getResource(TXT_FILES_DIR);
         assert resource != null;
         File txtFilesDirectory = new File(resource.getPath());
         fileChooser.setCurrentDirectory(txtFilesDirectory);
         
         fileChoosingWindow=fileChooser;         
-        this.painter = painter;
         this.UIEventQueue = UIEventQueue;
-        applicationConfiguration = ApplicationConfiguration.getInstance();
+        this.applicationConfiguration = applicationConfiguration;
     }
     
   //TODO nice option would be to show somewhere infos about the file we opened: average time in queue, 
@@ -49,7 +52,8 @@ private ApplicationConfiguration applicationConfiguration;
     
     @Override
     public void actionPerformed(ActionEvent e){
-
+        mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
+        painter = BeanRegistry.getBeanByClass(Painter.class);
         painter.pause();
         int optionChooser= fileChoosingWindow.showOpenDialog(null);
 
@@ -57,7 +61,7 @@ private ApplicationConfiguration applicationConfiguration;
                analyze(e);
            }
            
-           else if (MainLoop.getInstance().isPaused()){
+           else if (mainLoop.isPaused()){
                return;
            }
 
@@ -90,7 +94,7 @@ private ApplicationConfiguration applicationConfiguration;
          timeTable=processTimeTable(timeTable);
 
              if(applicationConfiguration.getNumberOfQueues() != lastQueueIndex){
-                 MainLoop.getInstance().pause();
+                 mainLoop.pause();
                  applicationConfiguration.setNumberOfQueues(lastQueueIndex+1);
                  painter.initiate();
              }

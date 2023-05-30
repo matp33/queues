@@ -17,18 +17,20 @@ import dto.ClientToExitDTO;
 import dto.PointWithTimeAndQueueIndexDTO;
 import dto.PointWithTimeDTO;
 import otherFunctions.ClientMovement;
+import spring2.Bean;
 import sprites.SpriteManager;
 import sprites.SpriteType;
 import visualComponents.Client;
 import visualComponents.Door;
 
+@Bean
 public class CustomLayout {
 
     private final int minimumWindowHeight=700;
     private final int horizontalPadding =10;
     private final int verticalPadding =50;
     private final int verticalMarginBetweenObjects =10;
-    private final JPanel buttonsPanel;
+    private JPanel buttonsPanel;
     private double checkoutProportions;
     private int spaceBetweenCheckouts;
     private int clientsWidth;
@@ -45,16 +47,14 @@ public class CustomLayout {
 
     private SpriteManager spriteManager;
 
-    public CustomLayout (JPanel buttonsPanel) {
-    	
+    public CustomLayout (SpriteManager spriteManager) {
 
-
-        spriteManager = ApplicationConfiguration.getInstance().getSpriteManager();
-        this.buttonsPanel=buttonsPanel;
+        this.spriteManager = spriteManager;
 
     }
 
-    public void initialize(int checkoutsAmount) {
+    public void initialize(int checkoutsAmount, JPanel buttonsPanel) {
+        this.buttonsPanel = buttonsPanel;
         BufferedImage imgStoreCheckout=spriteManager.getSprite(SpriteType.STORE_CHECKOUT).getSprite(0, 0);
         BufferedImage imgBackground=spriteManager.getSprite(SpriteType.BACKGROUND).getSprite(0, 0);
         BufferedImage imgDoor= spriteManager.getSprite(SpriteType.DOOR).getSprite(0, 0);

@@ -9,8 +9,10 @@ import constants.ClientPositionType;
 import core.MainLoop;
 import events.ClientEventsHandler;
 import otherFunctions.ClientAction;
+import spring2.Bean;
 import visualComponents.Client;
 
+@Bean
 public class Simulation {
     
     public static final int FINISH=5;
@@ -22,16 +24,17 @@ public class Simulation {
     
     private final Painter painter;
 
-	private ApplicationConfiguration applicationConfiguration;
+	private final ClientEventsHandler clientEventsHandler;
 
-    
-	public Simulation ()  {
+	private  MainLoop mainLoop;
 
-		this.applicationConfiguration = ApplicationConfiguration.getInstance();
-		this.painter=applicationConfiguration.getPainter();
-    }
+	public Simulation(Painter painter, ClientEventsHandler clientEventsHandler, MainLoop mainLoop) {
+		this.painter = painter;
+		this.clientEventsHandler = clientEventsHandler;
+		this.mainLoop = mainLoop;
+	}
 
-    public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
+	public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
 
 		ClientAction clientAction;
    
@@ -52,7 +55,7 @@ public class Simulation {
 			clientAction = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,
 					clients.size());
 
-			MainLoop.getInstance().addObject(client);
+			mainLoop.addObject(client);
 			clientActions.add(clientAction);
 			if (event == lastArrival) {
 				clientAction = new ClientAction(arrivalTime,
@@ -60,7 +63,6 @@ public class Simulation {
 				clientActions.add(clientAction);
 			}
 		}
-		ClientEventsHandler clientEventsHandler = applicationConfiguration.getClientEventsHandler();
 		clientEventsHandler.setEventsList(clientActions);
 
     }

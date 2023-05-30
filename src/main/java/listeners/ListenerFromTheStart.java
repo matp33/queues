@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -19,11 +18,12 @@ import javax.swing.JTextField;
 import core.MainLoop;
 import events.UIEventQueue;
 import otherFunctions.ExpressionAnalyzer;
-import symulation.Manager;
+import spring2.Bean;
+import spring2.BeanRegistry;
 import symulation.Painter;
 import symulation.Simulation;
 
-
+@Bean
 public class ListenerFromTheStart implements ActionListener{
 
     private boolean isErrorFound;
@@ -41,15 +41,15 @@ public class ListenerFromTheStart implements ActionListener{
             "<html><font color='red'>Please enter a proper number<br>" +   
             "according to symulation time.</font></html>";
 
-    private Painter painter;
 
     private UIEventQueue uiEventQueue;
 
-    public ListenerFromTheStart(Painter painter, UIEventQueue uiEventQueue){
+    private MainLoop mainLoop;
+
+    public ListenerFromTheStart( UIEventQueue uiEventQueue){
 
         this.uiEventQueue = uiEventQueue;
         isErrorFound=false;
-        this.painter=painter;
 //        this.numberOfQueues=numberOfQueues;
 
         btnFromStart=new JRadioButton("From the start");
@@ -62,6 +62,8 @@ public class ListenerFromTheStart implements ActionListener{
 
     @Override
     public void actionPerformed (ActionEvent e){
+        Painter painter = BeanRegistry.getBeanByClass(Painter.class);
+        mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
 
 //        System.out.println(e.getSource());
         createPanel();
@@ -73,7 +75,7 @@ public class ListenerFromTheStart implements ActionListener{
         }
 
         boolean wasRunning;
-        wasRunning = !MainLoop.getInstance().isPaused();
+        wasRunning = !mainLoop.isPaused();
         if (wasRunning){
             painter.pause();
         }
