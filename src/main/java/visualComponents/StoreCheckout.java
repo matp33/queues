@@ -7,9 +7,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import sprites.SpriteType;
-import symulation.Painter;
-
 public class StoreCheckout extends AnimatedAndObservable{
 
 	private static final long serialVersionUID = 1L;
@@ -24,7 +21,7 @@ public class StoreCheckout extends AnimatedAndObservable{
         
         public StoreCheckout(int checkoutIndex){
             
-        	super(SpriteType.STORE_CHECKOUT);
+        	super();
         	maxClients=painter.maxClientsVisibleInQueue;
             clientsAboveLimit=0;
             setClientsList(new ArrayList <Client>());

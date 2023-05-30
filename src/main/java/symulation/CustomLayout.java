@@ -4,24 +4,16 @@ package symulation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NavigableSet;
-import java.util.Optional;
 
 import javax.swing.JPanel;
 
 import constants.ClientPositionType;
-import constants.PositionInQueueToExit;
-import dto.ClientToExitDTO;
-import dto.PointWithTimeAndQueueIndexDTO;
-import dto.PointWithTimeDTO;
-import otherFunctions.ClientMovement;
 import spring2.Bean;
 import sprites.SpriteManager;
-import sprites.SpriteType;
+import visualComponents.Background;
 import visualComponents.Client;
 import visualComponents.Door;
+import visualComponents.StoreCheckout;
 
 @Bean
 public class CustomLayout {
@@ -45,20 +37,12 @@ public class CustomLayout {
     private int doorPositionY;
     private int maximumNumberOfClientsInQueue;
 
-    private SpriteManager spriteManager;
-
-    public CustomLayout (SpriteManager spriteManager) {
-
-        this.spriteManager = spriteManager;
-
-    }
-
     public void initialize(int checkoutsAmount, JPanel buttonsPanel) {
         this.buttonsPanel = buttonsPanel;
-        BufferedImage imgStoreCheckout=spriteManager.getSprite(SpriteType.STORE_CHECKOUT).getSprite(0, 0);
-        BufferedImage imgBackground=spriteManager.getSprite(SpriteType.BACKGROUND).getSprite(0, 0);
-        BufferedImage imgDoor= spriteManager.getSprite(SpriteType.DOOR).getSprite(0, 0);
-        BufferedImage imgClient = spriteManager.getSprite(SpriteType.CLIENT).getSprite(0, 0);
+        BufferedImage imgStoreCheckout=SpriteManager.getSprite(StoreCheckout.class).getSprite(0, 0);
+        BufferedImage imgBackground=SpriteManager.getSprite(Background.class).getSprite(0, 0);
+        BufferedImage imgDoor= SpriteManager.getSprite(Door.class).getSprite(0, 0);
+        BufferedImage imgClient = SpriteManager.getSprite(Client.class).getSprite(0, 0);
 
         doorHeight =imgDoor.getHeight();
 

@@ -1,18 +1,9 @@
 package visualComponents;
 
 
-import interfaces.AnimatedAndObservable;
 import interfaces.AnimatedObject;
-import interfaces.Observer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
-
-import sprites.SpriteType;
-import symulation.ApplicationConfiguration;
-import symulation.Painter;
 
 public class Door extends AnimatedObject {
 	
@@ -26,7 +17,7 @@ public class Door extends AnimatedObject {
 	private TimerTask currentAnimationTask;
 	
 	public Door(){
-		super(SpriteType.DOOR);
+		super();
 			
 		requestOpening=false;
 		finishedOpening = true;

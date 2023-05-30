@@ -2,16 +2,12 @@ package interfaces;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 import javax.swing.JComponent;
 
 import core.ChangeableObject;
-import core.MainLoop;
 import spring2.BeanRegistry;
 import sprites.SpriteManager;
-import sprites.SpriteType;
-import symulation.ApplicationConfiguration;
 import symulation.Painter;
 import animations.Animation;
 import sprites.Sprite;
@@ -20,7 +16,8 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 	
 	private static final long serialVersionUID = 1L;
 	private static final int frameDelay=20;
-	
+	protected final Sprite sprite;
+
 	protected Animation [] animations;
 	protected Animation currentAnimation;
 	protected Point position;
@@ -30,13 +27,10 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 	protected int spriteWidth;
 	protected int spriteHeight;
 	protected Dimension size;
-	private SpriteManager spriteManager;
-	
-	
-	public AnimatedObject (SpriteType spriteType){
 
-		spriteManager = BeanRegistry.getBeanByClass(SpriteManager.class);
-		Sprite sprite = spriteManager.getSprite(spriteType);
+	public AnimatedObject (){
+
+		sprite = SpriteManager.getSprite(getClass());
 		this.spriteWidth = sprite.getWidth();
 		this.spriteHeight = sprite.getHeight();
 		BufferedImage b=sprite.getSprite(0, 0);

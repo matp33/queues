@@ -1,13 +1,9 @@
 package visualComponents;
 
-import com.sun.tools.javac.Main;
 import constants.ClientPositionType;
 import core.MainLoop;
 import events.ClientEventsHandler;
-import interfaces.AnimatedAndObservable;
 import interfaces.AnimatedObject;
-import interfaces.Observable;
-import interfaces.Observer;
 
 import java.awt.*;
 
@@ -15,10 +11,7 @@ import otherFunctions.AppLogger;
 import otherFunctions.ClientMovement;
 import spring2.BeanRegistry;
 import sprites.SpriteManager;
-import sprites.SpriteType;
-import symulation.ApplicationConfiguration;
 import animations.Animation;
-import sprites.Sprite;
 import symulation.Painter;
 
 import java.util.ArrayList;
@@ -69,7 +62,6 @@ public static int nr;
 private final int id;
 
 private boolean isWaiting;
-private SpriteManager spriteManager;
 
 private double timeInCheckout;
 
@@ -79,23 +71,21 @@ private MainLoop mainLoop;
 
 public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime, double timeInCheckout)  {
 
-		super(SpriteType.CLIENT);
+		super();
 
 		mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
 		clientMovement = BeanRegistry.getBeanByClass(ClientMovement.class);
 		this.timeInCheckout = timeInCheckout;
-		spriteManager = BeanRegistry.getBeanByClass(SpriteManager.class);
 		logger = BeanRegistry.getBeanByClass(AppLogger.class);
 		nr++;
 		id=nr;
 		this.queueDelay=createDelay();
     	this.arrivalTime =arrivalTime;
-		Sprite spriteClient = spriteManager.getSprite(SpriteType.CLIENT);
 
-		moveDown=new Animation(spriteClient.getSpriteFileName(), spriteClient.getSprite(0),frameTime);
-		moveUp=new Animation(spriteClient.getSpriteFileName(),spriteClient.getSprite(3),frameTime);
-		moveLeft=new Animation(spriteClient.getSpriteFileName(),spriteClient.getSprite(1),frameTime);
-		moveRight=new Animation(spriteClient.getSpriteFileName(),spriteClient.getSprite(2),frameTime);
+		moveDown=new Animation(sprite.getSpriteFileName(), sprite.getSprite(0),frameTime);
+		moveUp=new Animation(sprite.getSpriteFileName(),sprite.getSprite(3),frameTime);
+		moveLeft=new Animation(sprite.getSpriteFileName(),sprite.getSprite(1),frameTime);
+		moveRight=new Animation(sprite.getSpriteFileName(),sprite.getSprite(2),frameTime);
 
         isWaiting=false;
 

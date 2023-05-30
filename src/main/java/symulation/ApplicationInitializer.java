@@ -12,9 +12,6 @@ import java.io.IOException;
 @Bean
 public class ApplicationInitializer {
 
-    private final SpriteManager spriteManager;
-
-
     private final Painter painter;
 
     private final ObjectsManager objectsManager;
@@ -25,8 +22,7 @@ public class ApplicationInitializer {
 
     private final Indicator waitingRoomIndicator;
 
-    public ApplicationInitializer(MainLoop mainLoop, SpriteManager spriteManager, Painter painter, ObjectsManager objectsManager, ClientEventsHandler clientEventsHandler, Indicator waitingRoomIndicator) {
-        this.spriteManager = spriteManager;
+    public ApplicationInitializer(MainLoop mainLoop, Painter painter, ObjectsManager objectsManager, ClientEventsHandler clientEventsHandler, Indicator waitingRoomIndicator) {
         this.painter = painter;
         this.objectsManager = objectsManager;
         this.clientEventsHandler = clientEventsHandler;
@@ -34,8 +30,7 @@ public class ApplicationInitializer {
         this.waitingRoomIndicator = waitingRoomIndicator;
     }
 
-    public void initialize () throws IOException {
-        spriteManager.loadSprites();
+    public void initialize () {
         painter.initiateWindow();
         objectsManager.initializeObjects();
         mainLoop.addObject(clientEventsHandler);
