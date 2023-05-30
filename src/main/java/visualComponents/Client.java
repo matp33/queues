@@ -10,7 +10,6 @@ import java.awt.*;
 import otherFunctions.AppLogger;
 import otherFunctions.ClientMovement;
 import spring2.BeanRegistry;
-import sprites.SpriteManager;
 import animations.Animation;
 import symulation.Painter;
 
@@ -67,13 +66,10 @@ private double timeInCheckout;
 
 private ClientEventsHandler clientEventsHandler;
 
-private MainLoop mainLoop;
-
 public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime, double timeInCheckout)  {
 
 		super();
 
-		mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
 		clientMovement = BeanRegistry.getBeanByClass(ClientMovement.class);
 		this.timeInCheckout = timeInCheckout;
 		logger = BeanRegistry.getBeanByClass(AppLogger.class);
@@ -129,7 +125,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 
     
-    public void moveUpInQueue()  {
+    public void moveUpInQueue(double currentTime)  {
     	
 //    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
     	
@@ -158,7 +154,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         else{
         	timerDelay.schedule(tt, 0);
         }
-        delayStartTime=(int)(mainLoop.getTimePassedSeconds()); //TODO this is too complicated I guess
+        delayStartTime=(int)(currentTime); //TODO this is too complicated I guess
         isWaiting=true;
         
     	
@@ -182,11 +178,11 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     }
     
     @Override
-    public void interrupt()  {
+    public void interrupt(double timePassedSeconds)  {
     	    	
     	if (isWaiting){
     		
-    		delayWaited+=(int)(mainLoop.getTimePassedSeconds())-delayStartTime; // no negative values allowed
+    		delayWaited+=(int)(timePassedSeconds)-delayStartTime; // no negative values allowed
 //    		System.out.println("delay wait: "+delayWaited+"abc"+abc);
     		timerDelay.cancel();
 			timer.cancel();
@@ -206,8 +202,8 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     }
 
 
-	public void calculateExpectedTimeInWaitingRoom() {
-		timeSupposed= mainLoop.getTimePassedSeconds()+trajectory.size()*movementDelay+ waitRoomDelay;
+	public void calculateExpectedTimeInWaitingRoom(double currentTime) {
+		timeSupposed= currentTime+trajectory.size()*movementDelay+ waitRoomDelay;
 	}
 
 
@@ -271,13 +267,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 		position=point;
 		setPositionType(type);		
 	}
-	
-	public void saveMeInLog()  {
-		if (storeCheckout.isClientOutOfSight(this)) storeCheckout.increaseNumber();
-        storeCheckout.getClientsArriving().remove(this);
-		logger.saveEvent(getQueueNumber(),timeSupposed, mainLoop.getTimePassedSeconds());
-	}
-	
+
 	public Point getPosition(){
 		return position;
 	}

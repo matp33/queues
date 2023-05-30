@@ -5,7 +5,6 @@ import constants.ClientPositionType;
 import core.ChangeableObject;
 import otherFunctions.ClientAction;
 import spring2.Bean;
-import symulation.ApplicationConfiguration;
 import symulation.Painter;
 import visualComponents.Client;
 import visualComponents.Door;
@@ -60,13 +59,13 @@ public class ClientEventsHandler implements ChangeableObject {
 
         switch (action){
             case ARRIVAL:
-                moveClientToWaitingRoom(client);
+                moveClientToWaitingRoom(client, currentTime);
                 break;
             case GOING_TO_QUEUE:
                 moveClientToQueue(client);
                 break;
             case EXITING:
-                moveClientToExit(client);
+                moveClientToExit(client, currentTime);
                 break;
         }
     }
@@ -100,13 +99,13 @@ public class ClientEventsHandler implements ChangeableObject {
         }
     }
 
-    private void moveClientToExit(Client client)  {
+    private void moveClientToExit(Client client, double currentTime)  {
         int queueNumber = client.getQueueNumber();
 
         client.setPositionType(ClientPositionType.EXITING);
         Deque<Client> clientsInQueue = objectsManager.getClientsInQueue(queueNumber);
         clientsInQueue.removeFirst();
-        clientsInQueue.forEach(Client::moveUpInQueue);
+        clientsInQueue.forEach(client1 -> client1.moveUpInQueue(currentTime));
         exitQueueManager.moveClientToExit(client, objectsManager.getClientsMovingToExit());
 
     }
@@ -120,10 +119,10 @@ public class ClientEventsHandler implements ChangeableObject {
         client.calculateExpectedTimeInQueue();
     }
 
-    private void moveClientToWaitingRoom(Client client)  {
+    private void moveClientToWaitingRoom(Client client, double currentTime)  {
         client.setPositionType(ClientPositionType.WAITING_ROOM);
         client.calculateTrajectory();
-        client.calculateExpectedTimeInWaitingRoom();
+        client.calculateExpectedTimeInWaitingRoom(currentTime);
     }
 
     private void moveOutside(Client client){

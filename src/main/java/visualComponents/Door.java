@@ -42,7 +42,7 @@ public class Door extends AnimatedObject {
 		currentAnimation.stop();
 	}
 	
-	public void interrupt(){		
+	public void interrupt(double timePassedSeconds){
 		if (requestOpening){
 			stopOpening();
 		}		

@@ -60,7 +60,7 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 	public void update() {};
 	protected abstract void initializePosition();
 	
-	public abstract void interrupt();
+	public abstract void interrupt(double timePassedSeconds);
 	public abstract void scheduleMoving();
 	
 	public BufferedImage getImage(){

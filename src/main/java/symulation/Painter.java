@@ -277,7 +277,7 @@ public class Painter extends JPanel {
     public void stopSprites() {
 
         for (int i=0; i<objects.size(); i++){
-            objects.get(i).interrupt();
+            objects.get(i).interrupt(mainLoop.getTimePassedSeconds());
         }
     }
 

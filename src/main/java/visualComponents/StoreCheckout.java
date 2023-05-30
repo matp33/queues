@@ -195,7 +195,7 @@ public class StoreCheckout extends AnimatedAndObservable{
 		}
 
 		@Override
-		public void interrupt() {
+		public void interrupt(double timePassedSeconds) {
 			// TODO Auto-generated method stub
 			
 		}
