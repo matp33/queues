@@ -32,6 +32,9 @@ public class ClientAction implements Comparable<ClientAction> {
     @Override
     public int compareTo(ClientAction o) {
         int timeCompareResult = Double.compare(time, o.getTime());
+        if (client == null || o.getClient()==null){
+            return timeCompareResult;
+        }
         return timeCompareResult ==0 ? Integer.compare(client.getId(), o.client.getId()): timeCompareResult;
     }
 }

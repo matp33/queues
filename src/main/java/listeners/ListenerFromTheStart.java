@@ -20,6 +20,7 @@ import events.UIEventQueue;
 import otherFunctions.ExpressionAnalyzer;
 import spring2.Bean;
 import spring2.BeanRegistry;
+import symulation.ApplicationConfiguration;
 import symulation.Painter;
 import symulation.Simulation;
 
@@ -46,9 +47,12 @@ public class ListenerFromTheStart implements ActionListener{
 
     private MainLoop mainLoop;
 
-    public ListenerFromTheStart( UIEventQueue uiEventQueue){
+    private ApplicationConfiguration applicationConfiguration;
+
+    public ListenerFromTheStart(UIEventQueue uiEventQueue, ApplicationConfiguration applicationConfiguration){
 
         this.uiEventQueue = uiEventQueue;
+        this.applicationConfiguration = applicationConfiguration;
         isErrorFound=false;
 //        this.numberOfQueues=numberOfQueues;
 
@@ -62,7 +66,6 @@ public class ListenerFromTheStart implements ActionListener{
 
     @Override
     public void actionPerformed (ActionEvent e){
-        Painter painter = BeanRegistry.getBeanByClass(Painter.class);
         mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
 
 //        System.out.println(e.getSource());
@@ -77,16 +80,16 @@ public class ListenerFromTheStart implements ActionListener{
         boolean wasRunning;
         wasRunning = !mainLoop.isPaused();
         if (wasRunning){
-            painter.pause();
+            uiEventQueue.publishPauseEvent();
         }
         
-        int optionChoosed=painter.displayWindowWithPanel(panel, Simulation.TITLE_FROM_BEGINNING);
+        int optionChoosed= uiEventQueue.publishNewDialogEvent(panel, Simulation.TITLE_FROM_BEGINNING);
 
         if (optionChoosed==JOptionPane.NO_OPTION){
 //            System.out.println("cancel");
             setIsErrorTo(false);
             if (wasRunning){
-            	painter.resume(false);
+                uiEventQueue.publishResumeEvent();
             }
             
             return;
@@ -116,17 +119,17 @@ public class ListenerFromTheStart implements ActionListener{
                     setIsErrorTo(true);
                     actionPerformed(e);
 	                    if (wasRunning){
-	                    	painter.resume(false);
+                            uiEventQueue.publishResumeEvent();
 	                    }
                     return;
                 }
 
-                if (!painter.isTimeWithinSimulationRange(d)){
+                if (applicationConfiguration.getSimulationTime()<d){
                     setErrorTextTo(RANGE_ERROR);
                     setIsErrorTo(true);
                     actionPerformed(e);
 	                    if (wasRunning){
-                            painter.resume(false);
+                            uiEventQueue.publishResumeEvent();
 	                    }
                     return;
                 }
@@ -134,7 +137,7 @@ public class ListenerFromTheStart implements ActionListener{
             }
 
 
-                painter.pause();
+                uiEventQueue.publishPauseEvent();
 
                 if (btnFromStart.isSelected()){
                     uiEventQueue.publishRestartEvent(0);

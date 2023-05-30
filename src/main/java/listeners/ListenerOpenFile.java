@@ -28,14 +28,13 @@ public class ListenerOpenFile implements ActionListener{
 private JFileChooser fileChoosingWindow = new JFileChooser();
 private static final String TXT_FILES_DIR = "/txtFiles";
 
-private UIEventQueue UIEventQueue;
+protected UIEventQueue uiEventQueue;
 
 private ApplicationConfiguration applicationConfiguration;
 
 private MainLoop mainLoop;
-private Painter painter;
 
-    public ListenerOpenFile ( UIEventQueue UIEventQueue, ApplicationConfiguration applicationConfiguration)  {
+    public ListenerOpenFile (UIEventQueue uiEventQueue, ApplicationConfiguration applicationConfiguration)  {
         JFileChooser fileChooser=new JFileChooser();
         URL resource = getClass().getResource(TXT_FILES_DIR);
         assert resource != null;
@@ -43,7 +42,7 @@ private Painter painter;
         fileChooser.setCurrentDirectory(txtFilesDirectory);
         
         fileChoosingWindow=fileChooser;         
-        this.UIEventQueue = UIEventQueue;
+        this.uiEventQueue = uiEventQueue;
         this.applicationConfiguration = applicationConfiguration;
     }
     
@@ -53,8 +52,7 @@ private Painter painter;
     @Override
     public void actionPerformed(ActionEvent e){
         mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
-        painter = BeanRegistry.getBeanByClass(Painter.class);
-        painter.pause();
+        uiEventQueue.publishPauseEvent();
         int optionChooser= fileChoosingWindow.showOpenDialog(null);
 
            if (optionChooser==JFileChooser.APPROVE_OPTION){
@@ -66,7 +64,8 @@ private Painter painter;
            }
 
 
-        painter.resume(false);
+       uiEventQueue.publishResumeEvent();
+
     }
     
     private void analyze(ActionEvent e) {
@@ -79,12 +78,13 @@ private Painter painter;
         }
         catch (IOException i){
             i.printStackTrace();
-            painter.displayMessage("File opening failed");
+            uiEventQueue.publishNewMessageEvent("File opening failed");
         }
         catch (NumberFormatException ex){
            ex.printStackTrace();
-            painter.displayMessage("Invalid file format!");
-           actionPerformed(e);
+            uiEventQueue.publishNewMessageEvent("Invalid file format!");
+
+            actionPerformed(e);
         }
          
 
@@ -96,11 +96,11 @@ private Painter painter;
              if(applicationConfiguration.getNumberOfQueues() != lastQueueIndex){
                  mainLoop.pause();
                  applicationConfiguration.setNumberOfQueues(lastQueueIndex+1);
-                 painter.initiate();
+                 uiEventQueue.publishNewReinitializeEvent();
              }
                           
 
-         UIEventQueue.publishNewTimetableEvent(timeTable);
+         uiEventQueue.publishNewTimetableEvent(timeTable);
     }
     
     // method to be overriden if we wanna do something on the time table

@@ -39,7 +39,7 @@ public class ListenerExtraction extends ListenerOpenFile{
     }
     
     private List<Integer> makeDialog(int number){
-		Painter painter = BeanRegistry.getBeanByClass(Painter.class);
+		//TODO add class - ui view that creates panels
 
 		JPanel p=new JPanel();
     	p.setLayout(new BorderLayout());
@@ -59,7 +59,7 @@ public class ListenerExtraction extends ListenerOpenFile{
 	    p.add(new JLabel("Please choose the queues you want to extract."), BorderLayout.NORTH);	
     	p.add(panel,BorderLayout.SOUTH);
     	
-    	painter.displayWindowWithPanel(p, title);
+		uiEventQueue.publishNewDialogEvent(p, title);
     	
     	List <Integer> numbers = new ArrayList <Integer> ();
     	for (int i=0; i<number; i++){

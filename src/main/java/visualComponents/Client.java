@@ -212,7 +212,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 			movingTask.cancel();
 		}
 		currentAnimation.setLastFrame();
-		chooseDirection(lookAtPoint);
 //    		System.out.println("o o is null: "+clientNumber);
     }
 

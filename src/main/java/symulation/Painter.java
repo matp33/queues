@@ -7,7 +7,6 @@ import events.EventSubscriber;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
@@ -38,7 +37,6 @@ public class Painter extends JPanel {
     public static final String BUTTON_EXTRACT="Extract queue";
     private static final String MAX_VISIBLE_TIME_VALUE="+99";
 
-    private SortedSet<ClientArrivalEvent> timeTable = new TreeSet<>();
     private JFrame window;
 
     private JButton btnRestart;
@@ -61,7 +59,7 @@ public class Painter extends JPanel {
 
 
 
-    private final UIEventQueue uIEventQueue = new UIEventQueue();
+    private final UIEventQueue uIEventQueue;
 
     private ListenerStopStart listenerStopStart;
    private  ListenerOpenFile listenerOpen;
@@ -70,9 +68,10 @@ public class Painter extends JPanel {
 
     private MainLoop mainLoop;
 
-    public Painter(ApplicationConfiguration applicationConfiguration, CustomLayout customLayout, ListenerStopStart listenerStopStart, ListenerOpenFile listenerOpen, ListenerFromTheStart listenerFromStart, ListenerExtraction listenerExtract)  {
+    public Painter(ApplicationConfiguration applicationConfiguration, CustomLayout customLayout, UIEventQueue uIEventQueue, ListenerStopStart listenerStopStart, ListenerOpenFile listenerOpen, ListenerFromTheStart listenerFromStart, ListenerExtraction listenerExtract)  {
 
         this.applicationConfiguration = applicationConfiguration;
+        this.uIEventQueue = uIEventQueue;
         this.listenerStopStart = listenerStopStart;
         this.listenerOpen = listenerOpen;
         this.listenerFromStart = listenerFromStart;
@@ -96,9 +95,6 @@ public class Painter extends JPanel {
         return objects.stream().filter(Door.class::isInstance).map(Door.class::cast).findAny().orElseThrow(()-> new IllegalArgumentException("No door inside objects"));
     }
 
-    public boolean isTimeWithinSimulationRange(double time){
-        return timeTable.last().getArrivalTime() >= time;
-    }
 
     public void initiateWindow() {
         layout.initialize(applicationConfiguration.getNumberOfQueues(), bottomPanel);
@@ -117,9 +113,6 @@ public class Painter extends JPanel {
         uIEventQueue.addSubscriber(eventSubscriber);
     }
 
-    public void setTimeTable(SortedSet<ClientArrivalEvent> timeTable){
-        this.timeTable = timeTable;
-    }
 
     private void initiateButtons() {
 

@@ -9,9 +9,8 @@ import interfaces.AnimatedObject;
 import java.awt.*;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import otherFunctions.ClientAction;
 import spring2.Bean;
@@ -25,7 +24,6 @@ public class Manager implements EventSubscriber {
 
 	private Simulation simulation;
 	private Painter painter;
-	private SortedSet<ClientArrivalEvent> timeTable = new TreeSet<>();
 
 	public OutsideWorld outside;
 	public Indicator waitingRoomIndicator;
@@ -42,6 +40,8 @@ public class Manager implements EventSubscriber {
 	private final MainLoop mainLoop;
 
 	private final ClientEventsHandler clientEventsHandler;
+
+	private SortedSet<ClientArrivalEvent> timeTable;
 
 	public Manager(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, Painter painter, ObjectsManager objectsManager, MainLoop mainLoop, ClientEventsHandler clientEventsHandler)  {
 
@@ -68,17 +68,33 @@ public class Manager implements EventSubscriber {
 	}
 
 
-	public void setTimeTable(SortedSet<ClientArrivalEvent> clientArrivalEvents){
-        this.timeTable = clientArrivalEvents;
-    }
+	@Override
+	public int handleNewDialog(JPanel panel, String title) {
+		return painter.displayWindowWithPanel(panel, title);
+	}
 
-	public void restart(double time) {
+	@Override
+	public void handleNewMessage(String message) {
+		painter.displayMessage(message);
+	}
+
+	@Override
+	public void handleReinitializeEvent() {
+		painter.initiate();
+	}
+
+
+	public void restart(double time, SortedSet<ClientArrivalEvent> timeTable) {
 		
 		clean();
 		objectsManager.initializeObjects();
-		doSimulation(time);
+		doSimulation(time, timeTable);
 		mainLoop.addObject(clientEventsHandler);
 
+	}
+
+	public void restart (double time){
+		restart(time, timeTable);
 	}
 	
 	public void clean(){
@@ -86,25 +102,19 @@ public class Manager implements EventSubscriber {
 		mainLoop.removeObjects();
 	}
 
-    public void doSimulation ()  {
-        doSimulation(0.0);
-    }
 
-
-	public void doSimulation (double time)  {
+	public void doSimulation (double time, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
+		this.timeTable = clientArrivalEvents;
+		applicationConfiguration.setSimulationTime(timeTable.last().getArrivalTime());
     	Client.nr=0;
 		mainLoop.setTimePassed (time);
     	waitingRoomIndicator.clear();
     	
         painter.setButtonRestartToActive();
-        simulation.prepareSimulation(time,timeTable);
+        simulation.prepareSimulation(time,clientArrivalEvents);
 
         painter.resume(false);
 //        System.out.println("resume");
-    }
-
-	public boolean isTimeTableNotEmpty(){
-        return !timeTable.isEmpty();
     }
 
 
@@ -137,13 +147,21 @@ public class Manager implements EventSubscriber {
 
 	@Override
 	public void handleNewTimetable(SortedSet<ClientArrivalEvent> clientArrivalEvents) {
-		setTimeTable(clientArrivalEvents);
-		painter.setTimeTable(clientArrivalEvents);
-		restart(0);
+		restart(0, clientArrivalEvents);
 	}
 
 	@Override
 	public void handleRestart(double time) {
 		restart(time);
+	}
+
+	@Override
+	public void handleResume() {
+		painter.resume(false);
+	}
+
+	@Override
+	public void handlePause() {
+		painter.pause();
 	}
 }

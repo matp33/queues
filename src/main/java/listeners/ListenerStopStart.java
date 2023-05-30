@@ -4,6 +4,7 @@ package listeners;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import events.UIEventQueue;
 import spring2.Bean;
 import spring2.BeanRegistry;
 import symulation.Manager;
@@ -14,16 +15,21 @@ public class ListenerStopStart implements ActionListener {
 
     private boolean isSimulationPaused = false;
 
+    private UIEventQueue uiEventQueue;
+
+    public ListenerStopStart(UIEventQueue uiEventQueue) {
+        this.uiEventQueue = uiEventQueue;
+    }
+
     @Override
     public void actionPerformed (ActionEvent e){
-        Painter painter = BeanRegistry.getBeanByClass(Painter.class);
         if (!isSimulationPaused){
-            painter.pause();
+            uiEventQueue.publishPauseEvent();
             isSimulationPaused = true;
 
         }
         else{
-            painter.resume(false);
+            uiEventQueue.publishResumeEvent();
             isSimulationPaused = false;
         }
 

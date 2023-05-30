@@ -45,9 +45,7 @@ public class RegularTests {
                 double timeInQueue = 1; //generateRandomTimeInQueue();
                 clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i/4, queueNumber));
             }
-            painter.setTimeTable(clientArrivalEvents);
-            manager.setTimeTable(clientArrivalEvents);
-            manager.doSimulation();
+            manager.doSimulation(0.0, clientArrivalEvents);
 
 
 
@@ -77,10 +75,8 @@ public class RegularTests {
 //    		departs[i-4][1]=i;
 //    	}
 
-        manager.setTimeTable(clientArrivalEvents);
-    	painter.setTimeTable(clientArrivalEvents);
 
-        manager.doSimulation();
+        manager.doSimulation(0.0, clientArrivalEvents);
 
     }
 
@@ -110,9 +106,7 @@ public class RegularTests {
             clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, 6+i*arrivalDelay, numberOfQueues-1));
         }
 
-        manager.setTimeTable(clientArrivalEvents);
-        manager.doSimulation();
-        painter.setTimeTable(clientArrivalEvents);
+        manager.doSimulation(0.0, clientArrivalEvents);
 
 
 
