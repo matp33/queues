@@ -1,14 +1,11 @@
 package visualComponents;
 
 import constants.ClientPositionType;
-import events.ClientEventsHandler;
 import interfaces.AnimatedObject;
 
 import java.awt.*;
 
-import spring2.BeanRegistry;
 import animations.Animation;
-import symulation.Painter;
 
 import java.util.*;
 import java.util.List;
@@ -26,8 +23,7 @@ private int delayStartTime;
 private Point lookAtPoint;
 
 	private List <Point> trajectory = new ArrayList<>();
-private StoreCheckout storeCheckout;
-
+private int queueNumber;
 private Timer timer;
 private Timer timerDelay; // timer for moving inside queue connected to clients having some delays
 
@@ -55,10 +51,10 @@ private boolean isWaiting;
 private double timeInCheckout;
 
 
-public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime, double timeInCheckout)  {
+public Client(int queueNumber, int clientNumber, double arrivalTime, double timeInCheckout)  {
 
 		super();
-
+		this.queueNumber = queueNumber;
 		this.timeInCheckout = timeInCheckout;
 		nr++;
 		id=nr;
@@ -77,7 +73,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 //        positionType=Client.POSITION_WAITING_ROOM;
         currentAnimation=moveUp;
         currentAnimation.start();    
-        this.storeCheckout = storeCheckout;
         delayWaited=0;
 		timer=new Timer();
 //        red = false;
@@ -111,38 +106,11 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 
     
-    public void decreaseClientsInQueue()  {
-    	
-//    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
-    	
-    	if (getPositionType().ordinal()>= ClientPositionType.EXITING.ordinal()){
-    		return;
-    	}
-		decreaseNumberOfClientsInQueue();
-
-
-
-
-    	
+    public void decreaseClientIndex()  {
+		clientNumber--;
     }
 
 
-	protected void decreaseNumberOfClientsInQueue() {
-		if ((
-				storeCheckout.isClientLastVisible(this))){
-			storeCheckout.decreaseClientsAboveLimit();
-			
-		}
-    	clientNumber--;    	
-		
-	}
-
-
-    public void scheduleMoving(){
-
-
-    }
-    
     @Override
     public void interrupt(double timePassedSeconds)  {
     	    	
@@ -157,8 +125,13 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
     	stopMoving();    	
     	
     }
-    
-    public void stopMoving(){ // this is when sprite stops by itself i.e. trajectory size = 0
+
+	@Override
+	public void scheduleMoving() {
+
+	}
+
+	public void stopMoving(){ // this is when sprite stops by itself i.e. trajectory size = 0
     	    	
     	if (movingTask!=null){
 			movingTask.cancel();
@@ -222,7 +195,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 	}
 
 	public int getQueueNumber() {
-		return storeCheckout.getCheckoutIndex();
+		return queueNumber;
 	}
 
 

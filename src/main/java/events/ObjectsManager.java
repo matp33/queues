@@ -5,10 +5,12 @@ import core.MainLoop;
 import dto.ClientToExitDTO;
 import spring2.Bean;
 import symulation.ApplicationConfiguration;
+import symulation.CustomLayout;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;
 
+import java.awt.*;
 import java.util.*;
 
 @Bean
@@ -30,9 +32,12 @@ public class ObjectsManager {
 
     private Set<Client> visibleClients = new HashSet<>();
 
-    public ObjectsManager(ApplicationConfiguration applicationConfiguration, MainLoop mainLoop) {
+    private CustomLayout customLayout;
+
+    public ObjectsManager(ApplicationConfiguration applicationConfiguration, MainLoop mainLoop, CustomLayout customLayout) {
         this.applicationConfiguration = applicationConfiguration;
         this.mainLoop = mainLoop;
+        this.customLayout = customLayout;
     }
 
     public void initializeObjects (){
@@ -42,6 +47,9 @@ public class ObjectsManager {
         int numberOfQueues = applicationConfiguration.getNumberOfQueues();
         for (int i=0;i<numberOfQueues;i++){
             StoreCheckout checkout = new StoreCheckout(i);
+            Point queueIndicatorPosition = customLayout.calculateQueueIndicatorPosition(i);
+            Point checkoutPosition = customLayout.calculateCheckoutPosition(i);
+            checkout.initializePosition(queueIndicatorPosition, checkoutPosition);
             mainLoop.addObject(checkout);
             storeCheckouts.add(checkout);
             clientsInQueue.put(i, new ArrayDeque<>());
@@ -62,6 +70,10 @@ public class ObjectsManager {
 
     public Set<StoreCheckout> getStoreCheckouts() {
         return storeCheckouts;
+    }
+
+    public StoreCheckout getStoreCheckout(int index){
+        return storeCheckouts.stream().filter(checkout->checkout.getCheckoutIndex() == index).findFirst().orElseThrow(()->new IllegalArgumentException("store checkout not found: "+index));
     }
 
     public void setClientByTheDoor(Client clientByTheDoor) {

@@ -6,9 +6,11 @@ import core.ChangeableObject;
 import otherFunctions.ClientAction;
 import otherFunctions.ClientMovement;
 import spring2.Bean;
+import symulation.CustomLayout;
 import symulation.Painter;
 import visualComponents.Client;
 import visualComponents.Door;
+import visualComponents.StoreCheckout;
 
 import java.awt.*;
 import java.util.*;
@@ -26,11 +28,14 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private ClientMovement clientMovement;
 
-    public ClientEventsHandler(Painter painter, ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement) {
+    private CustomLayout customLayout;
+
+    public ClientEventsHandler(Painter painter, ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement, CustomLayout customLayout) {
         this.painter = painter;
         this.objectsManager = objectsManager;
         this.exitQueueManager = exitQueueManager;
         this.clientMovement = clientMovement;
+        this.customLayout = customLayout;
     }
 
     public void setEventsList(SortedSet<ClientAction> setOfEvents) {
@@ -118,7 +123,11 @@ public class ClientEventsHandler implements ChangeableObject {
         Deque<Client> clientsInQueue = objectsManager.getClientsInQueue(queueNumber);
         clientsInQueue.removeFirst();
         clientsInQueue.forEach(clientToMove -> {
-            clientToMove.decreaseClientsInQueue();
+            StoreCheckout storeCheckout = objectsManager.getStoreCheckout(clientToMove.getQueueNumber());
+            if (clientToMove.getClientNumber()+1== customLayout.getMaximumVisibleClients()){
+                storeCheckout.decreaseClientsAboveLimit();
+            }
+            clientToMove.decreaseClientIndex();
             Point lookAtPoint=painter.calculateClientDestinationCoordinates(clientToMove.getClientNumber(),
                     clientToMove.getQueueNumber(), clientToMove.getPositionType());
             clientMovement.calculateAndSetClientTrajectory(clientToMove, lookAtPoint);

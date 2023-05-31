@@ -51,7 +51,7 @@ public class Simulation {
 			int queueNumber = event.getQueueNumber();
 			List<Client> clients = queueIndexToClientsInQueueMap.computeIfAbsent(queueNumber, index -> new ArrayList<>());
 			Client client = new Client(
-					painter.getQueue(queueNumber), clients.size(),
+					queueNumber, clients.size(),
 					arrivalTime, event.getTimeInCheckout());
 			clients.add(client);
 			objectsManager.addVisibleClient(client);
