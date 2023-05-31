@@ -2,6 +2,8 @@ package visualComponents;
 
 
 import interfaces.AnimatedObject;
+import spring2.BeanRegistry;
+import symulation.Painter;
 
 import java.util.TimerTask;
 
@@ -21,12 +23,11 @@ public class Door extends AnimatedObject {
 			
 		requestOpening=false;
 		finishedOpening = true;
-		startDrawingMe();
 
 	}
 
 	public void initializePosition (){
-		position=painter.getDoorPosition();		
+		position= BeanRegistry.getBeanByClass(Painter.class).getDoorPosition();
 	}
 		
 	public void doOpening(){

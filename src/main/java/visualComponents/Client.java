@@ -10,11 +10,8 @@ import spring2.BeanRegistry;
 import animations.Animation;
 import symulation.Painter;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class Client extends AnimatedObject {
@@ -57,7 +54,6 @@ private boolean isWaiting;
 
 private double timeInCheckout;
 
-private ClientEventsHandler clientEventsHandler;
 
 public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime, double timeInCheckout)  {
 
@@ -69,14 +65,14 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 		this.queueDelay=createDelay();
     	this.arrivalTime =arrivalTime;
 
-		moveDown=new Animation(sprite.getSpriteFileName(), sprite.getSprite(0),frameTime);
+
+	moveDown=new Animation(sprite.getSpriteFileName(), sprite.getSprite(0),frameTime);
 		moveUp=new Animation(sprite.getSpriteFileName(),sprite.getSprite(3),frameTime);
 		moveLeft=new Animation(sprite.getSpriteFileName(),sprite.getSprite(1),frameTime);
 		moveRight=new Animation(sprite.getSpriteFileName(),sprite.getSprite(2),frameTime);
 
         isWaiting=false;
 
-		this.painter= BeanRegistry.getBeanByClass(Painter.class);
         this.clientNumber=clientNumber;
 //        positionType=Client.POSITION_WAITING_ROOM;
         currentAnimation=moveUp;
@@ -84,7 +80,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
         this.storeCheckout = storeCheckout;
         delayWaited=0;
 		timer=new Timer();
-		clientEventsHandler = BeanRegistry.getBeanByClass(ClientEventsHandler.class);
 //        red = false;
                 
     }
@@ -116,7 +111,7 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 
     
-    public void decreaseClientsInQueue(double currentTime)  {
+    public void decreaseClientsInQueue()  {
     	
 //    	System.out.println("decreasing client: "+clientNumber+"time: "+manager.getTime());
     	
@@ -294,9 +289,6 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 			currentAnimation.start();
 			currentAnimation.updateFrame();
 			position=new Point(point.x, point.y);
-			if (trajectory.isEmpty()){
-				clientEventsHandler.handleClientStoppedMoving(this, timePassed);
-			}
 		}
 
 	}
@@ -336,6 +328,10 @@ public Client(StoreCheckout storeCheckout, int clientNumber,  double arrivalTime
 
 	public void setLookAtPoint(Point lookAtPoint) {
 		this.lookAtPoint = lookAtPoint;
+	}
+
+	public boolean stopped() {
+		return trajectory.isEmpty();
 	}
 }
 

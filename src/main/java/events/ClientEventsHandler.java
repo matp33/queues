@@ -46,6 +46,11 @@ public class ClientEventsHandler implements ChangeableObject {
 
             }
         }
+        for (Client visibleClient : objectsManager.getVisibleClients()) {
+            if (visibleClient.stopped()){
+                handleClientStoppedMoving(visibleClient, currentTime);
+            }
+        }
         if (setOfEvents.isEmpty()){
             return;
         }
@@ -70,7 +75,7 @@ public class ClientEventsHandler implements ChangeableObject {
                 moveClientToQueue(client);
                 break;
             case EXITING:
-                moveClientToExit(client, currentTime);
+                moveClientToExit(client);
                 break;
         }
     }
@@ -79,6 +84,7 @@ public class ClientEventsHandler implements ChangeableObject {
         switch (client.getPositionType()){
             case GOING_TO_QUEUE:
                 if (objectsManager.isClientInCheckout(client)){
+                    client.setPositionType(ClientPositionType.EXITING); //TODO this is confusing to have client position type and client event type
                     ClientAction clientAction = new ClientAction(timePassed + client.getTimeInCheckout(), ClientPositionType.EXITING, client);
                     setOfEvents.add(clientAction);
                 }
@@ -92,6 +98,7 @@ public class ClientEventsHandler implements ChangeableObject {
                 }
                 break;
             case OUTSIDE_VIEW:
+                objectsManager.removeClientFromView(client);
                 painter.removeObject(client);
                 exitQueueManager.handleClientWentOutsideView(client);
                 break;
@@ -104,14 +111,14 @@ public class ClientEventsHandler implements ChangeableObject {
         }
     }
 
-    private void moveClientToExit(Client client, double currentTime)  {
+    private void moveClientToExit(Client client)  {
         int queueNumber = client.getQueueNumber();
 
         client.setPositionType(ClientPositionType.EXITING);
         Deque<Client> clientsInQueue = objectsManager.getClientsInQueue(queueNumber);
         clientsInQueue.removeFirst();
         clientsInQueue.forEach(clientToMove -> {
-            clientToMove.decreaseClientsInQueue(currentTime);
+            clientToMove.decreaseClientsInQueue();
             Point lookAtPoint=painter.calculateClientDestinationCoordinates(clientToMove.getClientNumber(),
                     clientToMove.getQueueNumber(), clientToMove.getPositionType());
             clientMovement.calculateAndSetClientTrajectory(clientToMove, lookAtPoint);

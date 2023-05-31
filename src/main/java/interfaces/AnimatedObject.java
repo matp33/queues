@@ -21,7 +21,6 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 	protected Animation [] animations;
 	protected Animation currentAnimation;
 	protected Point position;
-	protected Painter painter;
 	protected int max;
 	protected int state;
 	protected int spriteWidth;
@@ -35,7 +34,6 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 		this.spriteHeight = sprite.getHeight();
 		BufferedImage b=sprite.getSprite(0, 0);
 		size=new Dimension(b.getWidth(), b.getHeight());
-		this.painter= BeanRegistry.getBeanByClass(Painter.class);
 		position=new Point();
 		initializePosition();
 
@@ -75,14 +73,10 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 		return size;
 	}
 	
-	public void startDrawingMe(){
-		painter.addObject(this); 
-	}
-	
+
 	@Override
 	public void paintComponent(Graphics g){
 		Graphics2D g2d = (Graphics2D) g;		
-		painter.repaint(position.x,position.y,spriteWidth,spriteHeight);
         g2d.drawImage(currentAnimation.getSprite(),position.x, position.y,null);
 //        System.out.println("#"+position);
 	}

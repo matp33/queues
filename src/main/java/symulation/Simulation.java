@@ -8,6 +8,7 @@ import java.util.List;
 import constants.ClientPositionType;
 import core.MainLoop;
 import events.ClientEventsHandler;
+import events.ObjectsManager;
 import otherFunctions.ClientAction;
 import spring2.Bean;
 import visualComponents.Client;
@@ -28,10 +29,13 @@ public class Simulation {
 
 	private  MainLoop mainLoop;
 
-	public Simulation(Painter painter, ClientEventsHandler clientEventsHandler, MainLoop mainLoop) {
+	private ObjectsManager objectsManager;
+
+	public Simulation(Painter painter, ClientEventsHandler clientEventsHandler, MainLoop mainLoop, ObjectsManager objectsManager) {
 		this.painter = painter;
 		this.clientEventsHandler = clientEventsHandler;
 		this.mainLoop = mainLoop;
+		this.objectsManager = objectsManager;
 	}
 
 	public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
@@ -50,6 +54,7 @@ public class Simulation {
 					painter.getQueue(queueNumber), clients.size(),
 					arrivalTime, event.getTimeInCheckout());
 			clients.add(client);
+			objectsManager.addVisibleClient(client);
 
 
 			clientAction = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,

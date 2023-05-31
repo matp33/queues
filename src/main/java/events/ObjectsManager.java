@@ -28,6 +28,8 @@ public class ObjectsManager {
 
     private MainLoop mainLoop;
 
+    private Set<Client> visibleClients = new HashSet<>();
+
     public ObjectsManager(ApplicationConfiguration applicationConfiguration, MainLoop mainLoop) {
         this.applicationConfiguration = applicationConfiguration;
         this.mainLoop = mainLoop;
@@ -39,9 +41,23 @@ public class ObjectsManager {
         mainLoop.addObject(door);
         int numberOfQueues = applicationConfiguration.getNumberOfQueues();
         for (int i=0;i<numberOfQueues;i++){
-            storeCheckouts.add(new StoreCheckout(i));
+            StoreCheckout checkout = new StoreCheckout(i);
+            mainLoop.addObject(checkout);
+            storeCheckouts.add(checkout);
             clientsInQueue.put(i, new ArrayDeque<>());
         }
+    }
+
+    public void addVisibleClient(Client client){
+        visibleClients.add(client);
+    }
+
+    public Set<Client> getVisibleClients() {
+        return new HashSet<>(visibleClients);
+    }
+
+    public void removeClientFromView(Client client){
+        visibleClients.remove(client);
     }
 
     public Set<StoreCheckout> getStoreCheckouts() {
@@ -74,7 +90,7 @@ public class ObjectsManager {
 
 
     public boolean isClientInCheckout (Client client){
-        return clientsInQueue.get(client.getQueueNumber()).getFirst().equals(client);
+        return !clientsInQueue.get(client.getQueueNumber()).isEmpty() && clientsInQueue.get(client.getQueueNumber()).getFirst().equals(client);
     }
 
     public Optional<ClientToExitDTO> getClientClosestToDoor (){

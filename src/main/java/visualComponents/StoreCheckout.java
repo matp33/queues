@@ -2,6 +2,8 @@ package visualComponents;
 
 import interfaces.AnimatedAndObservable;
 import interfaces.Observer;
+import spring2.BeanRegistry;
+import symulation.Painter;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -18,10 +20,13 @@ public class StoreCheckout extends AnimatedAndObservable{
 	private List<Client> clientsArriving;
 	private List<Client> clientsExiting;
 	private List <Client> clientsInQueue;
+
+	private Painter painter;
         
         public StoreCheckout(int checkoutIndex){
             
         	super();
+			painter = BeanRegistry.getBeanByClass(Painter.class);
         	maxClients=painter.maxClientsVisibleInQueue;
             clientsAboveLimit=0;
             setClientsList(new ArrayList <Client>());
@@ -35,7 +40,6 @@ public class StoreCheckout extends AnimatedAndObservable{
             clientsArriving=new ArrayList<Client>();
             clientsExiting=new ArrayList<Client>();
             this.position =painter.getCheckoutPosition(checkoutIndex);
-            startDrawingMe();
 
         }
 
