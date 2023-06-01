@@ -14,8 +14,6 @@ import symulation.CustomLayout;
 
     private static final long serialVersionUID = 1L;
     public int clientsOverLimit,x,y;
-
-
     private CustomLayout customLayout;
 
     public Indicator(CustomLayout customLayout){

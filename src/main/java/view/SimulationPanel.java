@@ -17,6 +17,7 @@ public class SimulationPanel extends JPanel {
 
     public SimulationPanel(CustomLayout layout) {
         this.layout = layout;
+        setFont(new Font("Times new roman", Font.PLAIN, 25));
     }
 
     public void addObject (AnimatedObject a){
