@@ -36,6 +36,8 @@ public class NavigationPanel {
 
     private DecimalFormat timeFormat;
 
+    private JPanel panel;
+
     public NavigationPanel(ListenerStopStart listenerStopStart, ListenerOpenFile listenerOpen, ListenerFromTheStart listenerFromStart, ListenerExtraction listenerExtract) {
         this.listenerStopStart = listenerStopStart;
         this.listenerOpen = listenerOpen;
@@ -44,22 +46,26 @@ public class NavigationPanel {
         timeFormat = new DecimalFormat("0.00");
     }
 
+    public JPanel getPanel() {
+        return panel;
+    }
 
     public void updateTime(double time){
         this.time.setText("Time: "+ timeFormat.format(time));
     }
 
     public JPanel initializePanel (){
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        buttonsPanel.setLayout(new FlowLayout());
+        JPanel navigationPanel = new JPanel();
+        navigationPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+        navigationPanel.setLayout(new FlowLayout());
         JButton[] buttons = initializeButtons();
         for (int i=0; i<buttons.length;i++){
-            buttonsPanel.add(buttons[i]);
+            navigationPanel.add(buttons[i]);
         }
         initializeTimeLabel();
-        buttonsPanel.add(time);
-        return buttonsPanel;
+        navigationPanel.add(time);
+        panel = navigationPanel;
+        return navigationPanel;
     }
 
     void initializeTimeLabel (){

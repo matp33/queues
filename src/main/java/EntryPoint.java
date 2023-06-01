@@ -29,8 +29,9 @@ public class EntryPoint {
 	private void runSimulation() {
 		int numberOfQueues = 4;
 		applicationConfiguration.setNumberOfQueues(numberOfQueues);
-		applicationWindow.initialize();
+		applicationWindow.initializeMainPanel();
 		applicationInitializer.initialize();
+		applicationWindow.initializeWindow();
 		regularTests.testMultipleClientsWithMultipleQueues(numberOfQueues,8);
 	}
 

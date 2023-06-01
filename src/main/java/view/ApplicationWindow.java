@@ -20,6 +20,8 @@ public class ApplicationWindow {
 
     private ApplicationConfiguration applicationConfiguration;
 
+    private JPanel mainPanel;
+
     public ApplicationWindow(SimulationPanel simulationPanel, NavigationPanel navigationPanel, CustomLayout customLayout, ApplicationConfiguration applicationConfiguration) {
         this.simulationPanel = simulationPanel;
         this.navigationPanel = navigationPanel;
@@ -27,12 +29,8 @@ public class ApplicationWindow {
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    public void initialize (){
-        JPanel mainPanel = initializeMainPanel();
-        initializeWindow(mainPanel);
-    }
 
-    private void initializeWindow(JPanel mainPanel) {
+    public void initializeWindow() {
         window = new JFrame();
         window.add(mainPanel);
         window.pack();
@@ -43,16 +41,14 @@ public class ApplicationWindow {
         window.setLayout(null);
     }
 
-    private JPanel initializeMainPanel (){
+    public void initializeMainPanel (){
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(simulationPanel);
         JPanel navigationPanel = this.navigationPanel.initializePanel();
         mainPanel.add(navigationPanel, BorderLayout.SOUTH);
-        customLayout.initialize(applicationConfiguration.getNumberOfQueues(), navigationPanel);
-        customLayout.calculateWindowSize(applicationConfiguration.getNumberOfQueues());
         mainPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        return mainPanel;
+        this.mainPanel = mainPanel;
     }
 
 }
