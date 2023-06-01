@@ -11,12 +11,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import core.MainLoop;
 import events.UIEventQueue;
 import spring2.Bean;
-import spring2.BeanRegistry;
 import symulation.ApplicationConfiguration;
-import symulation.Painter;
 import symulation.ClientArrivalEvent;
 
 @Bean

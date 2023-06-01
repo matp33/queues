@@ -23,7 +23,6 @@ public class Simulation {
 	public static final String TITLE_FROM_BEGINNING = "Restarting simulation";
     public static final String SIMULATION_FINISHED = "Simulation has been finished.";
     
-    private final Painter painter;
 
 	private final ClientEventsHandler clientEventsHandler;
 
@@ -31,11 +30,13 @@ public class Simulation {
 
 	private ObjectsManager objectsManager;
 
-	public Simulation(Painter painter, ClientEventsHandler clientEventsHandler, MainLoop mainLoop, ObjectsManager objectsManager) {
-		this.painter = painter;
+	private CustomLayout customLayout;
+
+	public Simulation(ClientEventsHandler clientEventsHandler, MainLoop mainLoop, ObjectsManager objectsManager, CustomLayout customLayout) {
 		this.clientEventsHandler = clientEventsHandler;
 		this.mainLoop = mainLoop;
 		this.objectsManager = objectsManager;
+		this.customLayout = customLayout;
 	}
 
 	public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
@@ -78,10 +79,10 @@ public class Simulation {
 		// TODO this is too similar method to calculateAppearTime check it
 		
 		
-		Point pointInitial=painter.calculateClientDestinationCoordinates(0, 0, ClientPositionType.ARRIVAL);
-		Point pointWaitPlace=painter.calculateClientDestinationCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
+		Point pointInitial=customLayout.calculateClientDestinationCoordinates(0, 0, ClientPositionType.ARRIVAL);
+		Point pointWaitPlace=customLayout.calculateClientDestinationCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
 
-		Point pointInQueue=painter.calculateClientDestinationCoordinates(peopleInQueue,
+		Point pointInQueue=customLayout.calculateClientDestinationCoordinates(peopleInQueue,
                              queueNumber, ClientPositionType.GOING_TO_QUEUE);
         Point calculatedPosition = Client.calculateCoordinates(pointInQueue, pointInitial,
         								arrivalTime);

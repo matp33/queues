@@ -13,13 +13,10 @@ import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
 
-import core.MainLoop;
 import events.UIEventQueue;
 import otherFunctions.FileAnalyzer;
 import spring2.Bean;
-import spring2.BeanRegistry;
 import symulation.ApplicationConfiguration;
-import symulation.Painter;
 import symulation.ClientArrivalEvent;
 
 @Bean

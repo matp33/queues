@@ -7,7 +7,6 @@ import dto.PointWithTimeDTO;
 import events.ObjectsManager;
 import otherFunctions.ClientMovement;
 import spring2.Bean;
-import symulation.Painter;
 import visualComponents.Client;
 
 import java.util.*;
@@ -22,7 +21,7 @@ public class ExitQueueManager {
 
     private ObjectsManager objectsManager;
 
-    public ExitQueueManager(ClientMovement clientMovement, ObjectsManager objectsManager, Painter painter) {
+    public ExitQueueManager(ClientMovement clientMovement, ObjectsManager objectsManager) {
         this.clientMovement = clientMovement;
         this.objectsManager = objectsManager;
     }

@@ -5,8 +5,7 @@ import java.awt.*;
 import javax.swing.JComponent;
 
 import spring2.Bean;
-import symulation.ApplicationConfiguration;
-import symulation.Painter;
+import symulation.CustomLayout;
 
 // ******* This class is used to show how many clients are not shown due to limits of size *********
 
@@ -16,18 +15,16 @@ import symulation.Painter;
     private static final long serialVersionUID = 1L;
     public int clientsOverLimit,x,y;
 
-    private Painter painter;
 
-    public Indicator(Painter painter){
+    private CustomLayout customLayout;
 
-        this.painter = painter;
-	    clientsOverLimit=0;
-
-
+    public Indicator(CustomLayout customLayout){
+        this.customLayout = customLayout;
+        clientsOverLimit=0;
     }
 
     public void initialize (){
-        Point position = painter.calculateWaitingRoomIndicatorPosition();
+        Point position = customLayout.calculateWaitingRoomIndicatorPosition();
         this.x=position.x;
         this.y=position.y;
     }

@@ -4,16 +4,16 @@ import core.MainLoop;
 import events.ClientEventsHandler;
 import events.EventSubscriber;
 import events.ObjectsManager;
-import interfaces.AnimatedObject;
 
 import java.awt.*;
-import java.util.List;
 import java.util.SortedSet;
 
 import javax.swing.*;
 
-import otherFunctions.ClientAction;
+import events.UIEventQueue;
 import spring2.Bean;
+import view.NavigationPanel;
+import view.SimulationPanel;
 import visualComponents.Client;
 import visualComponents.Indicator;
 import visualComponents.OutsideWorld;
@@ -23,15 +23,14 @@ public class Manager implements EventSubscriber {
 	
 
 	private Simulation simulation;
-	private Painter painter;
+
+	private NavigationPanel navigationPanel;
 
 	public OutsideWorld outside;
 	public Indicator waitingRoomIndicator;
 
 	private int numberOfQueues;
-	
 
-	private List<ClientAction> listOfEvents;
 
 	private ApplicationConfiguration applicationConfiguration;
 
@@ -43,25 +42,21 @@ public class Manager implements EventSubscriber {
 
 	private SortedSet<ClientArrivalEvent> timeTable;
 
-	public Manager(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, Painter painter, ObjectsManager objectsManager, MainLoop mainLoop, ClientEventsHandler clientEventsHandler)  {
+	private SimulationPanel simulationPanel;
+
+	public Manager(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, ClientEventsHandler clientEventsHandler, SimulationPanel simulationPanel, UIEventQueue uiEventQueue)  {
 
 		this.applicationConfiguration = applicationConfiguration;
 		this.simulation = simulation;
-		this.painter = painter;
+		this.navigationPanel = navigationPanel;
 		this.objectsManager = objectsManager;
 		this.mainLoop = mainLoop;
 		this.clientEventsHandler = clientEventsHandler;
-		painter.addEventsSubscriber(this);
-
+		this.simulationPanel = simulationPanel;
+		uiEventQueue.addSubscriber(this);
 
 		outside = new OutsideWorld();
 		 this.waitingRoomIndicator = waitingRoomIndicator;
-		 Point point=painter.getDoorPosition();
-		 int i=0;
-		 while (painter.getCheckoutPosition(i).x<point.x){
-			 i++;
-		 }
-		 System.out.println("IIIIIIIIIII"+i);
 
 		this.numberOfQueues=applicationConfiguration.getNumberOfQueues();
 
@@ -70,17 +65,17 @@ public class Manager implements EventSubscriber {
 
 	@Override
 	public int handleNewDialog(JPanel panel, String title) {
-		return painter.displayWindowWithPanel(panel, title);
+		return simulationPanel.displayWindowWithPanel(panel, title);
 	}
 
 	@Override
 	public void handleNewMessage(String message) {
-		painter.displayMessage(message);
+		simulationPanel.displayMessage(message);
 	}
 
 	@Override
 	public void handleReinitializeEvent() {
-		painter.initiate();
+
 	}
 
 
@@ -98,7 +93,7 @@ public class Manager implements EventSubscriber {
 	}
 	
 	public void clean(){
-		painter.clean();
+		simulationPanel.clean();
 		mainLoop.removeObjects();
 	}
 
@@ -110,7 +105,7 @@ public class Manager implements EventSubscriber {
 		mainLoop.setTimePassed (time);
     	waitingRoomIndicator.clear();
     	
-        painter.setButtonRestartToActive();
+        navigationPanel.setButtonRestartToActive();
         simulation.prepareSimulation(time,clientArrivalEvents);
 
 		resumeSimulation();
@@ -120,7 +115,8 @@ public class Manager implements EventSubscriber {
 
 	private void resumeSimulation (){
 		mainLoop.resume();
-		painter.resume();
+		navigationPanel.setButtonStopToResume();
+		simulationPanel.repaint();
 	}
 
 
@@ -129,27 +125,11 @@ public class Manager implements EventSubscriber {
     }
 
     public void beginSimulation(){
-    	painter.repaint(painter.getMovementArea());
-//	    System.out.println("!!!!!! "+simulation.painter.getMovementArea());
-	    painter.setButtonRestartToActive();
-	    painter.setButtonStopActiveness(true);
+    	simulationPanel.repaint();
+	    navigationPanel.setButtonRestartToActive();
+	    navigationPanel.setButtonStopActiveness(true);
     }
     
-    public int displayWindowWithPanel(Component panel, String title){
- 
-       return JOptionPane.showOptionDialog(painter, panel, title,
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, new Object[]{"Ok","Cancel"}, "Ok");
-
-    }
-
-    public void setEventsList(List<ClientAction> e){
-    	listOfEvents = e;
-    }
-    
-    public List <AnimatedObject> getAllObjects(){
-    	return painter.getAllObjects();
-    }
 
 	@Override
 	public void handleNewTimetable(SortedSet<ClientArrivalEvent> clientArrivalEvents) {
@@ -170,7 +150,8 @@ public class Manager implements EventSubscriber {
 	public boolean handlePause() {
 		boolean wasPaused = mainLoop.isPaused();
 		mainLoop.pause();
-		painter.pause();
+		navigationPanel.setButtonStopToResume();
+		simulationPanel. stopSprites();
 		return wasPaused;
 	}
 }

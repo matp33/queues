@@ -15,13 +15,10 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import core.MainLoop;
 import events.UIEventQueue;
 import otherFunctions.ExpressionAnalyzer;
 import spring2.Bean;
-import spring2.BeanRegistry;
 import symulation.ApplicationConfiguration;
-import symulation.Painter;
 import symulation.Simulation;
 
 @Bean

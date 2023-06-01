@@ -7,7 +7,7 @@ import otherFunctions.ClientAction;
 import otherFunctions.ClientMovement;
 import spring2.Bean;
 import symulation.CustomLayout;
-import symulation.Painter;
+import view.SimulationPanel;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;
@@ -20,8 +20,6 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private SortedSet<ClientAction> setOfEvents = new TreeSet<>();
 
-    private Painter painter;
-
     private ObjectsManager objectsManager;
 
     private ExitQueueManager exitQueueManager;
@@ -30,12 +28,14 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private CustomLayout customLayout;
 
-    public ClientEventsHandler(Painter painter, ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement, CustomLayout customLayout) {
-        this.painter = painter;
+    private SimulationPanel simulationPanel;
+
+    public ClientEventsHandler( ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement, CustomLayout customLayout, SimulationPanel simulationPanel) {
         this.objectsManager = objectsManager;
         this.exitQueueManager = exitQueueManager;
         this.clientMovement = clientMovement;
         this.customLayout = customLayout;
+        this.simulationPanel = simulationPanel;
     }
 
     public void setEventsList(SortedSet<ClientAction> setOfEvents) {
@@ -104,7 +104,7 @@ public class ClientEventsHandler implements ChangeableObject {
                 break;
             case OUTSIDE_VIEW:
                 objectsManager.removeClientFromView(client);
-                painter.removeObject(client);
+                simulationPanel.removeObject(client);
                 exitQueueManager.handleClientWentOutsideView(client);
                 break;
             case WAITING_ROOM:
@@ -128,7 +128,7 @@ public class ClientEventsHandler implements ChangeableObject {
                 storeCheckout.decreaseClientsAboveLimit();
             }
             clientToMove.decreaseClientIndex();
-            Point lookAtPoint=painter.calculateClientDestinationCoordinates(clientToMove.getClientNumber(),
+            Point lookAtPoint=customLayout.calculateClientDestinationCoordinates(clientToMove.getClientNumber(),
                     clientToMove.getQueueNumber(), clientToMove.getPositionType());
             clientMovement.calculateAndSetClientTrajectory(clientToMove, lookAtPoint);
         });
@@ -141,14 +141,14 @@ public class ClientEventsHandler implements ChangeableObject {
         client.setClientNumber(clientsInQueue.size());
         clientsInQueue.offerLast(client);
         client.setPositionType(ClientPositionType.GOING_TO_QUEUE);
-        Point lookAtPoint=painter.calculateClientDestinationCoordinates(client.getClientNumber(), client.getQueueNumber(), client.getPositionType());
+        Point lookAtPoint=customLayout.calculateClientDestinationCoordinates(client.getClientNumber(), client.getQueueNumber(), client.getPositionType());
         clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
         client.calculateExpectedTimeInQueue();
     }
 
     private void moveClientToWaitingRoom(Client client, double currentTime)  {
         client.setPositionType(ClientPositionType.WAITING_ROOM);
-        Point lookAtPoint=painter.calculateClientDestinationCoordinates(client.getClientNumber(),
+        Point lookAtPoint=customLayout.calculateClientDestinationCoordinates(client.getClientNumber(),
                 client.getQueueNumber(), client.getPositionType());
         clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
         client.calculateExpectedTimeInWaitingRoom(currentTime);
@@ -156,7 +156,7 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private void moveOutside(Client client){
         client.setPositionType(ClientPositionType.OUTSIDE_VIEW);
-        Point lookAtPoint=painter.calculateClientDestinationCoordinates(client.getClientNumber(),
+        Point lookAtPoint=customLayout.calculateClientDestinationCoordinates(client.getClientNumber(),
                 client.getQueueNumber(), client.getPositionType());
         clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
     }

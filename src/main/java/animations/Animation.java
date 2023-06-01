@@ -30,7 +30,7 @@ public class Animation {
             if (delay<0){
                 throw new IllegalArgumentException ("Delay must be positive integer. Current delay is not positive.");
             }
-            this.framesList.add(new Frame (frames[i],delay));
+            this.framesList.add(new Frame (frames[i]));
         }
 
         this.currentFrame=0;

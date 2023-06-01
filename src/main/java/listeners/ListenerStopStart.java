@@ -6,9 +6,6 @@ import java.awt.event.ActionListener;
 
 import events.UIEventQueue;
 import spring2.Bean;
-import spring2.BeanRegistry;
-import symulation.Manager;
-import symulation.Painter;
 
 @Bean
 public class ListenerStopStart implements ActionListener {

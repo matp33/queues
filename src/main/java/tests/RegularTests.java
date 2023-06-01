@@ -14,12 +14,10 @@ public class RegularTests {
     private Manager manager;
 
     private final ApplicationConfiguration applicationConfiguration;
-    private  final Painter painter;
 
-    public RegularTests(Manager manager, ApplicationConfiguration applicationConfiguration, Painter painter) {
+    public RegularTests(Manager manager, ApplicationConfiguration applicationConfiguration) {
         this.manager = manager;
         this.applicationConfiguration = applicationConfiguration;
-        this.painter = painter;
     }
 
     public void testInserting(int numberOfStoreCheckouts, int numberOfClients) throws InterruptedException {

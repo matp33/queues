@@ -2,8 +2,8 @@ package core;
 
 import interfaces.AnimatedObject;
 import spring2.Bean;
-import symulation.Painter;
-import visualComponents.Client;
+import view.NavigationPanel;
+import view.SimulationPanel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ public class MainLoop {
 
     public static final double DELTA_TIME = 0.02;
     private Timer timer;
-    private Painter painter;
 
     private List<ChangeableObject> changeableObjects = new ArrayList<>();
 
@@ -23,17 +22,22 @@ public class MainLoop {
 
     private double timePassedSeconds = 0;
 
+    private SimulationPanel simulationPanel;
 
-    public MainLoop(Painter painter) {
+    private NavigationPanel navigationPanel;
+
+
+    public MainLoop(SimulationPanel simulationPanel, NavigationPanel navigationPanel) {
+        this.simulationPanel = simulationPanel;
+        this.navigationPanel = navigationPanel;
         timer = new Timer();
-        this.painter = painter;
         timer.scheduleAtFixedRate(mainLoopTask(),0, (int)(DELTA_TIME*1000));
     }
 
     public void addObject (ChangeableObject object){
         changeableObjects.add(object);
         if (object instanceof AnimatedObject){
-            painter.addObject((AnimatedObject) object);
+            simulationPanel.addObject((AnimatedObject) object);
         }
     }
 
@@ -52,8 +56,8 @@ public class MainLoop {
                 if (!isPaused){
                     timePassedSeconds +=  DELTA_TIME;
                     changeableObjects.forEach(changeableObject -> changeableObject.update(timePassedSeconds));
-                    painter.repaint();
-                    painter.updateTime( timePassedSeconds);
+                    simulationPanel.repaint();
+                    navigationPanel.updateTime( timePassedSeconds);
                 }
 
             }
