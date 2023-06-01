@@ -16,17 +16,11 @@ public class ApplicationWindow {
 
     private NavigationPanel navigationPanel;
 
-    private CustomLayout customLayout;
-
-    private ApplicationConfiguration applicationConfiguration;
-
     private JPanel mainPanel;
 
-    public ApplicationWindow(SimulationPanel simulationPanel, NavigationPanel navigationPanel, CustomLayout customLayout, ApplicationConfiguration applicationConfiguration) {
+    public ApplicationWindow(SimulationPanel simulationPanel, NavigationPanel navigationPanel) {
         this.simulationPanel = simulationPanel;
         this.navigationPanel = navigationPanel;
-        this.customLayout = customLayout;
-        this.applicationConfiguration = applicationConfiguration;
     }
 
 
