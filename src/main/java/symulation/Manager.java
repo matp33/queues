@@ -113,9 +113,15 @@ public class Manager implements EventSubscriber {
         painter.setButtonRestartToActive();
         simulation.prepareSimulation(time,clientArrivalEvents);
 
-        painter.resume(false);
+		resumeSimulation();
+
 //        System.out.println("resume");
     }
+
+	private void resumeSimulation (){
+		mainLoop.resume();
+		painter.resume();
+	}
 
 
     public boolean isStoreCheckoutNumberSame(int numbOfQueues) {
@@ -157,11 +163,14 @@ public class Manager implements EventSubscriber {
 
 	@Override
 	public void handleResume() {
-		painter.resume(false);
+		resumeSimulation();
 	}
 
 	@Override
 	public boolean handlePause() {
-		return painter.pause();
+		boolean wasPaused = mainLoop.isPaused();
+		mainLoop.pause();
+		painter.pause();
+		return wasPaused;
 	}
 }

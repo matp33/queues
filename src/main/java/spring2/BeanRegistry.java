@@ -66,18 +66,5 @@ public class BeanRegistry {
         return constructor.newInstance(parameters.toArray());
     }
 
-    public static <T> T getBeanByClass(Class<T> classType){
-        //TODO many cyclic dependencies or dependencies from non bean objects to beans - this method should be deleted
-        BeanRegistry beanRegistry = BeanRegistry.getInstance();
-        T bean;
-        try {
-            bean = (T)beanRegistry.getBean(classType);
-        } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException |
-                 InstantiationException e) {
-            throw new RuntimeException("Bean of class: "+classType+ " not found");
-        }
-        return bean;
-    }
-
 
 }

@@ -66,7 +66,6 @@ public class Painter extends JPanel {
     private ListenerFromTheStart listenerFromStart;
     private ListenerExtraction listenerExtract;
 
-    private MainLoop mainLoop;
 
     public Painter(ApplicationConfiguration applicationConfiguration, CustomLayout customLayout, UIEventQueue uIEventQueue, ListenerStopStart listenerStopStart, ListenerOpenFile listenerOpen, ListenerFromTheStart listenerFromStart, ListenerExtraction listenerExtract)  {
 
@@ -105,7 +104,6 @@ public class Painter extends JPanel {
         window.setLocationRelativeTo(null);
         window.setResizable(false);
         window.setVisible(true);
-        mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
     }
 
 
@@ -277,7 +275,7 @@ public class Painter extends JPanel {
     public void stopSprites() {
 
         for (int i=0; i<objects.size(); i++){
-            objects.get(i).interrupt(mainLoop.getTimePassedSeconds());
+            objects.get(i).interrupt();
         }
     }
 
@@ -294,36 +292,16 @@ public class Painter extends JPanel {
         JOptionPane.showMessageDialog(this, text);
     }
 
-    public void resume(boolean fromZero){
+    public void resume(){
 
-
-        if (fromZero) mainLoop.setTimePassed(0);
-        mainLoop.resume();
         repaint();
         setButtonStopToPaused();
 
     }
 
-    public void pauseSimulationAndAskQuestion (){
-        pause();
-        SwingUtilities.invokeLater(()->{
-            boolean b=askQuestion(Simulation.NO_MORE_ARRIVALS,
-                    Simulation.TITLE_NO_MORE_ARRIVALS);
-            if (!b){
-                finishSimulation(true);
-            }
-            else{
-                resume(false);
-            }
-        });
-    }
-
-    public boolean pause() {
+    public void pause() {
         setButtonStopToResume();
         stopSprites();
-        boolean wasPaused = mainLoop.isPaused();
-        mainLoop.pause();
-        return wasPaused;
     }
 
 

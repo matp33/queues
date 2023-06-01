@@ -17,7 +17,6 @@ private double arrivalTime;
 private double timeSupposed=0;
 private int clientNumber;
 private ClientPositionType positionType;
-private int delayWaited;
 private int delayStartTime;
 
 private Point lookAtPoint;
@@ -70,7 +69,6 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 //        positionType=Client.POSITION_WAITING_ROOM;
         currentAnimation=moveUp;
         currentAnimation.start();    
-        delayWaited=0;
 //        red = false;
                 
     }
@@ -108,14 +106,9 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 
 
     @Override
-    public void interrupt(double timePassedSeconds)  {
+    public void interrupt()  {
     	    	
-    	if (isWaiting){
-    		
-    		delayWaited+=(int)(timePassedSeconds)-delayStartTime; // no negative values allowed
-    	}
-    	    	
-    	stopMoving();    	
+    	stopMoving();
     	
     }
 
@@ -124,7 +117,7 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 
 	}
 
-	public void stopMoving(){ // this is when sprite stops by itself i.e. trajectory size = 0
+	public void stopMoving(){
     	    	
 		currentAnimation.setLastFrame();
 //    		System.out.println("o o is null: "+clientNumber);

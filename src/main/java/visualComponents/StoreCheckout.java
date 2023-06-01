@@ -2,12 +2,8 @@ package visualComponents;
 
 import interfaces.AnimatedAndObservable;
 import interfaces.Observer;
-import spring2.BeanRegistry;
-import symulation.Painter;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class StoreCheckout extends AnimatedAndObservable{
 
@@ -75,7 +71,7 @@ public class StoreCheckout extends AnimatedAndObservable{
 	}
 
 	@Override
-	public void interrupt(double timePassedSeconds) {
+	public void interrupt() {
 		// TODO Auto-generated method stub
 
 	}

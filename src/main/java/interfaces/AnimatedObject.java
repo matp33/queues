@@ -6,9 +6,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 
 import core.ChangeableObject;
-import spring2.BeanRegistry;
 import sprites.SpriteManager;
-import symulation.Painter;
 import animations.Animation;
 import sprites.Sprite;
 
@@ -62,7 +60,7 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 	public void update() {};
 	protected abstract void initializePosition();
 	
-	public abstract void interrupt(double timePassedSeconds);
+	public abstract void interrupt();
 	public abstract void scheduleMoving();
 	
 	public BufferedImage getImage(){

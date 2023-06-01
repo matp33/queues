@@ -2,8 +2,6 @@ package visualComponents;
 
 
 import interfaces.AnimatedObject;
-import spring2.BeanRegistry;
-import symulation.Painter;
 
 import java.util.TimerTask;
 
@@ -42,7 +40,7 @@ public class Door extends AnimatedObject {
 		currentAnimation.stop();
 	}
 	
-	public void interrupt(double timePassedSeconds){
+	public void interrupt(){
 		if (requestOpening){
 			stopOpening();
 		}		
