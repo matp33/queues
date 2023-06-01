@@ -104,6 +104,7 @@ public class Painter extends JPanel {
         window.setLocationRelativeTo(null);
         window.setResizable(false);
         window.setVisible(true);
+        window.setTitle("Queue simulator");
     }
 
 
@@ -119,23 +120,21 @@ public class Painter extends JPanel {
         btnRestart=new JButton(BUTTON_FROM_START);
         btnExtract=new JButton(BUTTON_EXTRACT);
 
-        // ******** Buttons positioning
 
-        JButton [] buttons=new JButton [4];
-        buttons[0]=btnExtract;
-        buttons[1]=btnOpenFile;
-        buttons[2]=btnRestart;
-        buttons[3]=btnPause;
+        JButton [] buttons=new JButton[] {btnOpenFile,btnExtract, btnRestart, btnPause};
 
 
         bottomPanel.setLayout(new FlowLayout());
 
+        String helvetica = "Bodoni MT";
         for (int i=0; i<buttons.length;i++){
+            buttons[i].setFont(        new Font(helvetica, Font.PLAIN,20));
             bottomPanel.add(buttons[i]);
         }
 
         time = new JLabel();
-        time.setFont(new Font("Times new roman", Font.BOLD,20));
+
+        time.setFont(new Font(helvetica, Font.PLAIN,20));
         time.setForeground(new Color(0,45,110));
         bottomPanel.add(time);
 
