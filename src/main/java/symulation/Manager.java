@@ -5,7 +5,6 @@ import events.ClientEventsHandler;
 import events.EventSubscriber;
 import events.ObjectsManager;
 
-import java.awt.*;
 import java.util.SortedSet;
 
 import javax.swing.*;
@@ -115,7 +114,7 @@ public class Manager implements EventSubscriber {
 
 	private void resumeSimulation (){
 		mainLoop.resume();
-		navigationPanel.setButtonStopToResume();
+		navigationPanel.setButtonStopToPause();
 		simulationPanel.repaint();
 	}
 

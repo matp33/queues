@@ -105,7 +105,7 @@ public class NavigationPanel {
         btnRestart.setEnabled(true);
     }
 
-    public void setButtonStopToPaused(){
+    public void setButtonStopToPause(){
         btnPause.setText(BUTTON_PAUSE);
     }
 
