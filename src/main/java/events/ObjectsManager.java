@@ -42,7 +42,8 @@ public class ObjectsManager {
 
     public void initializeObjects (){
         this.door = new Door();
-        door.initializePosition();
+        Point position = customLayout.calculateDoorPosition();
+        door.setPosition(position);
         mainLoop.addObject(door);
         int numberOfQueues = applicationConfiguration.getNumberOfQueues();
         for (int i=0;i<numberOfQueues;i++){

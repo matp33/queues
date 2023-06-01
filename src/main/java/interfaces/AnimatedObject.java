@@ -50,6 +50,10 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 
 	}
 
+	public void setPosition(Point position) {
+		this.position = position;
+	}
+
 	@Override
 	public int getHeight() {
 		return spriteHeight;

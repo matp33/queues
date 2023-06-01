@@ -300,7 +300,6 @@ public class Painter extends JPanel {
         if (fromZero) mainLoop.setTimePassed(0);
         mainLoop.resume();
         repaint();
-        resumeSprites();
         setButtonStopToPaused();
 
     }
@@ -319,22 +318,14 @@ public class Painter extends JPanel {
         });
     }
 
-    public void pause() {
+    public boolean pause() {
         setButtonStopToResume();
         stopSprites();
+        boolean wasPaused = mainLoop.isPaused();
         mainLoop.pause();
+        return wasPaused;
     }
 
-    public void resumeSprites(){
-        for (int i=0; i<objects.size(); i++){
-            objects.get(i).scheduleMoving();
-            if (objects.get(i) instanceof Client){
-                Client c=(Client)objects.get(i);
-                c.resetTimerObject();
-//				System.out.println("@@"+c.id);
-            }
-        }
-    }
 
     public void removeObject(AnimatedObject obj){
         objects.remove(obj);

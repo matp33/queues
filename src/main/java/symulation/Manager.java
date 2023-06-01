@@ -161,7 +161,7 @@ public class Manager implements EventSubscriber {
 	}
 
 	@Override
-	public void handlePause() {
-		painter.pause();
+	public boolean handlePause() {
+		return painter.pause();
 	}
 }

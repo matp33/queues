@@ -12,7 +12,7 @@ public interface EventSubscriber {
 
     void handleResume();
 
-    void handlePause();
+    boolean handlePause();
 
     void handleNewMessage(String message);
 

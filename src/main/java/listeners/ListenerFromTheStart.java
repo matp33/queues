@@ -45,7 +45,6 @@ public class ListenerFromTheStart implements ActionListener{
 
     private UIEventQueue uiEventQueue;
 
-    private MainLoop mainLoop;
 
     private ApplicationConfiguration applicationConfiguration;
 
@@ -66,7 +65,6 @@ public class ListenerFromTheStart implements ActionListener{
 
     @Override
     public void actionPerformed (ActionEvent e){
-        mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
 
 //        System.out.println(e.getSource());
         createPanel();
@@ -77,21 +75,14 @@ public class ListenerFromTheStart implements ActionListener{
             panel.add(labelError);
         }
 
-        boolean wasRunning;
-        wasRunning = !mainLoop.isPaused();
-        if (wasRunning){
-            uiEventQueue.publishPauseEvent();
-        }
-        
+        uiEventQueue.publishPauseEvent();
+
         int optionChoosed= uiEventQueue.publishNewDialogEvent(panel, Simulation.TITLE_FROM_BEGINNING);
 
         if (optionChoosed==JOptionPane.NO_OPTION){
 //            System.out.println("cancel");
             setIsErrorTo(false);
-            if (wasRunning){
-                uiEventQueue.publishResumeEvent();
-            }
-            
+
             return;
         }
 
@@ -109,18 +100,15 @@ public class ListenerFromTheStart implements ActionListener{
                     }
                 }
                 
-                boolean succes=ExpressionAnalyzer.analyze(tf.getText());
+                boolean success=ExpressionAnalyzer.analyze(tf.getText());
 
-                if (succes==true){
+                if (success){
                     d=Double.parseDouble(tf.getText());
                 }
                 else{
                     setErrorTextTo(FORMAT_ERROR);
                     setIsErrorTo(true);
                     actionPerformed(e);
-	                    if (wasRunning){
-                            uiEventQueue.publishResumeEvent();
-	                    }
                     return;
                 }
 
@@ -128,9 +116,6 @@ public class ListenerFromTheStart implements ActionListener{
                     setErrorTextTo(RANGE_ERROR);
                     setIsErrorTo(true);
                     actionPerformed(e);
-	                    if (wasRunning){
-                            uiEventQueue.publishResumeEvent();
-	                    }
                     return;
                 }
                 

@@ -27,9 +27,8 @@ public class Door extends AnimatedObject {
 	}
 
 	public void initializePosition (){
-		position= BeanRegistry.getBeanByClass(Painter.class).getDoorPosition();
 	}
-		
+
 	public void doOpening(){
 		requestOpening = true;
 		finishedOpening = false;

@@ -24,10 +24,7 @@ private Point lookAtPoint;
 
 	private List <Point> trajectory = new ArrayList<>();
 private int queueNumber;
-private Timer timer;
-private Timer timerDelay; // timer for moving inside queue connected to clients having some delays
 
-private TimerTask movingTask;
 private Animation currentAnimation,moveLeft,moveRight,moveDown,moveUp;
 private Point position;
 
@@ -74,7 +71,6 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
         currentAnimation=moveUp;
         currentAnimation.start();    
         delayWaited=0;
-		timer=new Timer();
 //        red = false;
                 
     }
@@ -117,9 +113,6 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
     	if (isWaiting){
     		
     		delayWaited+=(int)(timePassedSeconds)-delayStartTime; // no negative values allowed
-//    		System.out.println("delay wait: "+delayWaited+"abc"+abc);
-    		timerDelay.cancel();
-			timer.cancel();
     	}
     	    	
     	stopMoving();    	
@@ -133,9 +126,6 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 
 	public void stopMoving(){ // this is when sprite stops by itself i.e. trajectory size = 0
     	    	
-    	if (movingTask!=null){
-			movingTask.cancel();
-		}
 		currentAnimation.setLastFrame();
 //    		System.out.println("o o is null: "+clientNumber);
     }
@@ -288,11 +278,6 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 	@Override
 	public String toString (){
 		return "" + id + " pos: " +positionType;
-	}
-
-
-	public void resetTimerObject() {
-		timerDelay = new Timer();
 	}
 
 	public void setTrajectory(List<Point> trajectory) {

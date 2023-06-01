@@ -29,8 +29,8 @@ public class UIEventQueue {
         observers.forEach(EventSubscriber::handleResume);
     }
 
-    public void publishPauseEvent (){
-        observers.forEach(EventSubscriber::handlePause);
+    public boolean publishPauseEvent (){
+        return observers.iterator().next().handlePause();
     }
 
     public void publishNewMessageEvent (String message){

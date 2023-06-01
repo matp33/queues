@@ -32,8 +32,6 @@ protected UIEventQueue uiEventQueue;
 
 private ApplicationConfiguration applicationConfiguration;
 
-private MainLoop mainLoop;
-
     public ListenerOpenFile (UIEventQueue uiEventQueue, ApplicationConfiguration applicationConfiguration)  {
         JFileChooser fileChooser=new JFileChooser();
         URL resource = getClass().getResource(TXT_FILES_DIR);
@@ -51,20 +49,18 @@ private MainLoop mainLoop;
     
     @Override
     public void actionPerformed(ActionEvent e){
-        mainLoop = BeanRegistry.getBeanByClass(MainLoop.class);
-        uiEventQueue.publishPauseEvent();
+        boolean wasPaused = uiEventQueue.publishPauseEvent();
         int optionChooser= fileChoosingWindow.showOpenDialog(null);
 
-           if (optionChooser==JFileChooser.APPROVE_OPTION){
-               analyze(e);
-           }
-           
-           else if (mainLoop.isPaused()){
-               return;
-           }
+       if (optionChooser==JFileChooser.APPROVE_OPTION){
+           analyze(e);
+       }
+
+       if (!wasPaused){
+           uiEventQueue.publishResumeEvent();
+       }
 
 
-       uiEventQueue.publishResumeEvent();
 
     }
     
@@ -94,7 +90,6 @@ private MainLoop mainLoop;
          timeTable=processTimeTable(timeTable);
 
              if(applicationConfiguration.getNumberOfQueues() != lastQueueIndex){
-                 mainLoop.pause();
                  applicationConfiguration.setNumberOfQueues(lastQueueIndex+1);
                  uiEventQueue.publishNewReinitializeEvent();
              }
