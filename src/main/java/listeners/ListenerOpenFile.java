@@ -95,7 +95,6 @@ private ApplicationConfiguration applicationConfiguration;
          uiEventQueue.publishNewTimetableEvent(timeTable);
     }
     
-    // method to be overriden if we wanna do something on the time table
     protected SortedSet<ClientArrivalEvent> processTimeTable(SortedSet<ClientArrivalEvent> tt) {
     	return tt;
     }

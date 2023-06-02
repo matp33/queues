@@ -2,37 +2,25 @@
 
 package listeners;
 
-import java.awt.Component;
+import constants.RestartOption;
+import events.RestartActionObserver;
+import spring2.Bean;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
+@Bean
 public class RadioListenerFromTime implements ActionListener{
 
-    JPanel panel;
+    private RestartActionObserver observer;
 
-    public RadioListenerFromTime (JPanel panel){
-        
-        this.panel=panel;
+    public void setObserver(RestartActionObserver restartActionObserver){
+        this.observer= restartActionObserver;
     }
 
     @Override
     public void actionPerformed(ActionEvent e){
-
-        JRadioButton b=(JRadioButton)e.getSource();
-        
-        JPanel mainPanel=(JPanel)b.getParent(); 
-        JTextField j=new JTextField();        
-        mainPanel.add(j);
-        j.requestFocusInWindow();      
-
-        SwingUtilities.getWindowAncestor((Component) e.getSource()).pack();      
-
-
+        observer.actionPerformed(RestartOption.FROM_SELECTED_TIME);
     }
 
 }
