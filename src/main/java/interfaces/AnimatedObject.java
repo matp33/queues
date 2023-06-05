@@ -61,8 +61,7 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 	protected abstract void initializePosition();
 	
 	public abstract void interrupt();
-	public abstract void scheduleMoving();
-	
+
 	public BufferedImage getImage(){
 		return currentAnimation.getSprite();
 	}

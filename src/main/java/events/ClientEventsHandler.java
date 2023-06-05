@@ -108,7 +108,7 @@ public class ClientEventsHandler implements ChangeableObject {
                 exitQueueManager.handleClientWentOutsideView(client);
                 break;
             case WAITING_ROOM:
-                ClientAction clientAction = new ClientAction(client.calculateTimeOfMovingToQueue(), ClientPositionType.GOING_TO_QUEUE, client);
+                ClientAction clientAction = new ClientAction(clientMovement.calculateTimeOfMovingToQueue(client.getArrivalTime()), ClientPositionType.GOING_TO_QUEUE, client);
                 setOfEvents.add(clientAction);
                 break;
 
@@ -143,7 +143,6 @@ public class ClientEventsHandler implements ChangeableObject {
         client.setPositionType(ClientPositionType.GOING_TO_QUEUE);
         Point lookAtPoint=customLayout.calculateClientDestinationCoordinates(client.getClientNumber(), client.getQueueNumber(), client.getPositionType());
         clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
-        client.calculateExpectedTimeInQueue();
     }
 
     private void moveClientToWaitingRoom(Client client, double currentTime)  {
@@ -151,7 +150,6 @@ public class ClientEventsHandler implements ChangeableObject {
         Point lookAtPoint=customLayout.calculateClientDestinationCoordinates(client.getClientNumber(),
                 client.getQueueNumber(), client.getPositionType());
         clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
-        client.calculateExpectedTimeInWaitingRoom(currentTime);
     }
 
     private void moveOutside(Client client){

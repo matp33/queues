@@ -14,64 +14,42 @@ import java.util.List;
 public class Client extends AnimatedObject {
 
 private double arrivalTime;
-private double timeSupposed=0;
 private int clientNumber;
 private ClientPositionType positionType;
-private int delayStartTime;
-
 private Point lookAtPoint;
 
-	private List <Point> trajectory = new ArrayList<>();
+private List <Point> trajectory = new ArrayList<>();
 private int queueNumber;
 
 private Animation currentAnimation,moveLeft,moveRight,moveDown,moveUp;
 private Point position;
-
-public final int queueDelay; // delay before client moves when he sees that another client moved
-private static final int frameTime=20; // so many steps before animation changes to next
-
-
-
-public static final int stepSize=2;
-public static final int zigzagLength=20; // for zigzag: denotes how many steps are done in each direction
-public static final double movementDelay=0.01; // seconds
-private static final int minMovementDelay=600; // min value for queue delay
-private static final int maxMovementDelay=700; // max value for queue delay
 private static final long serialVersionUID = 1L;
-public static final double waitRoomDelay = 1;
-public static int nr;
+
 private final int id;
-
-private boolean isWaiting;
-
 private double timeInCheckout;
 
-
-public Client(int queueNumber, int clientNumber, double arrivalTime, double timeInCheckout)  {
+public Client(int clientId, int queueNumber, int clientNumber, double arrivalTime, double timeInCheckout)  {
 
 		super();
+		this.id = clientId;
 		this.queueNumber = queueNumber;
 		this.timeInCheckout = timeInCheckout;
-		nr++;
-		id=nr;
-		this.queueDelay=createDelay();
     	this.arrivalTime =arrivalTime;
 
-
-	moveDown=new Animation(sprite.getSpriteFileName(), sprite.getSprite(0),frameTime);
-		moveUp=new Animation(sprite.getSpriteFileName(),sprite.getSprite(3),frameTime);
-		moveLeft=new Animation(sprite.getSpriteFileName(),sprite.getSprite(1),frameTime);
-		moveRight=new Animation(sprite.getSpriteFileName(),sprite.getSprite(2),frameTime);
-
-        isWaiting=false;
+		moveDown=animations[0];
+		moveUp=animations[3];
+		moveLeft= animations[1];
+		moveRight= animations[2];
 
         this.clientNumber=clientNumber;
-//        positionType=Client.POSITION_WAITING_ROOM;
         currentAnimation=moveUp;
         currentAnimation.start();    
-//        red = false;
-                
+
     }
+
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
 
 	@Override
 	public int getWidth (){
@@ -82,91 +60,18 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 		return id;
 	}
 
-	public double calculateTimeOfMovingToQueue() {
-		return arrivalTime + waitRoomDelay;
-	}
-
 	public double getTimeInCheckout() {
 		return timeInCheckout;
 	}
 
-
-	private int createDelay(){
-    	Random random=new Random();
-		return random.nextInt(maxMovementDelay-minMovementDelay+1)+minMovementDelay;
-    }
-
-
-
-
-    
     public void decreaseClientIndex()  {
 		clientNumber--;
     }
 
-
     @Override
     public void interrupt()  {
-    	    	
-    	stopMoving();
-    	
-    }
-
-	@Override
-	public void scheduleMoving() {
-
-	}
-
-	public void stopMoving(){
-    	    	
 		currentAnimation.setLastFrame();
-//    		System.out.println("o o is null: "+clientNumber);
     }
-
-
-	public void calculateExpectedTimeInWaitingRoom(double currentTime) {
-		timeSupposed= currentTime+trajectory.size()*movementDelay+ waitRoomDelay;
-	}
-
-
-	public void calculateExpectedTimeInQueue() {
-		timeSupposed+=trajectory.size()*movementDelay;
-	}
-
-    public static double calculateTimeToGetToQueue(Point queuePosition,
-                                             Point waitingRoomPosition){
-
-        int horizontalMoves=Math.abs(queuePosition.x - waitingRoomPosition.x)/stepSize+1;
-        int verticalMoves=Math.abs(queuePosition.y - waitingRoomPosition.y)/stepSize+1;
-
-        return (horizontalMoves+verticalMoves)*movementDelay;
-
-    }
-
-
-    public static Point calculateCoordinates (Point checkoutPosition, Point startingPosition,
-                                               double destinationTime){
-        
-        int amount=(int) (destinationTime/(2*movementDelay));
-        int excess=amount%zigzagLength;
-        amount-=excess;
-        int additional=2*excess;
-
-         
-        int signumForX=(int)Math.signum(startingPosition.x-checkoutPosition.x); // should add or
-        										// subtract from x position? add -> 1, subtract -1
-        int signumForY=(int)Math.signum(startingPosition.y-checkoutPosition.y);
-                    
-        Point point=new Point(checkoutPosition.x+signumForX*((amount)*stepSize+additional),
-                checkoutPosition.y+signumForY*((amount)*stepSize));
-                
-        if (point.y>startingPosition.y){
-        	int diff=point.y-startingPosition.y;
-        }
-        
-        return point;
-
-    }    
 
 	public void saveInformation(Point point, ClientPositionType type) {
 		position=point;
@@ -176,12 +81,9 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 	public Point getPosition(){
 		return position;
 	}
-
 	public int getQueueNumber() {
 		return queueNumber;
 	}
-
-
 	public ClientPositionType getPositionType() {
 		return positionType;
 	}
@@ -199,20 +101,12 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 		this.clientNumber = clientNumber;
 	}
 		
-	public List<Point> getTrajectory(){
-		return trajectory;
-	}
-
-
 	private void chooseDirection (Point destination){
 		
-		if (destination==null){
-		}
+		int horizontalDistanceAbs=Math.abs(position.x-destination.x);
+		int verticalDistanceAbs=Math.abs(position.y-destination.y);
 		
-		int diff1=Math.abs(position.x-destination.x);
-		int diff2=Math.abs(position.y-destination.y);
-		
-		if (diff1<diff2){
+		if (horizontalDistanceAbs<verticalDistanceAbs){
 			if (position.y<destination.y){
 	            currentAnimation=moveDown;
 	        }
@@ -220,9 +114,7 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 	            currentAnimation=moveUp;
 	        }
 		}
-		
 		else{
-			
 	        if (position.x<destination.x){
 	            currentAnimation=moveRight;
 	        }
@@ -230,9 +122,7 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 	            currentAnimation=moveLeft;
 	        }
 		}
-		
-        
-		
+
 	}
 
 	@Override
@@ -251,7 +141,6 @@ public Client(int queueNumber, int clientNumber, double arrivalTime, double time
 
 	@Override
 	protected void initializePosition() {
-//		position=painter.calculateClientDestinationCoordinates(clientNumber, 0, ClientPositionType.ARRIVAL);
 	}
 
 	

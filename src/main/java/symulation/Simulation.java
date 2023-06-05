@@ -10,21 +10,25 @@ import core.MainLoop;
 import events.ClientEventsHandler;
 import events.ObjectsManager;
 import otherFunctions.ClientAction;
+import otherFunctions.ClientMovement;
 import spring2.Bean;
 import visualComponents.Client;
 
 @Bean
 public class Simulation {
     
-    public static final int FINISH=5;
-    
+
     public static final String NO_MORE_ARRIVALS="No more clients will arive. Do you want to continue?";
 	public static final String TITLE_NO_MORE_ARRIVALS = "No more arrivals";
 	public static final String TITLE_FROM_BEGINNING = "Restarting simulation";
     public static final String SIMULATION_FINISHED = "Simulation has been finished.";
+
+	private int clientId = 0;
     
 
 	private final ClientEventsHandler clientEventsHandler;
+
+	private ClientMovement clientMovement;
 
 	private  MainLoop mainLoop;
 
@@ -32,8 +36,9 @@ public class Simulation {
 
 	private CustomLayout customLayout;
 
-	public Simulation(ClientEventsHandler clientEventsHandler, MainLoop mainLoop, ObjectsManager objectsManager, CustomLayout customLayout) {
+	public Simulation(ClientEventsHandler clientEventsHandler, ClientMovement clientMovement, MainLoop mainLoop, ObjectsManager objectsManager, CustomLayout customLayout) {
 		this.clientEventsHandler = clientEventsHandler;
+		this.clientMovement = clientMovement;
 		this.mainLoop = mainLoop;
 		this.objectsManager = objectsManager;
 		this.customLayout = customLayout;
@@ -42,7 +47,7 @@ public class Simulation {
 	public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
 
 		ClientAction clientAction;
-   
+   		clientId = 0;
 
 		Map<Integer, List<Client>> queueIndexToClientsInQueueMap = new HashMap<>();
 		SortedSet<ClientAction> clientActions = new TreeSet<>();
@@ -51,7 +56,7 @@ public class Simulation {
 			double arrivalTime = event.getArrivalTime();
 			int queueNumber = event.getQueueNumber();
 			List<Client> clients = queueIndexToClientsInQueueMap.computeIfAbsent(queueNumber, index -> new ArrayList<>());
-			Client client = new Client(
+			Client client = new Client(clientId++,
 					queueNumber, clients.size(),
 					arrivalTime, event.getTimeInCheckout());
 			clients.add(client);
@@ -84,12 +89,10 @@ public class Simulation {
 
 		Point pointInQueue=customLayout.calculateClientDestinationCoordinates(peopleInQueue,
                              queueNumber, ClientPositionType.GOING_TO_QUEUE);
-        Point calculatedPosition = Client.calculateCoordinates(pointInQueue, pointInitial,
+        Point calculatedPosition = clientMovement.calculateCoordinates(pointInQueue, pointInitial,
         								arrivalTime);
 
-		double timeNeededToMoveToQueue=Client.calculateTimeToGetToQueue(pointInQueue, pointWaitPlace);
-		double totalTime=timeNeededToMoveToQueue+//timeToWaitPlace+  TODO add it
-				Client.waitRoomDelay;
+		double totalTime= clientMovement.calculateTimeFromWaitingRoomToQueue(pointInQueue, pointWaitPlace);
 
 		ClientPositionType positionType;
 		if (calculatedPosition.equals(pointInQueue)){

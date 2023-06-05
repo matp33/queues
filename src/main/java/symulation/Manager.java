@@ -100,7 +100,7 @@ public class Manager implements EventSubscriber {
 	public void doSimulation (double time, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
 		this.timeTable = clientArrivalEvents;
 		applicationConfiguration.setSimulationTime(timeTable.last().getArrivalTime());
-    	Client.nr=0;
+
 		mainLoop.setTimePassed (time);
     	waitingRoomIndicator.clear();
     	

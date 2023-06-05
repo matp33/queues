@@ -46,13 +46,7 @@ public class Door extends AnimatedObject {
 		}		
 	}
 
-	@Override
-	public void scheduleMoving() {
-		//TODO remove from interface
-	}
-
-
-	public boolean canClientEnter(){
+    public boolean canClientEnter(){
 		if (currentAnimation.getCurrentFrame()>=2){
 			return true;
 		}

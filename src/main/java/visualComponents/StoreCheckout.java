@@ -76,11 +76,6 @@ public class StoreCheckout extends AnimatedAndObservable{
 
 	}
 
-	@Override
-	public void scheduleMoving() {
-		// TODO Auto-generated method stub
-	}
-
 
 	@Override
 	public void update(double currentTimeMilliseconds) {

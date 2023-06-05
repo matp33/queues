@@ -28,6 +28,26 @@ public class ClientMovement {
 
     private MainLoop mainLoop;
 
+    private static final int stepSize=2;
+
+    private static final int zigzagLength=20;
+
+    private static final double movementDelay=0.01;
+
+    public static final double waitRoomDelay = 1;
+
+    public double calculateTimeOfMovingToQueue(double arrivalTime) {
+        return arrivalTime + waitRoomDelay;
+    }
+
+    public double calculateTimeFromWaitingRoomToQueue (Point queuePosition,
+                                                       Point waitingRoomPosition){
+        double timeToGetToQueue = calculateTimeToGetToQueue(queuePosition, waitingRoomPosition);
+        return timeToGetToQueue + waitRoomDelay;
+
+    }
+
+
     public ClientMovement(ObjectsManager objectsManager, MainLoop mainLoop) {
         this.objectsManager = objectsManager;
         this.mainLoop = mainLoop;
@@ -95,8 +115,8 @@ public class ClientMovement {
     
     //  ******************************** zigzag movement *****************************************
     
-        while (Math.abs(newXCoord-coordinates.x)>=Client.stepSize ||
-                                Math.abs(newYCoord-coordinates.y)>=Client.stepSize){
+        while (Math.abs(newXCoord-coordinates.x)>=stepSize ||
+                                Math.abs(newYCoord-coordinates.y)>=stepSize){
         	
         	horizontalStep = movingDirection.getHorizontalDirection();
         	verticalStep = movingDirection.getVerticalDirection();
@@ -131,22 +151,22 @@ public class ClientMovement {
         	}
         	
         	if (b==true) counter=0;
-        	if (c==true) counter=Client.zigzagLength;
+        	if (c==true) counter=zigzagLength;
         	if (b==true || c== true){
         		movingDirection=chooseWhichWayToGo(new Point(newXCoord,newYCoord), coordinates);
         		continue;
         	}
 
-            if (counter<Client.zigzagLength && Math.abs(newXCoord-coordinates.x)>=Client.stepSize){
+            if (counter<zigzagLength && Math.abs(newXCoord-coordinates.x)>=stepSize){
                 newXCoord+=horizontalStep;                
                 newCoords.add(new Point(newXCoord,newYCoord));
                 
             }
-            if (counter>=Client.zigzagLength && Math.abs(newYCoord-coordinates.y)>=Client.stepSize){
+            if (counter>=zigzagLength && Math.abs(newYCoord-coordinates.y)>=stepSize){
                 newYCoord+=verticalStep;               
                 newCoords.add(new Point(newXCoord,newYCoord));
             }
-            if (counter==2*Client.zigzagLength){
+            if (counter==2*zigzagLength){
                 counter=0;
             }
             counter++;
@@ -157,12 +177,12 @@ public class ClientMovement {
     verticalStep=movingDirection.getVerticalDirection();
                 
     while (Math.abs(newXCoord-coordinates.x)!=0){
-        newXCoord+=horizontalStep/Client.stepSize;
+        newXCoord+=horizontalStep/stepSize;
         newCoords.add(new Point(newXCoord,newYCoord));
     }
     
     while (Math.abs(newYCoord-coordinates.y)!=0){
-        newYCoord+=verticalStep/Client.stepSize;
+        newYCoord+=verticalStep/stepSize;
         newCoords.add(new Point(newXCoord,newYCoord));
     }
 
@@ -174,11 +194,11 @@ public class ClientMovement {
     	
     	int horizontalDirection;
     	int verticalDirection;
-    	if (start.x<end.x) horizontalDirection=Client.stepSize;
-        else horizontalDirection=-1*Client.stepSize;    
+    	if (start.x<end.x) horizontalDirection=stepSize;
+        else horizontalDirection=-1*stepSize;
 
-        if (start.y<end.y) verticalDirection=Client.stepSize;
-        else verticalDirection=-1*Client.stepSize;
+        if (start.y<end.y) verticalDirection=stepSize;
+        else verticalDirection=-1*stepSize;
         
         return new Direction (verticalDirection, horizontalDirection);
         
@@ -189,4 +209,40 @@ public class ClientMovement {
         client.setTrajectory(trajectory);
         client.setLookAtPoint(lookAtPoint);
     }
+
+    public double calculateTimeToGetToQueue(Point queuePosition,
+                                                   Point waitingRoomPosition){
+
+        int horizontalMoves=Math.abs(queuePosition.x - waitingRoomPosition.x)/stepSize+1;
+        int verticalMoves=Math.abs(queuePosition.y - waitingRoomPosition.y)/stepSize+1;
+
+        return (horizontalMoves+verticalMoves)*movementDelay;
+
+    }
+
+
+    public Point calculateCoordinates (Point checkoutPosition, Point startingPosition,
+                                              double destinationTime){
+
+        int amount=(int) (destinationTime/(2*movementDelay));
+        int excess=amount%zigzagLength;
+        amount-=excess;
+        int additional=2*excess;
+
+
+        int signumForX=(int)Math.signum(startingPosition.x-checkoutPosition.x); // should add or
+        // subtract from x position? add -> 1, subtract -1
+        int signumForY=(int)Math.signum(startingPosition.y-checkoutPosition.y);
+
+        Point point=new Point(checkoutPosition.x+signumForX*((amount)*stepSize+additional),
+                checkoutPosition.y+signumForY*((amount)*stepSize));
+
+        if (point.y>startingPosition.y){
+            int diff=point.y-startingPosition.y;
+        }
+
+        return point;
+
+    }
+
 }
