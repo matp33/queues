@@ -33,7 +33,6 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 		BufferedImage b=sprite.getSprite(0, 0);
 		size=new Dimension(b.getWidth(), b.getHeight());
 		position=new Point();
-		initializePosition();
 
 
 		animations = new Animation [sprite.getNumberOfRows()*sprite.getNumberOfColumns()];
@@ -58,8 +57,7 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 	}
 
 	public void update() {};
-	protected abstract void initializePosition();
-	
+
 	public abstract void interrupt();
 
 	public BufferedImage getImage(){

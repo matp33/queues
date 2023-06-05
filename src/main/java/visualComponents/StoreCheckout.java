@@ -1,11 +1,10 @@
 package visualComponents;
 
-import interfaces.AnimatedAndObservable;
-import interfaces.Observer;
+import interfaces.AnimatedObject;
 
 import java.awt.*;
 
-public class StoreCheckout extends AnimatedAndObservable{
+public class StoreCheckout extends AnimatedObject {
 
 	private static final long serialVersionUID = 1L;
 	private int clientsAboveLimit;
@@ -44,30 +43,6 @@ public class StoreCheckout extends AnimatedAndObservable{
 
 	public int getCheckoutIndex() {
 		return checkoutIndex;
-	}
-
-	@Override
-	public void addObserver(Observer client) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void removeObserver(Observer client) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void notifyClients() {
-		// TODO Auto-generated method stub
-
-	}
-
-
-	@Override
-	protected void initializePosition() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override

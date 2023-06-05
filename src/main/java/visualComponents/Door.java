@@ -24,9 +24,6 @@ public class Door extends AnimatedObject {
 
 	}
 
-	public void initializePosition (){
-	}
-
 	public void doOpening(){
 		requestOpening = true;
 		finishedOpening = false;

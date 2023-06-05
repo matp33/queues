@@ -139,13 +139,7 @@ public Client(int clientId, int queueNumber, int clientNumber, double arrivalTim
 
 	}
 
-	@Override
-	protected void initializePosition() {
-	}
 
-	
-
-	
 	@Override
     public void paintComponent(Graphics g) {
      
