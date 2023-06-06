@@ -22,10 +22,7 @@ import view.SimulationPanel;
 @Bean
 public class ExtractionButtonClickHandler extends OpenFileButtonClickHandler {
 	private String title = "Choosing queue number.";
-
 	private SimulationPanel simulationPanel;
-
-
 
     public ExtractionButtonClickHandler(ApplicationConfiguration applicationConfiguration, SimulationPanel simulationPanel, SimulationController simulationController, UIEventQueue uiEventQueue){
         super(  applicationConfiguration, simulationPanel, simulationController, uiEventQueue);

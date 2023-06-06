@@ -63,7 +63,7 @@ private UIEventQueue uiEventQueue;
 
 
     @Override
-    public void handleEvent(UIEvent uiEvent){
+    public void handleEvent(UIEvent<?> uiEvent){
         boolean wasPaused = simulationController.pauseSimulation();
         int optionChooser= fileChoosingWindow.showOpenDialog(null);
 
@@ -100,8 +100,9 @@ private UIEventQueue uiEventQueue;
 
          timeTable=processTimeTable(timeTable);
 
-             if(applicationConfiguration.getNumberOfQueues() != lastQueueIndex){
-                 applicationConfiguration.setNumberOfQueues(lastQueueIndex+1);
+        int newAmountOfQueues = lastQueueIndex + 1;
+        if(applicationConfiguration.getNumberOfQueues() != newAmountOfQueues){
+                 applicationConfiguration.setNumberOfQueues(newAmountOfQueues);
              }
 
          simulationController.restart(0, timeTable);

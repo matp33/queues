@@ -31,9 +31,6 @@ public class RestartButtonClickHandler implements UIEventHandler {
             "according to symulation time.</font></html>";
 
 
-    private UIEventQueue uiEventQueue;
-
-
     private ApplicationConfiguration applicationConfiguration;
 
     private RestartSimulationPanel restartSimulationPanel;
@@ -50,14 +47,11 @@ public class RestartButtonClickHandler implements UIEventHandler {
 
     public RestartButtonClickHandler(UIEventQueue uiEventQueue, ApplicationConfiguration applicationConfiguration, RestartSimulationPanel restartSimulationPanel, SimulationController simulationController, SimulationPanel simulationPanel){
 
-        this.uiEventQueue = uiEventQueue;
         this.applicationConfiguration = applicationConfiguration;
         this.restartSimulationPanel = restartSimulationPanel;
         this.simulationController = simulationController;
         this.simulationPanel = simulationPanel;
         uiEventQueue.subscribeToEvents(this, UIEventType.RESTART_BUTTON_CLICK);
-
-
         restartSimulationPanel.createPanel();
     }
 

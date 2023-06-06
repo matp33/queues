@@ -115,7 +115,11 @@ public class ObjectsManager {
     }
 
     public void removeObjects() {
-
+        storeCheckouts.clear();
         animatedObjects.clear();
+        clientByTheDoor = null;
+        clientsInQueue.clear();
+        clientsMovingToExit.clear();
+        visibleClients.clear();
     }
 }
