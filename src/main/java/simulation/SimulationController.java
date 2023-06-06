@@ -1,9 +1,7 @@
 package simulation;
 
-import clienthandling.ClientEventsHandler;
 import core.MainLoop;
 import dto.ClientArrivalEventDTO;
-import events.*;
 
 import java.util.SortedSet;
 
@@ -14,7 +12,7 @@ import view.SimulationPanel;
 import visualComponents.Indicator;
 
 @Bean
-public class Manager {
+public class SimulationController {
 	
 
 	private Simulation simulation;
@@ -22,9 +20,6 @@ public class Manager {
 	private NavigationPanel navigationPanel;
 
 	public Indicator waitingRoomIndicator;
-
-	private int numberOfQueues;
-
 
 	private ApplicationConfiguration applicationConfiguration;
 
@@ -37,7 +32,7 @@ public class Manager {
 
 	private SimulationPanel simulationPanel;
 
-	public Manager(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, SimulationPanel simulationPanel)  {
+	public SimulationController(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, SimulationPanel simulationPanel)  {
 
 		this.applicationConfiguration = applicationConfiguration;
 		this.simulation = simulation;
@@ -45,11 +40,7 @@ public class Manager {
 		this.objectsManager = objectsManager;
 		this.mainLoop = mainLoop;
 		this.simulationPanel = simulationPanel;
-
 		 this.waitingRoomIndicator = waitingRoomIndicator;
-
-		this.numberOfQueues=applicationConfiguration.getNumberOfQueues();
-
 	}
 
 	public void restart(double time, SortedSet<ClientArrivalEventDTO> timeTable) {
@@ -57,7 +48,7 @@ public class Manager {
 		removeObjects();
 		objectsManager.initializeObjects();
 		objectsManager.getAnimatedObjects().forEach(mainLoop::addObject);
-		doSimulation(time, timeTable);
+		doVisualization(time, timeTable);
 	}
 
 	public void restart (double time){
@@ -70,42 +61,33 @@ public class Manager {
 		mainLoop.removeObjects();
 	}
 
-
-	public void doSimulation (double time, SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS)  {
+	public void initialize (double time, SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS){
 		this.timeTable = clientArrivalEventDTOS;
 		applicationConfiguration.setSimulationTime(timeTable.last().getArrivalTime());
 
 		MainLoop.setTimePassed (time);
-    	waitingRoomIndicator.clear();
-    	
-        navigationPanel.setButtonRestartToActive();
+		waitingRoomIndicator.clear();
+
+		navigationPanel.setButtonRestartToActive();
+	}
+
+
+	public void doVisualization(double time, SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS)  {
+
+		initialize(time, clientArrivalEventDTOS);
         simulation.prepareSimulation(time, clientArrivalEventDTOS);
+		startSimulation();
 
-		resumeSimulation();
-
-//        System.out.println("resume");
     }
 
-	public void resumeSimulation (){
+	public void startSimulation(){
 		mainLoop.resume();
 		navigationPanel.setButtonStopToPause();
 		simulationPanel.repaint();
 	}
 
 
-    public boolean isStoreCheckoutNumberSame(int numbOfQueues) {
-        return numbOfQueues==numberOfQueues;
-    }
-
-    public void beginSimulation(){
-    	simulationPanel.repaint();
-	    navigationPanel.setButtonRestartToActive();
-	    navigationPanel.setButtonStopActiveness(true);
-    }
-
-
-
-	public boolean pause (){
+	public boolean pauseSimulation(){
 		boolean wasPaused = mainLoop.isPaused();
 		mainLoop.pause();
 		navigationPanel.setButtonStopToResume();

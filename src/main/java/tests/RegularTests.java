@@ -12,26 +12,15 @@ public class RegularTests {
 
     static double arrivalDelay=0.7;
 
-    private Manager manager;
+    private SimulationController simulationController;
 
     private final ApplicationConfiguration applicationConfiguration;
 
-    public RegularTests(Manager manager, ApplicationConfiguration applicationConfiguration) {
-        this.manager = manager;
+    public RegularTests(SimulationController simulationController, ApplicationConfiguration applicationConfiguration) {
+        this.simulationController = simulationController;
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    public void testInserting(int numberOfStoreCheckouts, int numberOfClients) throws InterruptedException {
-
-
-        manager.beginSimulation();
-        for (int i=0; i<numberOfClients;i++){
-            Thread.sleep(1500);
-        }
-                         
-
-    
-    }
 
     public void testMultipleClientsWithMultipleQueues(int numberOfQueues, int numberOfClients)  {
 
@@ -44,7 +33,7 @@ public class RegularTests {
                 double timeInQueue = 1; //generateRandomTimeInQueue();
                 clientArrivalEventDTOS.add(new ClientArrivalEventDTO(timeInQueue, i/4, queueNumber));
             }
-            manager.doSimulation(0.0, clientArrivalEventDTOS);
+            simulationController.doVisualization(0.0, clientArrivalEventDTOS);
 
 
 
@@ -75,7 +64,7 @@ public class RegularTests {
 //    	}
 
 
-        manager.doSimulation(0.0, clientArrivalEventDTOS);
+        simulationController.doVisualization(0.0, clientArrivalEventDTOS);
 
     }
 
@@ -105,7 +94,7 @@ public class RegularTests {
             clientArrivalEventDTOS.add(new ClientArrivalEventDTO(timeInQueue, 6+i*arrivalDelay, numberOfQueues-1));
         }
 
-        manager.doSimulation(0.0, clientArrivalEventDTOS);
+        simulationController.doVisualization(0.0, clientArrivalEventDTOS);
 
 
 

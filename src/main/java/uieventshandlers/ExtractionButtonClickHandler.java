@@ -16,7 +16,7 @@ import events.UIEventQueue;
 import spring2.Bean;
 import simulation.ApplicationConfiguration;
 import dto.ClientArrivalEventDTO;
-import simulation.Manager;
+import simulation.SimulationController;
 import view.SimulationPanel;
 
 @Bean
@@ -27,8 +27,8 @@ public class ExtractionButtonClickHandler extends OpenFileButtonClickHandler {
 
 
 
-    public ExtractionButtonClickHandler(ApplicationConfiguration applicationConfiguration, SimulationPanel simulationPanel, Manager manager, UIEventQueue uiEventQueue){
-        super(  applicationConfiguration, simulationPanel, manager, uiEventQueue);
+    public ExtractionButtonClickHandler(ApplicationConfiguration applicationConfiguration, SimulationPanel simulationPanel, SimulationController simulationController, UIEventQueue uiEventQueue){
+        super(  applicationConfiguration, simulationPanel, simulationController, uiEventQueue);
 		this.simulationPanel = simulationPanel;
 	}
 

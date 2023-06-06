@@ -19,7 +19,7 @@ import utilities.FileAnalyzer;
 import spring2.Bean;
 import simulation.ApplicationConfiguration;
 import dto.ClientArrivalEventDTO;
-import simulation.Manager;
+import simulation.SimulationController;
 import view.SimulationPanel;
 
 @Bean
@@ -33,14 +33,14 @@ private ApplicationConfiguration applicationConfiguration;
 
 private SimulationPanel simulationPanel;
 
-private Manager manager;
+private SimulationController simulationController;
 
 private UIEventQueue uiEventQueue;
 
 
-    public OpenFileButtonClickHandler(ApplicationConfiguration applicationConfiguration, SimulationPanel simulationPanel, Manager manager, UIEventQueue uiEventQueue)  {
+    public OpenFileButtonClickHandler(ApplicationConfiguration applicationConfiguration, SimulationPanel simulationPanel, SimulationController simulationController, UIEventQueue uiEventQueue)  {
         this.simulationPanel = simulationPanel;
-        this.manager = manager;
+        this.simulationController = simulationController;
         this.uiEventQueue = uiEventQueue;
         JFileChooser fileChooser=new JFileChooser();
         URL resource = getClass().getResource(TXT_FILES_DIR);
@@ -64,7 +64,7 @@ private UIEventQueue uiEventQueue;
 
     @Override
     public void handleEvent(UIEvent uiEvent){
-        boolean wasPaused = manager.pause();
+        boolean wasPaused = simulationController.pauseSimulation();
         int optionChooser= fileChoosingWindow.showOpenDialog(null);
 
         if (optionChooser==JFileChooser.APPROVE_OPTION){
@@ -72,7 +72,7 @@ private UIEventQueue uiEventQueue;
         }
 
         if (!wasPaused){
-            manager.resumeSimulation();
+            simulationController.startSimulation();
         }
     }
 
@@ -104,7 +104,7 @@ private UIEventQueue uiEventQueue;
                  applicationConfiguration.setNumberOfQueues(lastQueueIndex+1);
              }
 
-         manager.restart(0, timeTable);
+         simulationController.restart(0, timeTable);
     }
     
     protected SortedSet<ClientArrivalEventDTO> processTimeTable(SortedSet<ClientArrivalEventDTO> tt) {

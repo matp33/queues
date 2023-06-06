@@ -14,7 +14,7 @@ import events.UIEventQueue;
 import utilities.ExpressionAnalyzer;
 import spring2.Bean;
 import simulation.ApplicationConfiguration;
-import simulation.Manager;
+import simulation.SimulationController;
 import simulation.Simulation;
 import view.RestartSimulationPanel;
 import view.SimulationPanel;
@@ -38,7 +38,7 @@ public class RestartButtonClickHandler implements UIEventHandler {
 
     private RestartSimulationPanel restartSimulationPanel;
 
-    private Manager manager;
+    private SimulationController simulationController;
 
     private SimulationPanel simulationPanel;
 
@@ -48,12 +48,12 @@ public class RestartButtonClickHandler implements UIEventHandler {
 
     }
 
-    public RestartButtonClickHandler(UIEventQueue uiEventQueue, ApplicationConfiguration applicationConfiguration, RestartSimulationPanel restartSimulationPanel, Manager manager, SimulationPanel simulationPanel){
+    public RestartButtonClickHandler(UIEventQueue uiEventQueue, ApplicationConfiguration applicationConfiguration, RestartSimulationPanel restartSimulationPanel, SimulationController simulationController, SimulationPanel simulationPanel){
 
         this.uiEventQueue = uiEventQueue;
         this.applicationConfiguration = applicationConfiguration;
         this.restartSimulationPanel = restartSimulationPanel;
-        this.manager = manager;
+        this.simulationController = simulationController;
         this.simulationPanel = simulationPanel;
         uiEventQueue.subscribeToEvents(this, UIEventType.RESTART_BUTTON_CLICK);
 
@@ -65,7 +65,7 @@ public class RestartButtonClickHandler implements UIEventHandler {
     public void handleEvent(UIEvent<?> uiEvent) {
         JPanel panel = restartSimulationPanel.getPanel();
 
-        manager.pause();
+        simulationController.pauseSimulation();
         int chosenOption= simulationPanel.displayWindowWithPanel(panel, Simulation.TITLE_FROM_BEGINNING);
 
         if (chosenOption==JOptionPane.NO_OPTION){
@@ -77,13 +77,13 @@ public class RestartButtonClickHandler implements UIEventHandler {
             if (restartSimulationPanel.getRestartOptionActive().equals(RestartOption.FROM_SELECTED_TIME)) {
                 ValidationResult validationResult = validate();
                 if (validationResult.valid){
-                    manager.restart(validationResult.time);
+                    simulationController.restart(validationResult.time);
                     restartSimulationPanel.hideError();
                 }
 
             }
             else{
-                manager.restart(0);
+                simulationController.restart(0);
 
             }
 

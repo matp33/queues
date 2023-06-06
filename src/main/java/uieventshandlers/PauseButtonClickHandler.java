@@ -6,19 +6,19 @@ import events.UIEventHandler;
 import events.UIEvent;
 import events.UIEventQueue;
 import spring2.Bean;
-import simulation.Manager;
+import simulation.SimulationController;
 
 @Bean
 public class PauseButtonClickHandler implements UIEventHandler {
 
     private boolean isSimulationPaused = false;
 
-    private Manager manager;
+    private SimulationController simulationController;
 
     private UIEventQueue uiEventQueue;
 
-    public PauseButtonClickHandler(Manager manager, UIEventQueue uiEventQueue) {
-        this.manager = manager;
+    public PauseButtonClickHandler(SimulationController simulationController, UIEventQueue uiEventQueue) {
+        this.simulationController = simulationController;
         this.uiEventQueue = uiEventQueue;
         this.uiEventQueue.subscribeToEvents(this, UIEventType.PAUSE_BUTTON_CLICK);
 
@@ -27,12 +27,12 @@ public class PauseButtonClickHandler implements UIEventHandler {
     @Override
     public void handleEvent(UIEvent<?> uiEvent) {
         if (!isSimulationPaused){
-            manager.pause();
+            simulationController.pauseSimulation();
             isSimulationPaused = true;
 
         }
         else{
-            manager.resumeSimulation();
+            simulationController.startSimulation();
             isSimulationPaused = false;
         }
     }
