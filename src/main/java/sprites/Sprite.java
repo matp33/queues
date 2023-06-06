@@ -17,6 +17,8 @@ public class Sprite {
     private final int numberOfColumns;
     private final String spriteFileName;
 
+    private final boolean loop;
+
     /**
      * 
      * @param width A single sprite width
@@ -27,8 +29,13 @@ public class Sprite {
      */
     public Sprite (int width,int height, String spriteFileName)
                                                             throws IOException{
-    	this.spriteFileName = spriteFileName;
-    	System.out.println(spriteFileName +" wi "+width +" he "+height);
+    	this(width, height, spriteFileName, false);
+    }
+
+    public Sprite (int width,int height, String spriteFileName, boolean loop)
+            throws IOException{
+        this.spriteFileName = spriteFileName;
+        System.out.println(spriteFileName +" wi "+width +" he "+height);
         URL resource = getClass().getResource("/images" + spriteFileName);
         assert resource != null;
         spriteFile=ImageIO.read(new File(resource.getPath()));
@@ -36,6 +43,11 @@ public class Sprite {
         numberOfRows=spriteFile.getHeight()/height;
         SPRITE_DIMENSION_HORIZONTAL=width;
         SPRITE_DIMENSION_VERTICAL=height;
+        this.loop = loop;
+    }
+
+    public boolean isLoop() {
+        return loop;
     }
 
     public int getHeight() {

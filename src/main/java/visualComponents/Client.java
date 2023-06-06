@@ -135,6 +135,9 @@ public Client(int clientId, int queueNumber, int clientNumber, double arrivalTim
 			currentAnimation.updateFrame();
 			position=new Point(point.x, point.y);
 		}
+		else{
+			currentAnimation.setLastFrame();
+		}
 
 	}
 

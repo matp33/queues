@@ -23,7 +23,7 @@ public class SpriteManager {
         try {
             doorSprite = new Sprite (43, 69, "/door2.png");
             backgroundSprite=new Sprite(620,395,"/supermarket-kolejka.jpg");
-            clientSprite = new Sprite (30, 45, "/sprite.png");
+            clientSprite = new Sprite (30, 45, "/sprite.png", true);
             storeCheckoutSprite = new Sprite (106, 58, "/kasa.png");
 
             sprites.put(Door.class, doorSprite);

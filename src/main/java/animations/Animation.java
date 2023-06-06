@@ -16,12 +16,13 @@ public class Animation {
     private int numberOfFrames;
 
     private boolean isStopped;
-    private List<Frame> framesList= new ArrayList<Frame>();
+    private List<Frame> framesList= new ArrayList<>();
 
     private String name;
 
-    public Animation(String name, BufferedImage [] frames, int delay) {
+    private boolean loop;
 
+    public Animation(String name, BufferedImage [] frames, int delay, boolean loop) {
         this.name = name;
         this.frameDelay=delay;
         isStopped=true;
@@ -36,10 +37,10 @@ public class Animation {
         this.currentFrame=0;
         this.animationDirection=1;
         this.numberOfFrames=this.framesList.size();
-
+        this.loop = loop;
     }
 
-    public void start(){
+        public void start(){
         if (!isStopped){
             return;
         }
@@ -59,20 +60,7 @@ public class Animation {
         isStopped=true;
     }
 
-    public void restart(){
-        if (framesList.size()==0){
-            return;
-        }
-        isStopped=false;
-        currentFrame=0;
-    }
 
-    public void reset(){
-        isStopped=true;
-        frameCounter=0;
-        currentFrame=0;
-    }
-    
     public void reverseDirection(){
     	if (animationDirection==1)
     	animationDirection=-1;
@@ -102,23 +90,26 @@ public class Animation {
                 frameCounter=0;
                 currentFrame+=animationDirection;
                 if(currentFrame>numberOfFrames-1){
-                    isStopped = true;
+                    if (loop){
+                        currentFrame = 0;
+                    }
+                    else{
+                        isStopped = true;
+                    }
                 }
                 else if (currentFrame==0){
-                    isStopped = true;
+                    if (loop){
+                        currentFrame = numberOfFrames - 1;
+                    }
+                    else{
+                        isStopped= true;
+                    }
                 }
             }
         }
     }
 
-  public int getAnimationDelay(){
-      return frameDelay;
-  }
-  
-  public boolean isInitialFrame(){
-	  return currentFrame==0;
-  }
-  
+
   public boolean isFinalFrame(){
 //	  System.out.println("###"+currentFrame);
 	  return currentFrame==numberOfFrames-1;
@@ -127,7 +118,7 @@ public class Animation {
   public int getCurrentFrame(){
 	  return currentFrame;
   }
-  
+
   public void setLastFrame(){
 	  int size=framesList.size();
 	  currentFrame=size-1;

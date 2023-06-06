@@ -13,7 +13,7 @@ import sprites.Sprite;
 public abstract class AnimatedObject extends JComponent implements ChangeableObject {
 	
 	private static final long serialVersionUID = 1L;
-	private static final int frameDelay=20;
+	private static final int frameDelay= 5;
 	protected final Sprite sprite;
 
 	protected Animation [] animations;
@@ -39,7 +39,7 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 
 		for (int i=0; i<sprite.getNumberOfRows(); i++ ){
 //					System.out.println("i "+i);
-				animations[i]=new Animation(sprite.getSpriteFileName(),sprite.getSprite(i), frameDelay);
+				animations[i]=new Animation(sprite.getSpriteFileName(),sprite.getSprite(i), frameDelay, sprite.isLoop());
 
 		}
 		max=animations.length;
