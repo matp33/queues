@@ -1,6 +1,6 @@
-package symulation;
+package dto;
 
-public class ClientArrivalEvent {
+public class ClientArrivalEventDTO {
 
     private double arrivalTime;
 
@@ -8,7 +8,7 @@ public class ClientArrivalEvent {
 
     private double timeInCheckout;
 
-    public ClientArrivalEvent(double timeInCheckout, double arrivalTime, int queueNumber) {
+    public ClientArrivalEventDTO(double timeInCheckout, double arrivalTime, int queueNumber) {
         this.arrivalTime = arrivalTime;
         this.queueNumber = queueNumber;
         this.timeInCheckout = timeInCheckout;

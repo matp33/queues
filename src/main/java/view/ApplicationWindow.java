@@ -1,8 +1,6 @@
 package view;
 
 import spring2.Bean;
-import symulation.ApplicationConfiguration;
-import symulation.CustomLayout;
 
 import javax.swing.*;
 import java.awt.*;

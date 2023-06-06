@@ -1,5 +1,5 @@
 
-package symulation;
+package simulation;
 
 import java.awt.*;
 import java.util.*;
@@ -8,9 +8,10 @@ import java.util.List;
 import constants.ClientPositionType;
 import core.MainLoop;
 import clienthandling.ClientEventsHandler;
-import otherFunctions.ObjectsManager;
-import otherFunctions.ClientAction;
-import otherFunctions.ClientMovement;
+import core.ObjectsManager;
+import dto.ClientActionDTO;
+import dto.ClientArrivalEventDTO;
+import utilities.ClientMovement;
 import spring2.Bean;
 import visualComponents.Client;
 
@@ -34,25 +35,25 @@ public class Simulation {
 
 	private ObjectsManager objectsManager;
 
-	private CustomLayout customLayout;
+	private AppLayoutManager appLayoutManager;
 
-	public Simulation(ClientEventsHandler clientEventsHandler, ClientMovement clientMovement, MainLoop mainLoop, ObjectsManager objectsManager, CustomLayout customLayout) {
+	public Simulation(ClientEventsHandler clientEventsHandler, ClientMovement clientMovement, MainLoop mainLoop, ObjectsManager objectsManager, AppLayoutManager appLayoutManager) {
 		this.clientEventsHandler = clientEventsHandler;
 		this.clientMovement = clientMovement;
 		this.mainLoop = mainLoop;
 		this.objectsManager = objectsManager;
-		this.customLayout = customLayout;
+		this.appLayoutManager = appLayoutManager;
 	}
 
-	public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
+	public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS)  {
 
-		ClientAction clientAction;
+		ClientActionDTO clientActionDTO;
    		clientId = 0;
 
 		Map<Integer, List<Client>> queueIndexToClientsInQueueMap = new HashMap<>();
-		SortedSet<ClientAction> clientActions = new TreeSet<>();
-		ClientArrivalEvent lastArrival =  clientArrivalEvents.stream().max(Comparator.comparing(ClientArrivalEvent::getArrivalTime)).orElseThrow(()->new IllegalArgumentException("simulation events empty"));
-		for (ClientArrivalEvent event : clientArrivalEvents) {
+		SortedSet<ClientActionDTO> clientActionDTOS = new TreeSet<>();
+		ClientArrivalEventDTO lastArrival =  clientArrivalEventDTOS.stream().max(Comparator.comparing(ClientArrivalEventDTO::getArrivalTime)).orElseThrow(()->new IllegalArgumentException("simulation events empty"));
+		for (ClientArrivalEventDTO event : clientArrivalEventDTOS) {
 			double arrivalTime = event.getArrivalTime();
 			int queueNumber = event.getQueueNumber();
 			List<Client> clients = queueIndexToClientsInQueueMap.computeIfAbsent(queueNumber, index -> new ArrayList<>());
@@ -63,31 +64,31 @@ public class Simulation {
 			objectsManager.addVisibleClient(client);
 
 
-			clientAction = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,
+			clientActionDTO = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,
 					clients.size());
 
 			mainLoop.addObject(client);
-			clientActions.add(clientAction);
+			clientActionDTOS.add(clientActionDTO);
 			if (event == lastArrival) {
-				clientAction = new ClientAction(arrivalTime,
+				clientActionDTO = new ClientActionDTO(arrivalTime,
 						ClientPositionType.PAUSE, null);
-				clientActions.add(clientAction);
+				clientActionDTOS.add(clientActionDTO);
 			}
 		}
-		clientEventsHandler.setEventsList(clientActions);
+		clientEventsHandler.setEventsList(clientActionDTOS);
 
     }
 
-	private ClientAction createClientAction(Client client, int queueNumber, double arrivalTime,
-										   double simulationStartTime, int peopleInQueue){
+	private ClientActionDTO createClientAction(Client client, int queueNumber, double arrivalTime,
+											   double simulationStartTime, int peopleInQueue){
 	
 		// TODO this is too similar method to calculateAppearTime check it
 		
 		
-		Point pointInitial=customLayout.calculateClientDestinationCoordinates(0, 0, ClientPositionType.ARRIVAL);
-		Point pointWaitPlace=customLayout.calculateClientDestinationCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
+		Point pointInitial= appLayoutManager.calculateClientDestinationCoordinates(0, 0, ClientPositionType.ARRIVAL);
+		Point pointWaitPlace= appLayoutManager.calculateClientDestinationCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
 
-		Point pointInQueue=customLayout.calculateClientDestinationCoordinates(peopleInQueue,
+		Point pointInQueue= appLayoutManager.calculateClientDestinationCoordinates(peopleInQueue,
                              queueNumber, ClientPositionType.GOING_TO_QUEUE);
         Point calculatedPosition = clientMovement.calculateCoordinates(pointInQueue, pointInitial,
         								arrivalTime);
@@ -98,7 +99,7 @@ public class Simulation {
 		if (calculatedPosition.equals(pointInQueue)){
 			positionType = ClientPositionType.GOING_TO_QUEUE;
 			client.saveInformation(calculatedPosition, positionType);
-			return new ClientAction(arrivalTime, positionType, client);
+			return new ClientActionDTO(arrivalTime, positionType, client);
 		}
 		
 	    if (arrivalTime<0){
@@ -121,7 +122,7 @@ public class Simulation {
 			throw new IllegalArgumentException("Unexpected situation happened");
 		}
 		client.saveInformation(calculatedPosition, positionType);
-		return new ClientAction(time, positionType, client);
+		return new ClientActionDTO(time, positionType, client);
 	}
 
 

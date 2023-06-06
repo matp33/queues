@@ -1,11 +1,10 @@
-package otherFunctions;
+package core;
 
 import constants.PositionInQueueToExit;
-import core.MainLoop;
 import dto.ClientToExitDTO;
 import spring2.Bean;
-import symulation.ApplicationConfiguration;
-import symulation.CustomLayout;
+import simulation.ApplicationConfiguration;
+import simulation.AppLayoutManager;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;
@@ -32,24 +31,24 @@ public class ObjectsManager {
 
     private Set<Client> visibleClients = new HashSet<>();
 
-    private CustomLayout customLayout;
+    private AppLayoutManager appLayoutManager;
 
-    public ObjectsManager(ApplicationConfiguration applicationConfiguration, MainLoop mainLoop, CustomLayout customLayout) {
+    public ObjectsManager(ApplicationConfiguration applicationConfiguration, MainLoop mainLoop, AppLayoutManager appLayoutManager) {
         this.applicationConfiguration = applicationConfiguration;
         this.mainLoop = mainLoop;
-        this.customLayout = customLayout;
+        this.appLayoutManager = appLayoutManager;
     }
 
     public void initializeObjects (){
         this.door = new Door();
-        Point position = customLayout.calculateDoorPosition();
+        Point position = appLayoutManager.calculateDoorPosition();
         door.setPosition(position);
         mainLoop.addObject(door);
         int numberOfQueues = applicationConfiguration.getNumberOfQueues();
         for (int i=0;i<numberOfQueues;i++){
             StoreCheckout checkout = new StoreCheckout(i);
-            Point queueIndicatorPosition = customLayout.calculateQueueIndicatorPosition(i);
-            Point checkoutPosition = customLayout.calculateCheckoutPosition(i);
+            Point queueIndicatorPosition = appLayoutManager.calculateQueueIndicatorPosition(i);
+            Point checkoutPosition = appLayoutManager.calculateCheckoutPosition(i);
             checkout.initializePosition(queueIndicatorPosition, checkoutPosition);
             mainLoop.addObject(checkout);
             storeCheckouts.add(checkout);

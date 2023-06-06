@@ -1,17 +1,17 @@
-package symulation;
+package simulation;
 
 import clienthandling.ClientEventsHandler;
 import core.MainLoop;
+import dto.ClientArrivalEventDTO;
 import events.*;
 
 import java.util.SortedSet;
 
-import otherFunctions.ObjectsManager;
+import core.ObjectsManager;
 import spring2.Bean;
 import view.NavigationPanel;
 import view.SimulationPanel;
 import visualComponents.Indicator;
-import visualComponents.OutsideWorld;
 
 @Bean
 public class Manager {
@@ -21,7 +21,6 @@ public class Manager {
 
 	private NavigationPanel navigationPanel;
 
-	public OutsideWorld outside;
 	public Indicator waitingRoomIndicator;
 
 	private int numberOfQueues;
@@ -35,7 +34,7 @@ public class Manager {
 
 	private final ClientEventsHandler clientEventsHandler;
 
-	private SortedSet<ClientArrivalEvent> timeTable;
+	private SortedSet<ClientArrivalEventDTO> timeTable;
 
 	private SimulationPanel simulationPanel;
 
@@ -49,14 +48,13 @@ public class Manager {
 		this.clientEventsHandler = clientEventsHandler;
 		this.simulationPanel = simulationPanel;
 
-		outside = new OutsideWorld();
 		 this.waitingRoomIndicator = waitingRoomIndicator;
 
 		this.numberOfQueues=applicationConfiguration.getNumberOfQueues();
 
 	}
 
-	public void restart(double time, SortedSet<ClientArrivalEvent> timeTable) {
+	public void restart(double time, SortedSet<ClientArrivalEventDTO> timeTable) {
 		
 		clean();
 		objectsManager.initializeObjects();
@@ -75,15 +73,15 @@ public class Manager {
 	}
 
 
-	public void doSimulation (double time, SortedSet<ClientArrivalEvent> clientArrivalEvents)  {
-		this.timeTable = clientArrivalEvents;
+	public void doSimulation (double time, SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS)  {
+		this.timeTable = clientArrivalEventDTOS;
 		applicationConfiguration.setSimulationTime(timeTable.last().getArrivalTime());
 
 		mainLoop.setTimePassed (time);
     	waitingRoomIndicator.clear();
     	
         navigationPanel.setButtonRestartToActive();
-        simulation.prepareSimulation(time,clientArrivalEvents);
+        simulation.prepareSimulation(time, clientArrivalEventDTOS);
 
 		resumeSimulation();
 

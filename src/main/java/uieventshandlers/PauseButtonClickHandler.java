@@ -6,7 +6,7 @@ import events.UIEventHandler;
 import events.UIEvent;
 import events.UIEventQueue;
 import spring2.Bean;
-import symulation.Manager;
+import simulation.Manager;
 
 @Bean
 public class PauseButtonClickHandler implements UIEventHandler {

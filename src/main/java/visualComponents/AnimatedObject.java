@@ -1,4 +1,4 @@
-package interfaces;
+package visualComponents;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

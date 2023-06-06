@@ -11,11 +11,11 @@ import constants.UIEventType;
 import events.UIEventHandler;
 import events.UIEvent;
 import events.UIEventQueue;
-import otherFunctions.ExpressionAnalyzer;
+import utilities.ExpressionAnalyzer;
 import spring2.Bean;
-import symulation.ApplicationConfiguration;
-import symulation.Manager;
-import symulation.Simulation;
+import simulation.ApplicationConfiguration;
+import simulation.Manager;
+import simulation.Simulation;
 import view.RestartSimulationPanel;
 import view.SimulationPanel;
 

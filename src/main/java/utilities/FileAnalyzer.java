@@ -1,8 +1,8 @@
 
 
-package otherFunctions;
+package utilities;
 
-import symulation.ClientArrivalEvent;
+import dto.ClientArrivalEventDTO;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,12 +10,12 @@ import java.util.*;
 
 public class FileAnalyzer {
 
-    public static SortedSet<ClientArrivalEvent> analyze(File file) throws IOException{
+    public static SortedSet<ClientArrivalEventDTO> analyze(File file) throws IOException{
         
         Scanner s=new Scanner(file);
 
         ArrayList <double[]> timeTable= new ArrayList <double[]> ();
-        SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
+        SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS = new TreeSet<>(Comparator.comparing(ClientArrivalEventDTO::getArrivalTime));
 
         if (!s.hasNextLine()){
         	s.close();
@@ -53,12 +53,12 @@ public class FileAnalyzer {
 
         for (int i=0; i<amount;i++){            
             double [] words =  timeTable.get(i);
-            clientArrivalEvents.add(new ClientArrivalEvent(words[2], words[0], (int)words[1]));
+            clientArrivalEventDTOS.add(new ClientArrivalEventDTO(words[2], words[0], (int)words[1]));
 
         }
 
         s.close();
-        return clientArrivalEvents;
+        return clientArrivalEventDTOS;
         
         
     }

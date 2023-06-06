@@ -3,7 +3,7 @@ package core;
 import constants.UIEventType;
 import events.UIEvent;
 import events.UIEventQueue;
-import interfaces.AnimatedObject;
+import visualComponents.AnimatedObject;
 import spring2.Bean;
 import view.SimulationPanel;
 

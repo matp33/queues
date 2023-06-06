@@ -1,7 +1,7 @@
 import spring2.Bean;
 import spring2.BeanScanner;
-import symulation.ApplicationConfiguration;
-import symulation.ApplicationInitializer;
+import simulation.ApplicationConfiguration;
+import simulation.ApplicationInitializer;
 import tests.RegularTests;
 import view.ApplicationWindow;
 

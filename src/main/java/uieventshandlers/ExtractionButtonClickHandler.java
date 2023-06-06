@@ -14,9 +14,9 @@ import javax.swing.JPanel;
 import constants.UIEventType;
 import events.UIEventQueue;
 import spring2.Bean;
-import symulation.ApplicationConfiguration;
-import symulation.ClientArrivalEvent;
-import symulation.Manager;
+import simulation.ApplicationConfiguration;
+import dto.ClientArrivalEventDTO;
+import simulation.Manager;
 import view.SimulationPanel;
 
 @Bean
@@ -38,7 +38,7 @@ public class ExtractionButtonClickHandler extends OpenFileButtonClickHandler {
 	}
 
 	@Override
-    protected SortedSet<ClientArrivalEvent> processTimeTable(SortedSet<ClientArrivalEvent> timetable){
+    protected SortedSet<ClientArrivalEventDTO> processTimeTable(SortedSet<ClientArrivalEventDTO> timetable){
     	
     	int number= findLastQueueIndex(timetable);
     	List<Integer> chosenQueues=makeDialog(number);
@@ -80,14 +80,14 @@ public class ExtractionButtonClickHandler extends OpenFileButtonClickHandler {
     	return numbers;
     }
     
-    private SortedSet<ClientArrivalEvent> extractQueues(SortedSet<ClientArrivalEvent> table, List<Integer> chosenQueues){
+    private SortedSet<ClientArrivalEventDTO> extractQueues(SortedSet<ClientArrivalEventDTO> table, List<Integer> chosenQueues){
 
 
-		return table.stream().filter(event->chosenQueues.contains( event.getQueueNumber())).collect(Collectors.toCollection(()->new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime))));
+		return table.stream().filter(event->chosenQueues.contains( event.getQueueNumber())).collect(Collectors.toCollection(()->new TreeSet<>(Comparator.comparing(ClientArrivalEventDTO::getArrivalTime))));
     }
     
-    private int findLastQueueIndex(SortedSet<ClientArrivalEvent> timeTable){
-    	return timeTable.stream().max(Comparator.comparing(ClientArrivalEvent::getQueueNumber)).map(ClientArrivalEvent::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"))+1;
+    private int findLastQueueIndex(SortedSet<ClientArrivalEventDTO> timeTable){
+    	return timeTable.stream().max(Comparator.comparing(ClientArrivalEventDTO::getQueueNumber)).map(ClientArrivalEventDTO::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"))+1;
     }
 
 }

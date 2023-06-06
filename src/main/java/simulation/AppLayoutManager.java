@@ -1,6 +1,6 @@
 
 
-package symulation;
+package simulation;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,7 +16,7 @@ import visualComponents.Door;
 import visualComponents.StoreCheckout;
 
 @Bean
-public class CustomLayout {
+public class AppLayoutManager {
 
     private final int minimumWindowHeight=700;
     private final int horizontalPadding =10;

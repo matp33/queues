@@ -1,8 +1,8 @@
 package view;
 
-import interfaces.AnimatedObject;
+import visualComponents.AnimatedObject;
 import spring2.Bean;
-import symulation.CustomLayout;
+import simulation.AppLayoutManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,9 +13,9 @@ import java.util.List;
 public class SimulationPanel extends JPanel {
 
     private List<AnimatedObject> objects = new ArrayList<>();
-    private CustomLayout layout;
+    private AppLayoutManager layout;
 
-    public SimulationPanel(CustomLayout layout) {
+    public SimulationPanel(AppLayoutManager layout) {
         this.layout = layout;
         setFont(new Font("Times new roman", Font.PLAIN, 25));
     }

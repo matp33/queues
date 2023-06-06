@@ -4,8 +4,8 @@ import constants.PositionInQueueToExit;
 import dto.ClientToExitDTO;
 import dto.PointWithTimeAndQueueIndexDTO;
 import dto.PointWithTimeDTO;
-import otherFunctions.ObjectsManager;
-import otherFunctions.ClientMovement;
+import core.ObjectsManager;
+import utilities.ClientMovement;
 import spring2.Bean;
 import visualComponents.Client;
 

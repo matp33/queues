@@ -1,6 +1,6 @@
 
 
-package otherFunctions;
+package utilities;
 
 public class ExpressionAnalyzer {
 

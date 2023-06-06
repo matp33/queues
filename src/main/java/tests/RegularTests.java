@@ -1,8 +1,9 @@
 
 package tests;
 
+import dto.ClientArrivalEventDTO;
 import spring2.Bean;
-import symulation.*;
+import simulation.*;
 
 import java.util.*;
 
@@ -36,14 +37,14 @@ public class RegularTests {
 
             applicationConfiguration.setNumberOfQueues(numberOfQueues);
 
-            SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime).thenComparing(ClientArrivalEvent::getQueueNumber));
+            SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS = new TreeSet<>(Comparator.comparing(ClientArrivalEventDTO::getArrivalTime).thenComparing(ClientArrivalEventDTO::getQueueNumber));
 
             for (int i=0; i<numberOfClients;i++){
                 int queueNumber = i%4; // new Random().nextInt(numberOfQueues);
                 double timeInQueue = 1; //generateRandomTimeInQueue();
-                clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, i/4, queueNumber));
+                clientArrivalEventDTOS.add(new ClientArrivalEventDTO(timeInQueue, i/4, queueNumber));
             }
-            manager.doSimulation(0.0, clientArrivalEvents);
+            manager.doSimulation(0.0, clientArrivalEventDTOS);
 
 
 
@@ -59,11 +60,11 @@ public class RegularTests {
     public void test1ClientPerQueue(int numberOfQueues) {
     	double time = 1.5;
         applicationConfiguration.setNumberOfQueues(numberOfQueues);
-        SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
+        SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS = new TreeSet<>(Comparator.comparing(ClientArrivalEventDTO::getArrivalTime));
 
         for (int i=0; i<numberOfQueues; i++){
             double timeInQueue = generateRandomTimeInQueue();
-            clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, time, i));
+            clientArrivalEventDTOS.add(new ClientArrivalEventDTO(timeInQueue, time, i));
 
         }
 //    	for (int i=4; i<6; i++){
@@ -74,7 +75,7 @@ public class RegularTests {
 //    	}
 
 
-        manager.doSimulation(0.0, clientArrivalEvents);
+        manager.doSimulation(0.0, clientArrivalEventDTOS);
 
     }
 
@@ -97,14 +98,14 @@ public class RegularTests {
 //            ex.printStackTrace();
 //        }
         int arrivingClients=2;
-        SortedSet<ClientArrivalEvent> clientArrivalEvents = new TreeSet<>(Comparator.comparing(ClientArrivalEvent::getArrivalTime));
+        SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS = new TreeSet<>(Comparator.comparing(ClientArrivalEventDTO::getArrivalTime));
         double timeInQueue = generateRandomTimeInQueue();
 
         for (int i=0; i<arrivingClients;i++){
-            clientArrivalEvents.add(new ClientArrivalEvent(timeInQueue, 6+i*arrivalDelay, numberOfQueues-1));
+            clientArrivalEventDTOS.add(new ClientArrivalEventDTO(timeInQueue, 6+i*arrivalDelay, numberOfQueues-1));
         }
 
-        manager.doSimulation(0.0, clientArrivalEvents);
+        manager.doSimulation(0.0, clientArrivalEventDTOS);
 
 
 

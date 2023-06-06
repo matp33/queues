@@ -1,8 +1,6 @@
 package visualComponents;
 
 
-import interfaces.AnimatedObject;
-
 import java.util.TimerTask;
 
 public class Door extends AnimatedObject {

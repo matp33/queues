@@ -1,7 +1,5 @@
 package visualComponents;
 
-import interfaces.AnimatedObject;
-
 import java.awt.*;
 
 public class StoreCheckout extends AnimatedObject {

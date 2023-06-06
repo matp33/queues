@@ -1,4 +1,4 @@
-package symulation;
+package simulation;
 
 import spring2.Bean;
 

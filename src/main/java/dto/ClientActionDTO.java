@@ -1,18 +1,16 @@
-package otherFunctions;
+package dto;
 
 
 import constants.ClientPositionType;
 import visualComponents.Client;
 
-import java.util.Comparator;
-
-public class ClientAction implements Comparable<ClientAction> {
+public class ClientActionDTO implements Comparable<ClientActionDTO> {
     private double time;
     private ClientPositionType clientPositionType;
     private Client client;
    
 
-    public ClientAction (double time, ClientPositionType clientPositionType, Client client){
+    public ClientActionDTO(double time, ClientPositionType clientPositionType, Client client){
         this.time=time;
         this.clientPositionType = clientPositionType;
         this.client=client;
@@ -30,7 +28,7 @@ public class ClientAction implements Comparable<ClientAction> {
     }
 
     @Override
-    public int compareTo(ClientAction o) {
+    public int compareTo(ClientActionDTO o) {
         int timeCompareResult = Double.compare(time, o.getTime());
         if (client == null || o.getClient()==null){
             return timeCompareResult;

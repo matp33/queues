@@ -1,11 +1,11 @@
-package otherFunctions;
+package utilities;
 
-public class Direction {
+public class MoveDirection {
 	
 	private int horizontalDirection;
 	private int verticalDirection;
 	
-	public Direction (int verticalDirection, int horizontalDirection){
+	public MoveDirection(int verticalDirection, int horizontalDirection){
 		this.verticalDirection=verticalDirection;
 		this.horizontalDirection=horizontalDirection;
 	}

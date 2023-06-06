@@ -15,11 +15,11 @@ import constants.UIEventType;
 import events.UIEventHandler;
 import events.UIEvent;
 import events.UIEventQueue;
-import otherFunctions.FileAnalyzer;
+import utilities.FileAnalyzer;
 import spring2.Bean;
-import symulation.ApplicationConfiguration;
-import symulation.ClientArrivalEvent;
-import symulation.Manager;
+import simulation.ApplicationConfiguration;
+import dto.ClientArrivalEventDTO;
+import simulation.Manager;
 import view.SimulationPanel;
 
 @Bean
@@ -80,7 +80,7 @@ private UIEventQueue uiEventQueue;
     private void analyze() {
     	
     	File selectedFile = fileChoosingWindow.getSelectedFile();                 
-        SortedSet<ClientArrivalEvent> timeTable= new TreeSet<>();
+        SortedSet<ClientArrivalEventDTO> timeTable= new TreeSet<>();
         
         try {
            timeTable = FileAnalyzer.analyze(selectedFile);
@@ -96,7 +96,7 @@ private UIEventQueue uiEventQueue;
          
 
 
-        Integer lastQueueIndex = timeTable.stream().max(Comparator.comparing(ClientArrivalEvent::getQueueNumber)).map(ClientArrivalEvent::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"));
+        Integer lastQueueIndex = timeTable.stream().max(Comparator.comparing(ClientArrivalEventDTO::getQueueNumber)).map(ClientArrivalEventDTO::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"));
 
          timeTable=processTimeTable(timeTable);
 
@@ -107,7 +107,7 @@ private UIEventQueue uiEventQueue;
          manager.restart(0, timeTable);
     }
     
-    protected SortedSet<ClientArrivalEvent> processTimeTable(SortedSet<ClientArrivalEvent> tt) {
+    protected SortedSet<ClientArrivalEventDTO> processTimeTable(SortedSet<ClientArrivalEventDTO> tt) {
     	return tt;
     }
 

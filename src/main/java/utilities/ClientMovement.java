@@ -1,11 +1,12 @@
 
 
-package otherFunctions;
+package utilities;
 
 import constants.PositionInQueueToExit;
 import core.MainLoop;
+import core.ObjectsManager;
 import dto.PointWithTimeDTO;
-import interfaces.AnimatedObject;
+import visualComponents.AnimatedObject;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -23,7 +24,7 @@ public class ClientMovement {
 
     public static final int DISTANCE_TO_DOOR_VERTICAL = 20;
 
-    private  ObjectsManager objectsManager;
+    private ObjectsManager objectsManager;
 
     private MainLoop mainLoop;
 
@@ -95,7 +96,7 @@ public class ClientMovement {
     
     List <StoreCheckout> objectsOnTheWay = new ArrayList <>();
     Rectangle clientTrajectory = new Rectangle(minOfRangeX, minOfRangeY, rectangleWidth, rectangleHeight);
-    Direction movingDirection = chooseWhichWayToGo(new Point (newXCoord, newYCoord), coordinates);
+    MoveDirection movingMoveDirection = chooseWhichWayToGo(new Point (newXCoord, newYCoord), coordinates);
     Set<StoreCheckout> storeCheckouts = objectsManager.getStoreCheckouts();
 
     for (StoreCheckout q: storeCheckouts){
@@ -117,8 +118,8 @@ public class ClientMovement {
         while (Math.abs(newXCoord-coordinates.x)>=stepSize ||
                                 Math.abs(newYCoord-coordinates.y)>=stepSize){
         	
-        	horizontalStep = movingDirection.getHorizontalDirection();
-        	verticalStep = movingDirection.getVerticalDirection();
+        	horizontalStep = movingMoveDirection.getHorizontalDirection();
+        	verticalStep = movingMoveDirection.getVerticalDirection();
         	
         	boolean b=false;
         	boolean c=false;
@@ -152,7 +153,7 @@ public class ClientMovement {
         	if (b==true) counter=0;
         	if (c==true) counter=zigzagLength;
         	if (b==true || c== true){
-        		movingDirection=chooseWhichWayToGo(new Point(newXCoord,newYCoord), coordinates);
+        		movingMoveDirection =chooseWhichWayToGo(new Point(newXCoord,newYCoord), coordinates);
         		continue;
         	}
 
@@ -172,8 +173,8 @@ public class ClientMovement {
                                     
         }
         
-    horizontalStep=movingDirection.getHorizontalDirection();
-    verticalStep=movingDirection.getVerticalDirection();
+    horizontalStep= movingMoveDirection.getHorizontalDirection();
+    verticalStep= movingMoveDirection.getVerticalDirection();
                 
     while (Math.abs(newXCoord-coordinates.x)!=0){
         newXCoord+=horizontalStep/stepSize;
@@ -189,7 +190,7 @@ public class ClientMovement {
 
     }
 
-    public Direction chooseWhichWayToGo (Point start, Point end){
+    public MoveDirection chooseWhichWayToGo (Point start, Point end){
     	
     	int horizontalDirection;
     	int verticalDirection;
@@ -199,7 +200,7 @@ public class ClientMovement {
         if (start.y<end.y) verticalDirection=stepSize;
         else verticalDirection=-1*stepSize;
         
-        return new Direction (verticalDirection, horizontalDirection);
+        return new MoveDirection(verticalDirection, horizontalDirection);
         
     }
 

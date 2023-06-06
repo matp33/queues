@@ -1,7 +1,6 @@
 package visualComponents;
 
 import constants.ClientPositionType;
-import interfaces.AnimatedObject;
 
 import java.awt.*;
 

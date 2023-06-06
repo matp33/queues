@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Bean
 public class SpriteManager {
 
     private static Sprite clientSprite;
