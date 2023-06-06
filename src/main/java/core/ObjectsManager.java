@@ -5,6 +5,7 @@ import dto.ClientToExitDTO;
 import spring2.Bean;
 import simulation.ApplicationConfiguration;
 import simulation.AppLayoutManager;
+import visualComponents.AnimatedObject;
 import visualComponents.Client;
 import visualComponents.Door;
 import visualComponents.StoreCheckout;
@@ -27,15 +28,14 @@ public class ObjectsManager {
 
     private ApplicationConfiguration applicationConfiguration;
 
-    private MainLoop mainLoop;
-
     private Set<Client> visibleClients = new HashSet<>();
 
     private AppLayoutManager appLayoutManager;
 
-    public ObjectsManager(ApplicationConfiguration applicationConfiguration, MainLoop mainLoop, AppLayoutManager appLayoutManager) {
+    private Set<AnimatedObject> animatedObjects = new HashSet<>();
+
+    public ObjectsManager(ApplicationConfiguration applicationConfiguration, AppLayoutManager appLayoutManager) {
         this.applicationConfiguration = applicationConfiguration;
-        this.mainLoop = mainLoop;
         this.appLayoutManager = appLayoutManager;
     }
 
@@ -43,17 +43,21 @@ public class ObjectsManager {
         this.door = new Door();
         Point position = appLayoutManager.calculateDoorPosition();
         door.setPosition(position);
-        mainLoop.addObject(door);
+        animatedObjects.add(door);
         int numberOfQueues = applicationConfiguration.getNumberOfQueues();
         for (int i=0;i<numberOfQueues;i++){
             StoreCheckout checkout = new StoreCheckout(i);
             Point queueIndicatorPosition = appLayoutManager.calculateQueueIndicatorPosition(i);
             Point checkoutPosition = appLayoutManager.calculateCheckoutPosition(i);
             checkout.initializePosition(queueIndicatorPosition, checkoutPosition);
-            mainLoop.addObject(checkout);
+            animatedObjects.add(checkout);
             storeCheckouts.add(checkout);
             clientsInQueue.put(i, new ArrayDeque<>());
         }
+    }
+
+    public Set<AnimatedObject> getAnimatedObjects() {
+        return animatedObjects;
     }
 
     public void addVisibleClient(Client client){
@@ -110,4 +114,8 @@ public class ObjectsManager {
 
     }
 
+    public void removeObjects() {
+
+        animatedObjects.clear();
+    }
 }

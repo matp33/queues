@@ -13,8 +13,6 @@ public class ApplicationInitializer {
 
     private final ObjectsManager objectsManager;
 
-    private final ClientEventsHandler clientEventsHandler;
-
     private final MainLoop mainLoop;
 
     private final Indicator waitingRoomIndicator;
@@ -27,7 +25,6 @@ public class ApplicationInitializer {
 
     public ApplicationInitializer(MainLoop mainLoop, ObjectsManager objectsManager, ClientEventsHandler clientEventsHandler, Indicator waitingRoomIndicator, AppLayoutManager appLayoutManager, ApplicationConfiguration applicationConfiguration, NavigationPanel navigationPanel) {
         this.objectsManager = objectsManager;
-        this.clientEventsHandler = clientEventsHandler;
         this.mainLoop = mainLoop;
         this.waitingRoomIndicator = waitingRoomIndicator;
         this.appLayoutManager = appLayoutManager;
@@ -39,7 +36,7 @@ public class ApplicationInitializer {
         appLayoutManager.initialize(applicationConfiguration.getNumberOfQueues(), navigationPanel.getPanel());
         appLayoutManager.calculateWindowSize(applicationConfiguration.getNumberOfQueues());
         objectsManager.initializeObjects();
-        mainLoop.addObject(clientEventsHandler);
+        objectsManager.getAnimatedObjects().forEach(mainLoop::addObject);
         waitingRoomIndicator.initialize();
     }
 

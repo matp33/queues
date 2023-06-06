@@ -1,5 +1,6 @@
 package core;
 
+import clienthandling.ClientEventsHandler;
 import constants.UIEventType;
 import events.UIEvent;
 import events.UIEventQueue;
@@ -22,17 +23,19 @@ public class MainLoop {
 
     private boolean isPaused = true;
 
-    private double timePassedSeconds = 0;
+    private static double timePassedSeconds = 0;
 
     private SimulationPanel simulationPanel;
 
 
     private UIEventQueue uiEventQueue;
 
+    private ClientEventsHandler clientEventsHandler;
 
-    public MainLoop(SimulationPanel simulationPanel,  UIEventQueue uiEventQueue) {
+    public MainLoop(SimulationPanel simulationPanel, UIEventQueue uiEventQueue, ClientEventsHandler clientEventsHandler) {
         this.simulationPanel = simulationPanel;
         this.uiEventQueue = uiEventQueue;
+        this.clientEventsHandler = clientEventsHandler;
         timer = new Timer();
         timer.scheduleAtFixedRate(mainLoopTask(),0, (int)(DELTA_TIME*1000));
     }
@@ -60,6 +63,7 @@ public class MainLoop {
                     timePassedSeconds +=  DELTA_TIME;
                     changeableObjects.forEach(changeableObject -> changeableObject.update(timePassedSeconds));
                     simulationPanel.repaint();
+                    clientEventsHandler.update(timePassedSeconds);
                     uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.TIME_VALUE_CHANGE, timePassedSeconds));
                 }
 
@@ -67,16 +71,16 @@ public class MainLoop {
         };
     }
 
+    public static double getTimePassed (){
+        return timePassedSeconds;
+    }
+
     public boolean isPaused() {
         return isPaused;
     }
 
-    public double getTimePassedSeconds() {
-        return timePassedSeconds;
-    }
-
-    public void setTimePassed(double timePassedSeconds) {
-        this.timePassedSeconds = timePassedSeconds;
+    public static void setTimePassed(double newValue) {
+        timePassedSeconds = newValue;
     }
 
     public void removeObjects() {

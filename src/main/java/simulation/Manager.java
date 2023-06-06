@@ -32,20 +32,18 @@ public class Manager {
 
 	private final MainLoop mainLoop;
 
-	private final ClientEventsHandler clientEventsHandler;
 
 	private SortedSet<ClientArrivalEventDTO> timeTable;
 
 	private SimulationPanel simulationPanel;
 
-	public Manager(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, ClientEventsHandler clientEventsHandler, SimulationPanel simulationPanel, UIEventQueue uiEventQueue)  {
+	public Manager(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, SimulationPanel simulationPanel)  {
 
 		this.applicationConfiguration = applicationConfiguration;
 		this.simulation = simulation;
 		this.navigationPanel = navigationPanel;
 		this.objectsManager = objectsManager;
 		this.mainLoop = mainLoop;
-		this.clientEventsHandler = clientEventsHandler;
 		this.simulationPanel = simulationPanel;
 
 		 this.waitingRoomIndicator = waitingRoomIndicator;
@@ -56,19 +54,19 @@ public class Manager {
 
 	public void restart(double time, SortedSet<ClientArrivalEventDTO> timeTable) {
 		
-		clean();
+		removeObjects();
 		objectsManager.initializeObjects();
+		objectsManager.getAnimatedObjects().forEach(mainLoop::addObject);
 		doSimulation(time, timeTable);
-		mainLoop.addObject(clientEventsHandler);
-
 	}
 
 	public void restart (double time){
 		restart(time, timeTable);
 	}
 	
-	public void clean(){
-		simulationPanel.clean();
+	public void removeObjects(){
+		objectsManager.removeObjects();
+		simulationPanel.removeObjects();
 		mainLoop.removeObjects();
 	}
 
@@ -77,7 +75,7 @@ public class Manager {
 		this.timeTable = clientArrivalEventDTOS;
 		applicationConfiguration.setSimulationTime(timeTable.last().getArrivalTime());
 
-		mainLoop.setTimePassed (time);
+		MainLoop.setTimePassed (time);
     	waitingRoomIndicator.clear();
     	
         navigationPanel.setButtonRestartToActive();

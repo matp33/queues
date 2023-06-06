@@ -24,9 +24,8 @@ public class SimulationPanel extends JPanel {
         objects.add(a);
     }
 
-    public void clean (){
-        while (objects.size()>0)
-            objects.remove(0);
+    public void removeObjects(){
+        objects.clear();
     }
 
     public void stopSprites() {

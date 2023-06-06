@@ -26,8 +26,6 @@ public class ClientMovement {
 
     private ObjectsManager objectsManager;
 
-    private MainLoop mainLoop;
-
     private static final int stepSize=2;
 
     private static final int zigzagLength=20;
@@ -48,15 +46,14 @@ public class ClientMovement {
     }
 
 
-    public ClientMovement(ObjectsManager objectsManager, MainLoop mainLoop) {
+    public ClientMovement(ObjectsManager objectsManager) {
         this.objectsManager = objectsManager;
-        this.mainLoop = mainLoop;
     }
 
     public PointWithTimeDTO calculateTimeToGetToDoor(Client client){
         Point belowDoor = calculatePositionNextToDoor();
         List<Point> trajectory = moveClient(belowDoor, client);
-        return new PointWithTimeDTO(belowDoor, mainLoop.getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
+        return new PointWithTimeDTO(belowDoor, MainLoop.getTimePassed() + trajectory.size() * MainLoop.DELTA_TIME);
 
     }
 
@@ -77,7 +74,7 @@ public class ClientMovement {
                 break;
         }
         List<Point> trajectory = moveClient(destinationPosition, client);
-        return new PointWithTimeDTO(destinationPosition, mainLoop.getTimePassedSeconds() + trajectory.size() * MainLoop.DELTA_TIME);
+        return new PointWithTimeDTO(destinationPosition, MainLoop.getTimePassed() + trajectory.size() * MainLoop.DELTA_TIME);
     }
 
     public List <Point> moveClient (Point coordinates, Client client){
