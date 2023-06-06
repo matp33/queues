@@ -78,8 +78,6 @@ public class ExtractionButtonClickHandler extends OpenFileButtonClickHandler {
     }
     
     private SortedSet<ClientArrivalEventDTO> extractQueues(SortedSet<ClientArrivalEventDTO> table, List<Integer> chosenQueues){
-
-
 		return table.stream().filter(event->chosenQueues.contains( event.getQueueNumber())).collect(Collectors.toCollection(()->new TreeSet<>(Comparator.comparing(ClientArrivalEventDTO::getArrivalTime))));
     }
     
