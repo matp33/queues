@@ -23,7 +23,7 @@ public class ApplicationInitializer {
 
     private final NavigationPanel navigationPanel;
 
-    public ApplicationInitializer(MainLoop mainLoop, ObjectsManager objectsManager, ClientEventsHandler clientEventsHandler, Indicator waitingRoomIndicator, AppLayoutManager appLayoutManager, ApplicationConfiguration applicationConfiguration, NavigationPanel navigationPanel) {
+    public ApplicationInitializer(MainLoop mainLoop, ObjectsManager objectsManager, Indicator waitingRoomIndicator, AppLayoutManager appLayoutManager, ApplicationConfiguration applicationConfiguration, NavigationPanel navigationPanel) {
         this.objectsManager = objectsManager;
         this.mainLoop = mainLoop;
         this.waitingRoomIndicator = waitingRoomIndicator;

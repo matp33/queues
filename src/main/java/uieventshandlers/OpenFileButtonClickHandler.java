@@ -80,10 +80,21 @@ private UIEventQueue uiEventQueue;
     private void analyze() {
     	
     	File selectedFile = fileChoosingWindow.getSelectedFile();                 
-        SortedSet<ClientArrivalEventDTO> timeTable= new TreeSet<>();
+        SortedSet<ClientArrivalEventDTO> timeTable;
         
         try {
            timeTable = FileAnalyzer.analyze(selectedFile);
+            Integer lastQueueIndex = timeTable.stream().max(Comparator.comparing(ClientArrivalEventDTO::getQueueNumber)).map(ClientArrivalEventDTO::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"));
+
+            timeTable=processTimeTable(timeTable);
+
+            int newAmountOfQueues = lastQueueIndex + 1;
+            if(applicationConfiguration.getNumberOfQueues() != newAmountOfQueues){
+                applicationConfiguration.setNumberOfQueues(newAmountOfQueues);
+                simulationController.requestRepaint();
+            }
+
+            simulationController.restart(0, timeTable);
         }
         catch (IOException i){
             i.printStackTrace();
@@ -93,19 +104,7 @@ private UIEventQueue uiEventQueue;
            ex.printStackTrace();
             simulationPanel.displayMessage("Invalid file format!");
         }
-         
 
-
-        Integer lastQueueIndex = timeTable.stream().max(Comparator.comparing(ClientArrivalEventDTO::getQueueNumber)).map(ClientArrivalEventDTO::getQueueNumber).orElseThrow(() -> new IllegalArgumentException("empty time table"));
-
-         timeTable=processTimeTable(timeTable);
-
-        int newAmountOfQueues = lastQueueIndex + 1;
-        if(applicationConfiguration.getNumberOfQueues() != newAmountOfQueues){
-                 applicationConfiguration.setNumberOfQueues(newAmountOfQueues);
-             }
-
-         simulationController.restart(0, timeTable);
     }
     
     protected SortedSet<ClientArrivalEventDTO> processTimeTable(SortedSet<ClientArrivalEventDTO> tt) {

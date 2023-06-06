@@ -32,7 +32,11 @@ public class SimulationController {
 
 	private SimulationPanel simulationPanel;
 
-	public SimulationController(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, SimulationPanel simulationPanel)  {
+	private boolean repaintRequested = false;
+
+	private AppLayoutManager appLayoutManager;
+
+	public SimulationController(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, SimulationPanel simulationPanel, AppLayoutManager appLayoutManager)  {
 
 		this.applicationConfiguration = applicationConfiguration;
 		this.simulation = simulation;
@@ -41,11 +45,17 @@ public class SimulationController {
 		this.mainLoop = mainLoop;
 		this.simulationPanel = simulationPanel;
 		 this.waitingRoomIndicator = waitingRoomIndicator;
+		this.appLayoutManager = appLayoutManager;
 	}
 
 	public void restart(double time, SortedSet<ClientArrivalEventDTO> timeTable) {
 		
 		removeObjects();
+		if (repaintRequested){
+			repaintRequested = false;
+			appLayoutManager.initialize(applicationConfiguration.getNumberOfQueues(), navigationPanel.getPanel());
+			appLayoutManager.calculateWindowSize(applicationConfiguration.getNumberOfQueues());
+		}
 		objectsManager.initializeObjects();
 		objectsManager.getAnimatedObjects().forEach(mainLoop::addObject);
 		doVisualization(time, timeTable);
@@ -60,6 +70,7 @@ public class SimulationController {
 		simulationPanel.removeObjects();
 		mainLoop.removeObjects();
 	}
+
 
 	public void initialize (double time, SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS){
 		this.timeTable = clientArrivalEventDTOS;
@@ -96,4 +107,7 @@ public class SimulationController {
 	}
 
 
+	public void requestRepaint() {
+		repaintRequested = true;
+	}
 }
