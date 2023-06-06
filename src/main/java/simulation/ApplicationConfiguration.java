@@ -5,7 +5,6 @@ import spring2.Bean;
 @Bean
 public class ApplicationConfiguration {
 
-
     private int numberOfQueues;
 
     private double simulationTime;

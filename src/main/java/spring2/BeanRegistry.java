@@ -1,9 +1,7 @@
 package spring2;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.*;
 
 public class BeanRegistry {
@@ -42,11 +40,30 @@ public class BeanRegistry {
                 bean = handleParameterizedConstructor( constructor, classType);
 
             }
+            handlePostConstruct(bean,classType);
             beans.put(classType, bean);
             beansInCreation.remove(classType);
 
         }
         return bean;
+    }
+
+    private void handlePostConstruct(Object bean, Class<?> classType) throws InvocationTargetException, IllegalAccessException {
+        for (Method method : classType.getDeclaredMethods()) {
+            for (Annotation annotation : method.getAnnotations()) {
+                if (annotation.annotationType().equals(PostConstruct.class)){
+                    if (method.getParameterCount() != 0){
+                        throw new IllegalArgumentException("Post construct should be parameterless");
+                    }
+                    if (method.canAccess(bean)){
+                        method.invoke(bean);
+                    }
+                    else{
+                        throw new IllegalArgumentException("Post construct method should be public");
+                    }
+                }
+            }
+        }
     }
 
 
