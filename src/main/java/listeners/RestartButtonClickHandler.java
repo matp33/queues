@@ -2,23 +2,25 @@
 
 package listeners;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import constants.RestartOption;
+import constants.UIEventType;
+import events.UIEventHandler;
+import events.UIEvent;
 import events.UIEventQueue;
 import otherFunctions.ExpressionAnalyzer;
 import spring2.Bean;
 import symulation.ApplicationConfiguration;
+import symulation.Manager;
 import symulation.Simulation;
 import view.RestartSimulationPanel;
+import view.SimulationPanel;
 
 @Bean
-public class ListenerFromTheStart implements ActionListener{
+public class RestartButtonClickHandler implements UIEventHandler {
 
     private final String FORMAT_ERROR=
             "<html><font color='red'>Invalid input.<br>" +
@@ -36,28 +38,35 @@ public class ListenerFromTheStart implements ActionListener{
 
     private RestartSimulationPanel restartSimulationPanel;
 
+    private Manager manager;
+
+    private SimulationPanel simulationPanel;
+
     private class ValidationResult {
         private boolean valid;
         private double time;
 
     }
 
-    public ListenerFromTheStart(UIEventQueue uiEventQueue, ApplicationConfiguration applicationConfiguration, RestartSimulationPanel restartSimulationPanel){
+    public RestartButtonClickHandler(UIEventQueue uiEventQueue, ApplicationConfiguration applicationConfiguration, RestartSimulationPanel restartSimulationPanel, Manager manager, SimulationPanel simulationPanel){
 
         this.uiEventQueue = uiEventQueue;
         this.applicationConfiguration = applicationConfiguration;
         this.restartSimulationPanel = restartSimulationPanel;
+        this.manager = manager;
+        this.simulationPanel = simulationPanel;
+        uiEventQueue.subscribeToEvents(this, UIEventType.RESTART_BUTTON_CLICK);
+
 
         restartSimulationPanel.createPanel();
     }
 
     @Override
-    public void actionPerformed (ActionEvent e){
-
+    public void handleEvent(UIEvent<?> uiEvent) {
         JPanel panel = restartSimulationPanel.getPanel();
 
-        uiEventQueue.publishPauseEvent();
-        int chosenOption= uiEventQueue.publishNewDialogEvent(panel, Simulation.TITLE_FROM_BEGINNING);
+        manager.pause();
+        int chosenOption= simulationPanel.displayWindowWithPanel(panel, Simulation.TITLE_FROM_BEGINNING);
 
         if (chosenOption==JOptionPane.NO_OPTION){
             return;
@@ -69,27 +78,19 @@ public class ListenerFromTheStart implements ActionListener{
             if (selectedOption == RestartOption.FROM_SELECTED_TIME) {
                 ValidationResult validationResult = validate();
                 if (validationResult.valid){
-                    uiEventQueue.publishRestartEvent(validationResult.time);
+                    manager.restart(validationResult.time);
                     restartSimulationPanel.hideError();
-                }
-                else{
-                    actionPerformed(e);
                 }
 
             }
             else{
-                uiEventQueue.publishRestartEvent(0);
+                manager.restart(0);
 
             }
 
 
         }
 
-
-
-            
-
-                
     }
 
     private ValidationResult validate(){

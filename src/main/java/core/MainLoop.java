@@ -1,8 +1,10 @@
 package core;
 
+import constants.UIEventType;
+import events.UIEvent;
+import events.UIEventQueue;
 import interfaces.AnimatedObject;
 import spring2.Bean;
-import view.NavigationPanel;
 import view.SimulationPanel;
 
 import java.util.ArrayList;
@@ -24,12 +26,13 @@ public class MainLoop {
 
     private SimulationPanel simulationPanel;
 
-    private NavigationPanel navigationPanel;
+
+    private UIEventQueue uiEventQueue;
 
 
-    public MainLoop(SimulationPanel simulationPanel, NavigationPanel navigationPanel) {
+    public MainLoop(SimulationPanel simulationPanel,  UIEventQueue uiEventQueue) {
         this.simulationPanel = simulationPanel;
-        this.navigationPanel = navigationPanel;
+        this.uiEventQueue = uiEventQueue;
         timer = new Timer();
         timer.scheduleAtFixedRate(mainLoopTask(),0, (int)(DELTA_TIME*1000));
     }
@@ -57,7 +60,7 @@ public class MainLoop {
                     timePassedSeconds +=  DELTA_TIME;
                     changeableObjects.forEach(changeableObject -> changeableObject.update(timePassedSeconds));
                     simulationPanel.repaint();
-                    navigationPanel.updateTime( timePassedSeconds);
+                    uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.TIME_VALUE_CHANGE, timePassedSeconds));
                 }
 
             }

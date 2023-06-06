@@ -1,16 +1,17 @@
 package view;
 
 import constants.RestartOption;
-import events.RestartActionObserver;
-import listeners.RadioListenerFromStart;
-import listeners.RadioListenerFromTime;
+import constants.UIEventType;
+import events.UIEvent;
+import events.UIEventHandler;
+import events.UIEventQueue;
 import spring2.Bean;
 
 import javax.swing.*;
 import java.awt.*;
 
 @Bean
-public class RestartSimulationPanel implements RestartActionObserver {
+public class RestartSimulationPanel implements UIEventHandler {
     private JPanel panel;
     private ButtonGroup buttonGroup;
 
@@ -22,16 +23,11 @@ public class RestartSimulationPanel implements RestartActionObserver {
 
     private JLabel labelError;
 
+    private UIEventQueue uiEventQueue;
 
-    private RadioListenerFromStart radioListenerFromStart;
-
-    private RadioListenerFromTime radioListenerFromTime;
-
-    public RestartSimulationPanel(RadioListenerFromStart radioListenerFromStart, RadioListenerFromTime radioListenerFromTime) {
-        this.radioListenerFromStart = radioListenerFromStart;
-        this.radioListenerFromTime = radioListenerFromTime;
-        radioListenerFromTime.setObserver(this);
-        radioListenerFromStart.setObserver(this);
+    public RestartSimulationPanel(UIEventQueue uiEventQueue) {
+        this.uiEventQueue = uiEventQueue;
+        uiEventQueue.subscribeToEvents(this, UIEventType.RESTART_FROM_BEGINNING_OPTION_CHOSEN, UIEventType.RESTART_FROM_TIME_OPTION_CHOSEN);
     }
 
     public void createPanel (){
@@ -44,8 +40,8 @@ public class RestartSimulationPanel implements RestartActionObserver {
         btnFromTime.setActionCommand(RestartOption.FROM_SELECTED_TIME.name());
         btnFromStart.setActionCommand(RestartOption.FROM_BEGINNING.name());
 
-        btnFromTime.addActionListener(radioListenerFromTime);
-        btnFromStart.addActionListener(radioListenerFromStart);
+        btnFromTime.addActionListener(e-> uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.RESTART_FROM_TIME_OPTION_CHOSEN, new Object())));
+        btnFromStart.addActionListener(e-> uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.RESTART_FROM_BEGINNING_OPTION_CHOSEN, new Object())));
 
         buttonGroup=new ButtonGroup();
         buttonGroup.add(btnFromStart);
@@ -90,18 +86,17 @@ public class RestartSimulationPanel implements RestartActionObserver {
         labelError.setVisible(false);
     }
 
+
     @Override
-    public void actionPerformed(RestartOption restartOption) {
-        if (restartOption.equals(RestartOption.FROM_BEGINNING)){
-            timeInput.setVisible(false);
-        }
-        else{
-            timeInput.setVisible(true);
+    public void handleEvent(UIEvent<?> uiEvent) {
+        switch (uiEvent.getUiEventType()){
+            case RESTART_FROM_BEGINNING_OPTION_CHOSEN:
+                timeInput.setVisible(false);
+                break;
+            case RESTART_FROM_TIME_OPTION_CHOSEN:
+                timeInput.setVisible(true);
+                break;
         }
         SwingUtilities.getWindowAncestor(panel).pack();
-
-
-
-
     }
 }

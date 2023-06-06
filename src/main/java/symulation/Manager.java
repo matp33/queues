@@ -1,24 +1,21 @@
 package symulation;
 
+import constants.UIEventType;
 import core.MainLoop;
-import events.ClientEventsHandler;
-import events.EventSubscriber;
-import events.ObjectsManager;
+import events.*;
 
 import java.util.SortedSet;
 
 import javax.swing.*;
 
-import events.UIEventQueue;
 import spring2.Bean;
 import view.NavigationPanel;
 import view.SimulationPanel;
-import visualComponents.Client;
 import visualComponents.Indicator;
 import visualComponents.OutsideWorld;
 
 @Bean
-public class Manager implements EventSubscriber {
+public class Manager {
 	
 
 	private Simulation simulation;
@@ -52,7 +49,6 @@ public class Manager implements EventSubscriber {
 		this.mainLoop = mainLoop;
 		this.clientEventsHandler = clientEventsHandler;
 		this.simulationPanel = simulationPanel;
-		uiEventQueue.addSubscriber(this);
 
 		outside = new OutsideWorld();
 		 this.waitingRoomIndicator = waitingRoomIndicator;
@@ -60,23 +56,6 @@ public class Manager implements EventSubscriber {
 		this.numberOfQueues=applicationConfiguration.getNumberOfQueues();
 
 	}
-
-
-	@Override
-	public int handleNewDialog(JPanel panel, String title) {
-		return simulationPanel.displayWindowWithPanel(panel, title);
-	}
-
-	@Override
-	public void handleNewMessage(String message) {
-		simulationPanel.displayMessage(message);
-	}
-
-	@Override
-	public void handleReinitializeEvent() {
-
-	}
-
 
 	public void restart(double time, SortedSet<ClientArrivalEvent> timeTable) {
 		
@@ -112,7 +91,7 @@ public class Manager implements EventSubscriber {
 //        System.out.println("resume");
     }
 
-	private void resumeSimulation (){
+	public void resumeSimulation (){
 		mainLoop.resume();
 		navigationPanel.setButtonStopToPause();
 		simulationPanel.repaint();
@@ -128,29 +107,16 @@ public class Manager implements EventSubscriber {
 	    navigationPanel.setButtonRestartToActive();
 	    navigationPanel.setButtonStopActiveness(true);
     }
-    
 
-	@Override
-	public void handleNewTimetable(SortedSet<ClientArrivalEvent> clientArrivalEvents) {
-		restart(0, clientArrivalEvents);
-	}
 
-	@Override
-	public void handleRestart(double time) {
-		restart(time);
-	}
 
-	@Override
-	public void handleResume() {
-		resumeSimulation();
-	}
-
-	@Override
-	public boolean handlePause() {
+	public boolean pause (){
 		boolean wasPaused = mainLoop.isPaused();
 		mainLoop.pause();
 		navigationPanel.setButtonStopToResume();
 		simulationPanel. stopSprites();
 		return wasPaused;
 	}
+
+
 }

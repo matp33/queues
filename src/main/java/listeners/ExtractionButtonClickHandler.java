@@ -11,21 +11,33 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import constants.UIEventType;
 import events.UIEventQueue;
 import spring2.Bean;
 import symulation.ApplicationConfiguration;
 import symulation.ClientArrivalEvent;
+import symulation.Manager;
+import view.SimulationPanel;
 
 @Bean
-public class ListenerExtraction extends ListenerOpenFile{
+public class ExtractionButtonClickHandler extends OpenFileButtonClickHandler {
 	private String title = "Choosing queue number.";
 
+	private SimulationPanel simulationPanel;
 
-    public ListenerExtraction ( UIEventQueue UIEventQueue, ApplicationConfiguration applicationConfiguration){
-        super( UIEventQueue, applicationConfiguration);
+
+
+    public ExtractionButtonClickHandler(ApplicationConfiguration applicationConfiguration, SimulationPanel simulationPanel, Manager manager, UIEventQueue uiEventQueue){
+        super(  applicationConfiguration, simulationPanel, manager, uiEventQueue);
+		this.simulationPanel = simulationPanel;
 	}
-    
-    @Override 
+
+	@Override
+	protected UIEventType getUiEventType() {
+		return UIEventType.EXTRACT_BUTTON_CLICK;
+	}
+
+	@Override
     protected SortedSet<ClientArrivalEvent> processTimeTable(SortedSet<ClientArrivalEvent> timetable){
     	
     	int number= findLastQueueIndex(timetable);
@@ -56,7 +68,7 @@ public class ListenerExtraction extends ListenerOpenFile{
 	    p.add(new JLabel("Please choose the queues you want to extract."), BorderLayout.NORTH);	
     	p.add(panel,BorderLayout.SOUTH);
     	
-		uiEventQueue.publishNewDialogEvent(p, title);
+		simulationPanel.displayWindowWithPanel(p, title);
     	
     	List <Integer> numbers = new ArrayList <Integer> ();
     	for (int i=0; i<number; i++){

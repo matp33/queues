@@ -147,7 +147,7 @@ public Client(int clientId, int queueNumber, int clientNumber, double arrivalTim
     	int y = position.y;
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(currentAnimation.getSprite(),x,y,null);
-        g2d.drawString(""+id, x+getSize().width, y+getSize().height);
+        g2d.drawString("" + id, x+getSize().width, y+getSize().height);
               
     }
 

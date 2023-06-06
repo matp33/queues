@@ -1,52 +1,24 @@
 package events;
 
+import constants.UIEventType;
 import spring2.Bean;
-import symulation.ClientArrivalEvent;
 
-import javax.swing.*;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 
 @Bean
 public class UIEventQueue {
 
-    private Set<EventSubscriber> observers = new HashSet<>();
+    private Map<UIEventType, Set<UIEventHandler>> subscribers = new HashMap<>();
 
-    public void addSubscriber(EventSubscriber o){
-        observers.add(o);
+    public void subscribeToEvents (UIEventHandler UIEventHandler, UIEventType... uiEventTypes){
+        for (UIEventType uiEventType : uiEventTypes) {
+            subscribers.putIfAbsent(uiEventType, new HashSet<>());
+            subscribers.get(uiEventType).add(UIEventHandler);
+        }
     }
 
-    public void publishNewTimetableEvent(SortedSet<ClientArrivalEvent> timeTable){
-        observers.forEach(subscriber->subscriber.handleNewTimetable(timeTable));
+    public <T> void publishNewEvent (UIEvent<T> uiEvent){
+        subscribers.get(uiEvent.getUiEventType()).forEach(subscriber->subscriber.handleEvent(uiEvent));
     }
-
-    public void publishRestartEvent(double time){
-        observers.forEach(eventSubscriber -> eventSubscriber.handleRestart(time));
-    }
-
-    public void publishResumeEvent (){
-        observers.forEach(EventSubscriber::handleResume);
-    }
-
-    public boolean publishPauseEvent (){
-        return observers.iterator().next().handlePause();
-    }
-
-    public void publishNewMessageEvent (String message){
-        observers.forEach(eventSubscriber -> eventSubscriber.handleNewMessage(message));
-
-    }
-
-    public void publishNewReinitializeEvent (){
-        observers.forEach(EventSubscriber::handleReinitializeEvent);
-
-    }
-
-    public int publishNewDialogEvent (JPanel panel, String title){
-        return observers.iterator().next().handleNewDialog(panel, title);
-    }
-
-
 
 }
