@@ -25,6 +25,8 @@ public class RestartSimulationPanel implements UIEventHandler {
 
     private UIEventQueue uiEventQueue;
 
+    private RestartOption restartOptionActive = RestartOption.FROM_BEGINNING;
+
     public RestartSimulationPanel(UIEventQueue uiEventQueue) {
         this.uiEventQueue = uiEventQueue;
         uiEventQueue.subscribeToEvents(this, UIEventType.RESTART_FROM_BEGINNING_OPTION_CHOSEN, UIEventType.RESTART_FROM_TIME_OPTION_CHOSEN);
@@ -37,11 +39,9 @@ public class RestartSimulationPanel implements UIEventHandler {
 
         btnFromStart=new JRadioButton("From the start");
         btnFromTime=new JRadioButton("From the selected time");
-        btnFromTime.setActionCommand(RestartOption.FROM_SELECTED_TIME.name());
-        btnFromStart.setActionCommand(RestartOption.FROM_BEGINNING.name());
 
-        btnFromTime.addActionListener(e-> uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.RESTART_FROM_TIME_OPTION_CHOSEN, new Object())));
-        btnFromStart.addActionListener(e-> uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.RESTART_FROM_BEGINNING_OPTION_CHOSEN, new Object())));
+        btnFromTime.addActionListener(e-> uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.RESTART_FROM_TIME_OPTION_CHOSEN, RestartOption.FROM_SELECTED_TIME)));
+        btnFromStart.addActionListener(e-> uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.RESTART_FROM_BEGINNING_OPTION_CHOSEN, RestartOption.FROM_BEGINNING)));
 
         buttonGroup=new ButtonGroup();
         buttonGroup.add(btnFromStart);
@@ -62,14 +62,14 @@ public class RestartSimulationPanel implements UIEventHandler {
 
     }
 
+    public RestartOption getRestartOptionActive() {
+        return restartOptionActive;
+    }
+
     public JTextField getTimeInput() {
         return timeInput;
     }
 
-    public RestartOption getSelectedOption (){
-        ButtonModel selection = buttonGroup.getSelection();
-        return RestartOption.valueOf( selection.getActionCommand());
-    }
 
     public JPanel getPanel() {
         return panel;
@@ -97,6 +97,7 @@ public class RestartSimulationPanel implements UIEventHandler {
                 timeInput.setVisible(true);
                 break;
         }
+        restartOptionActive = (RestartOption) uiEvent.getData();
         SwingUtilities.getWindowAncestor(panel).pack();
     }
 }

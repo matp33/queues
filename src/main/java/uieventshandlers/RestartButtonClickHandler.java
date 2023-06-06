@@ -73,9 +73,8 @@ public class RestartButtonClickHandler implements UIEventHandler {
         }
 
         if (chosenOption==JOptionPane.YES_OPTION ){
-            RestartOption selectedOption = restartSimulationPanel.getSelectedOption();
 
-            if (selectedOption == RestartOption.FROM_SELECTED_TIME) {
+            if (restartSimulationPanel.getRestartOptionActive().equals(RestartOption.FROM_SELECTED_TIME)) {
                 ValidationResult validationResult = validate();
                 if (validationResult.valid){
                     manager.restart(validationResult.time);
