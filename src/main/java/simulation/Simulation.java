@@ -81,46 +81,26 @@ public class Simulation {
 
 	private ClientActionDTO createClientAction(Client client, int queueNumber, double arrivalTime,
 											   double simulationStartTime, int peopleInQueue){
-	
-		// TODO this is too similar method to calculateAppearTime check it
-		
-		
-		Point pointInitial= appLayoutManager.calculateClientDestinationCoordinates(0, 0, ClientPositionType.ARRIVAL);
-		Point pointWaitPlace= appLayoutManager.calculateClientDestinationCoordinates(0, 0, ClientPositionType.WAITING_ROOM);
 
+		Point pointWaitPlace= appLayoutManager.calculateClientDestinationCoordinates(0, 0, ClientPositionType.QUEUE_FOR_ENTRANCE);
 		Point pointInQueue= appLayoutManager.calculateClientDestinationCoordinates(peopleInQueue,
                              queueNumber, ClientPositionType.GOING_TO_QUEUE);
-        Point calculatedPosition = clientMovement.calculateCoordinates(pointInQueue, pointInitial,
-        								arrivalTime);
-
 		double totalTime= clientMovement.calculateTimeFromWaitingRoomToQueue(pointInQueue, pointWaitPlace);
 
 		ClientPositionType positionType;
-		if (calculatedPosition.equals(pointInQueue)){
-			positionType = ClientPositionType.GOING_TO_QUEUE;
-			client.saveInformation(calculatedPosition, positionType);
-			return new ClientActionDTO(arrivalTime, positionType, client);
-		}
-		
-	    if (arrivalTime<0){
-	    	arrivalTime=0;
-	    }  	    	    
-	    
 		double time;
+		Point calculatedPosition;
 
-	    if ( totalTime + simulationStartTime >= arrivalTime){
-	    	positionType=ClientPositionType.GOING_TO_QUEUE;
-	    	calculatedPosition=pointInQueue;
+	    if ( arrivalTime >= simulationStartTime){
+	    	positionType=ClientPositionType.QUEUE_FOR_ENTRANCE;
+	    	calculatedPosition=pointWaitPlace;
 			time = simulationStartTime;
 	    }
-	    else if (totalTime <= arrivalTime - simulationStartTime){
-			positionType= ClientPositionType.ARRIVAL;
+	    else {
+			positionType= ClientPositionType.GOING_TO_QUEUE;
 			time=arrivalTime-totalTime;
-			calculatedPosition = pointInitial;
+			calculatedPosition = pointInQueue;
 	    }
-		else{
-			throw new IllegalArgumentException("Unexpected situation happened");
-		}
 		client.saveInformation(calculatedPosition, positionType);
 		return new ClientActionDTO(time, positionType, client);
 	}

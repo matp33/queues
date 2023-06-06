@@ -63,6 +63,7 @@ public class RestartButtonClickHandler implements UIEventHandler {
         int chosenOption= simulationPanel.displayWindowWithPanel(panel, Simulation.TITLE_FROM_BEGINNING);
 
         if (chosenOption==JOptionPane.NO_OPTION){
+            simulationController.startSimulation();
             return;
         }
 
@@ -73,6 +74,9 @@ public class RestartButtonClickHandler implements UIEventHandler {
                 if (validationResult.valid){
                     simulationController.restart(validationResult.time);
                     restartSimulationPanel.hideError();
+                }
+                else{
+                    handleEvent(uiEvent);
                 }
 
             }

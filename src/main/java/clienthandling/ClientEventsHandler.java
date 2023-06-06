@@ -73,8 +73,11 @@ public class ClientEventsHandler implements ChangeableObject {
         Client client= clientActionDTO.getClient();
 
         switch (action){
-            case ARRIVAL:
-                moveClientToWaitingRoom(client, currentTime);
+            case QUEUE_FOR_ENTRANCE:
+                moveClientToQueueForEntrance(client);
+                break;
+            case ENTRANCE:
+                moveClientToEntrance(client);
                 break;
             case GOING_TO_QUEUE:
                 moveClientToQueue(client);
@@ -85,7 +88,13 @@ public class ClientEventsHandler implements ChangeableObject {
         }
     }
 
-    public void handleClientStoppedMoving(Client client, double timePassed) {
+    private void moveClientToQueueForEntrance(Client client) {
+        Point lookAtPoint= appLayoutManager.calculateClientDestinationCoordinates(client.getClientNumber(),
+                client.getQueueNumber(), client.getPositionType());
+        clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
+    }
+
+    private void handleClientStoppedMoving(Client client, double timePassed) {
         switch (client.getPositionType()){
             case GOING_TO_QUEUE:
                 if (objectsManager.isClientInCheckout(client)){
@@ -107,9 +116,22 @@ public class ClientEventsHandler implements ChangeableObject {
                 simulationPanel.removeObject(client);
                 exitQueueManager.handleClientWentOutsideView(client);
                 break;
-            case WAITING_ROOM:
-                ClientActionDTO clientActionDTO = new ClientActionDTO(clientMovement.calculateTimeOfMovingToQueue(client.getArrivalTime()), ClientPositionType.GOING_TO_QUEUE, client);
+            case ENTRANCE:
+                ClientActionDTO clientActionDTO = new ClientActionDTO(clientMovement.calculateTimeOfMovingToQueue(timePassed), ClientPositionType.GOING_TO_QUEUE, client);
                 setOfEvents.add(clientActionDTO);
+                client.setPositionType(ClientPositionType.IDLE);
+                break;
+            case QUEUE_FOR_ENTRANCE:
+                boolean anyClientInEntrance = objectsManager.isAnyClientInEntrance();
+                if (!anyClientInEntrance && objectsManager.isFirstClientInQueueToEntrance(client)){
+                    client.setPositionType(ClientPositionType.ENTRANCE);
+                    moveClientToEntrance(client);
+                    objectsManager.setClientInEntrance(client);
+                    objectsManager.removeClientFromQueueToEntrance(client);
+                }
+                else{
+                    objectsManager.addClientToQueueToEntrance(client);
+                }
                 break;
 
 
@@ -143,10 +165,12 @@ public class ClientEventsHandler implements ChangeableObject {
         client.setPositionType(ClientPositionType.GOING_TO_QUEUE);
         Point lookAtPoint= appLayoutManager.calculateClientDestinationCoordinates(client.getClientNumber(), client.getQueueNumber(), client.getPositionType());
         clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
+        if (objectsManager.getClientInEntrance().equals(client)){
+            objectsManager.clearClientInEntrance();
+        }
     }
 
-    private void moveClientToWaitingRoom(Client client, double currentTime)  {
-        client.setPositionType(ClientPositionType.WAITING_ROOM);
+    private void moveClientToEntrance(Client client)  {
         Point lookAtPoint= appLayoutManager.calculateClientDestinationCoordinates(client.getClientNumber(),
                 client.getQueueNumber(), client.getPositionType());
         clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);

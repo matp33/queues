@@ -34,8 +34,9 @@ public class ClientMovement {
 
     public static final double waitRoomDelay = 1;
 
-    public double calculateTimeOfMovingToQueue(double arrivalTime) {
-        return arrivalTime + waitRoomDelay;
+
+    public double calculateTimeOfMovingToQueue(double currentTime) {
+        return currentTime + waitRoomDelay;
     }
 
     public double calculateTimeFromWaitingRoomToQueue (Point queuePosition,
@@ -218,28 +219,5 @@ public class ClientMovement {
     }
 
 
-    public Point calculateCoordinates (Point checkoutPosition, Point startingPosition,
-                                              double destinationTime){
-
-        int amount=(int) (destinationTime/(2*movementDelay));
-        int excess=amount%zigzagLength;
-        amount-=excess;
-        int additional=2*excess;
-
-
-        int signumForX=(int)Math.signum(startingPosition.x-checkoutPosition.x); // should add or
-        // subtract from x position? add -> 1, subtract -1
-        int signumForY=(int)Math.signum(startingPosition.y-checkoutPosition.y);
-
-        Point point=new Point(checkoutPosition.x+signumForX*((amount)*stepSize+additional),
-                checkoutPosition.y+signumForY*((amount)*stepSize));
-
-        if (point.y>startingPosition.y){
-            int diff=point.y-startingPosition.y;
-        }
-
-        return point;
-
-    }
 
 }

@@ -28,11 +28,15 @@ public class ObjectsManager {
 
     private ApplicationConfiguration applicationConfiguration;
 
-    private Set<Client> visibleClients = new HashSet<>();
+    private Set<Client> visibleClients = new LinkedHashSet<>();
 
     private AppLayoutManager appLayoutManager;
 
     private Set<AnimatedObject> animatedObjects = new HashSet<>();
+
+    private Set<Client> clientsInQueueToEntrance = new LinkedHashSet<>();
+
+    private Client clientInEntrance;
 
     public ObjectsManager(ApplicationConfiguration applicationConfiguration, AppLayoutManager appLayoutManager) {
         this.applicationConfiguration = applicationConfiguration;
@@ -65,7 +69,7 @@ public class ObjectsManager {
     }
 
     public Set<Client> getVisibleClients() {
-        return new HashSet<>(visibleClients);
+        return new LinkedHashSet<>(visibleClients);
     }
 
     public void removeClientFromView(Client client){
@@ -121,5 +125,35 @@ public class ObjectsManager {
         clientsInQueue.clear();
         clientsMovingToExit.clear();
         visibleClients.clear();
+        clientsInQueueToEntrance.clear();
+        clientInEntrance = null;
+    }
+
+    public boolean isAnyClientInEntrance() {
+        return clientInEntrance != null;
+    }
+
+    public void removeClientFromQueueToEntrance(Client client) {
+        clientsInQueueToEntrance.remove(client);
+    }
+
+    public void addClientToQueueToEntrance(Client client) {
+        clientsInQueueToEntrance.add(client);
+    }
+
+    public void setClientInEntrance(Client client){
+        clientInEntrance = client;
+    }
+
+    public void clearClientInEntrance() {
+        clientInEntrance = null;
+    }
+
+    public boolean isFirstClientInQueueToEntrance(Client client) {
+        return clientsInQueueToEntrance.isEmpty() ||  clientsInQueueToEntrance.iterator().next().equals(client);
+    }
+
+    public Client getClientInEntrance() {
+        return clientInEntrance;
     }
 }

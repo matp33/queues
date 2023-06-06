@@ -32,7 +32,7 @@ public class EntryPoint {
 		applicationWindow.initializeMainPanel();
 		applicationInitializer.initialize();
 		applicationWindow.initializeWindow();
-		regularTests.testMultipleClientsWithMultipleQueues(numberOfQueues,8);
+		regularTests.testMultipleClientsWithMultipleQueues(numberOfQueues,12);
 	}
 
 	public static void main(String[] args) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {

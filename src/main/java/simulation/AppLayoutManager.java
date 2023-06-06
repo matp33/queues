@@ -120,11 +120,11 @@ public class AppLayoutManager {
                x=(int)((queueNumber+1)*(spaceBetweenCheckouts + checkoutWidth)-0.5*(checkoutWidth
                        +clientsWidth));
                break;
-           case ARRIVAL:
+           case QUEUE_FOR_ENTRANCE:
                x=(buttonsPanel.getWidth()+clientsWidth)/2;
                y=buttonsPanel.getLocation().y;
                break;
-           case WAITING_ROOM:
+           case ENTRANCE:
                x=(buttonsPanel.getWidth()-clientsWidth)/2;
                y=buttonsPanel.getLocation().y-clientsHeight;
                break;
@@ -174,7 +174,7 @@ public class AppLayoutManager {
 
 	public Point calculateWaitingRoomIndicatorPosition() {
 		Point d = calculateClientDestinationCoordinates(0, 0,
-                ClientPositionType.WAITING_ROOM);
+                ClientPositionType.ENTRANCE);
 		return new Point (d.x+clientsWidth, d.y+clientsHeight);
 	}
 
