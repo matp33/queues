@@ -7,8 +7,8 @@ import java.util.List;
 
 import constants.ClientPositionType;
 import core.MainLoop;
-import events.ClientEventsHandler;
-import events.ObjectsManager;
+import clienthandling.ClientEventsHandler;
+import otherFunctions.ObjectsManager;
 import otherFunctions.ClientAction;
 import otherFunctions.ClientMovement;
 import spring2.Bean;

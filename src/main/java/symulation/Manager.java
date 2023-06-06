@@ -1,13 +1,12 @@
 package symulation;
 
-import constants.UIEventType;
+import clienthandling.ClientEventsHandler;
 import core.MainLoop;
 import events.*;
 
 import java.util.SortedSet;
 
-import javax.swing.*;
-
+import otherFunctions.ObjectsManager;
 import spring2.Bean;
 import view.NavigationPanel;
 import view.SimulationPanel;

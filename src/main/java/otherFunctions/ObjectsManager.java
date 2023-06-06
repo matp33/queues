@@ -1,4 +1,4 @@
-package events;
+package otherFunctions;
 
 import constants.PositionInQueueToExit;
 import core.MainLoop;

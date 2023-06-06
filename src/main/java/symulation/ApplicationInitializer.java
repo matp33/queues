@@ -1,8 +1,8 @@
 package symulation;
 
 import core.MainLoop;
-import events.ClientEventsHandler;
-import events.ObjectsManager;
+import clienthandling.ClientEventsHandler;
+import otherFunctions.ObjectsManager;
 import spring2.Bean;
 import view.NavigationPanel;
 import visualComponents.Indicator;

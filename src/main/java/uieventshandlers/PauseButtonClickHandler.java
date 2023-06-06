@@ -1,5 +1,5 @@
 
-package listeners;
+package uieventshandlers;
 
 import constants.UIEventType;
 import events.UIEventHandler;

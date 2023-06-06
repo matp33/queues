@@ -5,7 +5,6 @@ package otherFunctions;
 import constants.PositionInQueueToExit;
 import core.MainLoop;
 import dto.PointWithTimeDTO;
-import events.ObjectsManager;
 import interfaces.AnimatedObject;
 
 import java.awt.Point;

@@ -1,6 +1,6 @@
 
 
-package listeners;
+package uieventshandlers;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;

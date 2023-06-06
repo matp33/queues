@@ -1,8 +1,8 @@
-package events;
+package clienthandling;
 
-import clienthandling.ExitQueueManager;
 import constants.ClientPositionType;
 import core.ChangeableObject;
+import otherFunctions.ObjectsManager;
 import otherFunctions.ClientAction;
 import otherFunctions.ClientMovement;
 import spring2.Bean;
