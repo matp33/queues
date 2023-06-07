@@ -59,7 +59,8 @@ public class ClientToExitDTO implements Comparable<ClientToExitDTO> {
 
     @Override
     public int compareTo(ClientToExitDTO o) {
-        return Double.compare(estimatedTimeAtDestination, o.estimatedTimeAtDestination);
+        int timeComparisonResult = Double.compare(estimatedTimeAtDestination, o.estimatedTimeAtDestination);
+        return timeComparisonResult != 0 ? timeComparisonResult: Integer.compare(client.getId(), o.client.getId());
     }
 
     @Override
@@ -68,8 +69,7 @@ public class ClientToExitDTO implements Comparable<ClientToExitDTO> {
                 "client=" + client +
                 ", positionInQueueToExit=" + positionInQueueToExit +
                 ", estimatedTimeAtDestination=" + estimatedTimeAtDestination +
-                ", indexInPosition=" + indexInPosition +
-                ", destinationPoint=" + destinationPoint +
+
                 '}';
     }
 

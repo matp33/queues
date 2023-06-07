@@ -38,9 +38,7 @@ public abstract class AnimatedObject extends JComponent implements ChangeableObj
 		animations = new Animation [sprite.getNumberOfRows()*sprite.getNumberOfColumns()];
 
 		for (int i=0; i<sprite.getNumberOfRows(); i++ ){
-//					System.out.println("i "+i);
-				animations[i]=new Animation(sprite.getSpriteFileName(),sprite.getSprite(i), frameDelay, sprite.isLoop());
-
+			animations[i]=new Animation(sprite.getSpriteFileName(),sprite.getSprite(i), frameDelay, sprite.isLoop());
 		}
 		max=animations.length;
 		currentAnimation=animations[0];

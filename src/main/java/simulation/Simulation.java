@@ -13,6 +13,7 @@ import dto.ClientActionDTO;
 import dto.ClientArrivalEventDTO;
 import utilities.ClientMovement;
 import spring2.Bean;
+import utilities.EventTimesCalculator;
 import visualComponents.Client;
 
 @Bean
@@ -37,18 +38,25 @@ public class Simulation {
 
 	private AppLayoutManager appLayoutManager;
 
-	public Simulation(ClientEventsHandler clientEventsHandler, ClientMovement clientMovement, MainLoop mainLoop, ObjectsManager objectsManager, AppLayoutManager appLayoutManager) {
+	private EventTimesCalculator eventTimesCalculator;
+
+	private ApplicationConfiguration applicationConfiguration;
+
+	public Simulation(ClientEventsHandler clientEventsHandler, ClientMovement clientMovement, MainLoop mainLoop, ObjectsManager objectsManager, AppLayoutManager appLayoutManager, EventTimesCalculator eventTimesCalculator, ApplicationConfiguration applicationConfiguration) {
 		this.clientEventsHandler = clientEventsHandler;
 		this.clientMovement = clientMovement;
 		this.mainLoop = mainLoop;
 		this.objectsManager = objectsManager;
 		this.appLayoutManager = appLayoutManager;
+		this.eventTimesCalculator = eventTimesCalculator;
+		this.applicationConfiguration = applicationConfiguration;
 	}
 
 	public void prepareSimulation(double simulationStartTime, SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS)  {
 
 		ClientActionDTO clientActionDTO;
    		clientId = 0;
+	   eventTimesCalculator.initialize();
 
 		Map<Integer, List<Client>> queueIndexToClientsInQueueMap = new HashMap<>();
 		SortedSet<ClientActionDTO> clientActionDTOS = new TreeSet<>();
@@ -63,9 +71,9 @@ public class Simulation {
 			clients.add(client);
 			objectsManager.addVisibleClient(client);
 
-
 			clientActionDTO = createClientAction(client, queueNumber, arrivalTime, simulationStartTime,
 					clients.size());
+			eventTimesCalculator.calculateClientEventTimes(client);
 
 			mainLoop.addObject(client);
 			clientActionDTOS.add(clientActionDTO);
@@ -75,6 +83,7 @@ public class Simulation {
 				clientActionDTOS.add(clientActionDTO);
 			}
 		}
+		applicationConfiguration.setSimulationTime(eventTimesCalculator.getSimulationEndTime());
 		clientEventsHandler.setEventsList(clientActionDTOS);
 
     }

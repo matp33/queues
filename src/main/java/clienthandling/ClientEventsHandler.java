@@ -98,7 +98,7 @@ public class ClientEventsHandler implements ChangeableObject {
         switch (client.getPositionType()){
             case GOING_TO_QUEUE:
                 if (objectsManager.isClientInCheckout(client)){
-                    client.setPositionType(ClientPositionType.EXITING); //TODO this is confusing to have client position type and client event type
+                    client.setPositionType(ClientPositionType.IDLE);
                     ClientActionDTO clientActionDTO = new ClientActionDTO(timePassed + client.getTimeInCheckout(), ClientPositionType.EXITING, client);
                     setOfEvents.add(clientActionDTO);
                 }
@@ -165,7 +165,7 @@ public class ClientEventsHandler implements ChangeableObject {
         client.setPositionType(ClientPositionType.GOING_TO_QUEUE);
         Point lookAtPoint= appLayoutManager.calculateClientDestinationCoordinates(client.getClientNumber(), client.getQueueNumber(), client.getPositionType());
         clientMovement.calculateAndSetClientTrajectory(client, lookAtPoint);
-        if (objectsManager.getClientInEntrance().equals(client)){
+        if (client.equals(objectsManager.getClientInEntrance())){
             objectsManager.clearClientInEntrance();
         }
     }

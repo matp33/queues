@@ -74,7 +74,6 @@ public class SimulationController {
 
 	public void initialize (double time, SortedSet<ClientArrivalEventDTO> clientArrivalEventDTOS){
 		this.timeTable = clientArrivalEventDTOS;
-		applicationConfiguration.setSimulationTime(timeTable.last().getArrivalTime());
 
 		MainLoop.setTimePassed (time);
 		waitingRoomIndicator.clear();

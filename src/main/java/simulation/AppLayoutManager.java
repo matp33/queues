@@ -107,6 +107,7 @@ public class AppLayoutManager {
    public Point calculateClientDestinationCoordinates(int clientNumber, int queueNumber, ClientPositionType position){
        int x=0;
        int y=0;
+       Point destinationPoint;
 
        switch (position){
            case GOING_TO_QUEUE:
@@ -119,27 +120,38 @@ public class AppLayoutManager {
 
                x=(int)((queueNumber+1)*(spaceBetweenCheckouts + checkoutWidth)-0.5*(checkoutWidth
                        +clientsWidth));
+               destinationPoint = new Point(x, y);
+
                break;
            case QUEUE_FOR_ENTRANCE:
                x=(buttonsPanel.getWidth()+clientsWidth)/2;
                y=buttonsPanel.getLocation().y;
+               destinationPoint = new Point(x, y);
                break;
            case ENTRANCE:
-               x=(buttonsPanel.getWidth()-clientsWidth)/2;
-               y=buttonsPanel.getLocation().y-clientsHeight;
+               destinationPoint = getEntranceCoordinates();
                break;
            case OUTSIDE_VIEW:
                Point doorPosition= calculateDoorPosition();
                y=doorPosition.y;
                x=doorPosition.x;
+               destinationPoint = new Point(x, y);
                break;
+           default:
+               throw new IllegalArgumentException("Unhandled position");
 
 
        }
 
 
-       return new Point(x,y);
+       return destinationPoint;
 
+   }
+
+   public Point getEntranceCoordinates (){
+       int x=(buttonsPanel.getWidth()-clientsWidth)/2;
+       int y=buttonsPanel.getLocation().y-clientsHeight;
+       return new Point(x, y);
    }
 
    public Point calculateCheckoutPosition(int checkoutIndex){

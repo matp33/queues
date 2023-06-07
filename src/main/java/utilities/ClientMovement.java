@@ -6,6 +6,7 @@ import constants.PositionInQueueToExit;
 import core.MainLoop;
 import core.ObjectsManager;
 import dto.PointWithTimeDTO;
+import simulation.AppLayoutManager;
 import visualComponents.AnimatedObject;
 
 import java.awt.Point;
@@ -34,6 +35,14 @@ public class ClientMovement {
 
     public static final double waitRoomDelay = 1;
 
+    private final AppLayoutManager appLayoutManager;
+
+    public ClientMovement(ObjectsManager objectsManager, AppLayoutManager appLayoutManager) {
+        this.objectsManager = objectsManager;
+        this.appLayoutManager = appLayoutManager;
+    }
+
+
 
     public double calculateTimeOfMovingToQueue(double currentTime) {
         return currentTime + waitRoomDelay;
@@ -47,14 +56,17 @@ public class ClientMovement {
     }
 
 
-    public ClientMovement(ObjectsManager objectsManager) {
-        this.objectsManager = objectsManager;
-    }
-
     public PointWithTimeDTO calculateTimeToGetToDoor(Client client){
         Point belowDoor = calculatePositionNextToDoor();
         List<Point> trajectory = moveClient(belowDoor, client);
         return new PointWithTimeDTO(belowDoor, MainLoop.getTimePassed() + trajectory.size() * MainLoop.DELTA_TIME);
+
+    }
+
+    public double calculateTimeSinceCheckoutExitingToArrivingAtDoor(Client client){
+        Point belowDoor = calculatePositionNextToDoor();
+        List<Point> trajectory = moveClient(belowDoor, client);
+        return trajectory.size() * MainLoop.DELTA_TIME;
 
     }
 
@@ -78,23 +90,23 @@ public class ClientMovement {
         return new PointWithTimeDTO(destinationPosition, MainLoop.getTimePassed() + trajectory.size() * MainLoop.DELTA_TIME);
     }
 
-    public List <Point> moveClient (Point coordinates, Client client){
+    public List <Point> moveClient (Point destinationCoordinates, Client client){
 
     
     int newXCoord=client.getPosition().x;
     int newYCoord=client.getPosition().y;
     
-    int minOfRangeX = Math.min(newXCoord, coordinates.x);
-    int maxOfRangeX = Math.max(newXCoord, coordinates.x);
-    int minOfRangeY = Math.min(newYCoord, coordinates.y);
-    int maxOfRangeY = Math.max(newYCoord, coordinates.y);
+    int lowerXCoordinate = Math.min(newXCoord, destinationCoordinates.x);
+    int higherXCoordinate = Math.max(newXCoord, destinationCoordinates.x);
+    int lowerYCoordinate = Math.min(newYCoord, destinationCoordinates.y);
+    int higherYCoordinate = Math.max(newYCoord, destinationCoordinates.y);
     
-    int rectangleWidth=maxOfRangeX-minOfRangeX;
-    int rectangleHeight=maxOfRangeY-minOfRangeY;
+    int rectangleWidth=higherXCoordinate-lowerXCoordinate;
+    int rectangleHeight=higherYCoordinate-lowerYCoordinate;
     
     List <StoreCheckout> objectsOnTheWay = new ArrayList <>();
-    Rectangle clientTrajectory = new Rectangle(minOfRangeX, minOfRangeY, rectangleWidth, rectangleHeight);
-    MoveDirection movingMoveDirection = chooseWhichWayToGo(new Point (newXCoord, newYCoord), coordinates);
+    Rectangle clientTrajectory = new Rectangle(lowerXCoordinate, lowerYCoordinate, rectangleWidth, rectangleHeight);
+    MoveDirection movingMoveDirection = chooseWhichWayToGo(new Point (newXCoord, newYCoord), destinationCoordinates);
     Set<StoreCheckout> storeCheckouts = objectsManager.getStoreCheckouts();
 
     for (StoreCheckout q: storeCheckouts){
@@ -113,8 +125,8 @@ public class ClientMovement {
     
     //  ******************************** zigzag movement *****************************************
     
-        while (Math.abs(newXCoord-coordinates.x)>=stepSize ||
-                                Math.abs(newYCoord-coordinates.y)>=stepSize){
+        while (Math.abs(newXCoord-destinationCoordinates.x)>=stepSize ||
+                                Math.abs(newYCoord-destinationCoordinates.y)>=stepSize){
         	
         	horizontalStep = movingMoveDirection.getHorizontalDirection();
         	verticalStep = movingMoveDirection.getVerticalDirection();
@@ -151,16 +163,16 @@ public class ClientMovement {
         	if (b==true) counter=0;
         	if (c==true) counter=zigzagLength;
         	if (b==true || c== true){
-        		movingMoveDirection =chooseWhichWayToGo(new Point(newXCoord,newYCoord), coordinates);
+        		movingMoveDirection =chooseWhichWayToGo(new Point(newXCoord,newYCoord), destinationCoordinates);
         		continue;
         	}
 
-            if (counter<zigzagLength && Math.abs(newXCoord-coordinates.x)>=stepSize){
+            if (counter<zigzagLength && Math.abs(newXCoord-destinationCoordinates.x)>=stepSize){
                 newXCoord+=horizontalStep;                
                 newCoords.add(new Point(newXCoord,newYCoord));
                 
             }
-            if (counter>=zigzagLength && Math.abs(newYCoord-coordinates.y)>=stepSize){
+            if (counter>=zigzagLength && Math.abs(newYCoord-destinationCoordinates.y)>=stepSize){
                 newYCoord+=verticalStep;               
                 newCoords.add(new Point(newXCoord,newYCoord));
             }
@@ -174,12 +186,12 @@ public class ClientMovement {
     horizontalStep= movingMoveDirection.getHorizontalDirection();
     verticalStep= movingMoveDirection.getVerticalDirection();
                 
-    while (Math.abs(newXCoord-coordinates.x)!=0){
+    while (Math.abs(newXCoord-destinationCoordinates.x)!=0){
         newXCoord+=horizontalStep/stepSize;
         newCoords.add(new Point(newXCoord,newYCoord));
     }
     
-    while (Math.abs(newYCoord-coordinates.y)!=0){
+    while (Math.abs(newYCoord-destinationCoordinates.y)!=0){
         newYCoord+=verticalStep/stepSize;
         newCoords.add(new Point(newXCoord,newYCoord));
     }
@@ -208,6 +220,11 @@ public class ClientMovement {
         client.setLookAtPoint(lookAtPoint);
     }
 
+    public double calculateTimeNeededToMoveToEntrance (Client client){
+        List<Point> trajectory = moveClient(appLayoutManager.getEntranceCoordinates(), client);
+        return trajectory.size() * MainLoop.DELTA_TIME;
+    }
+
     public double calculateTimeToGetToQueue(Point queuePosition,
                                                    Point waitingRoomPosition){
 
@@ -215,6 +232,17 @@ public class ClientMovement {
         int verticalMoves=Math.abs(queuePosition.y - waitingRoomPosition.y)/stepSize+1;
 
         return (horizontalMoves+verticalMoves)*movementDelay;
+
+    }
+
+    public double calculateTimeToGetToQueue(Point queuePosition){
+
+        Point entranceCoordinates = appLayoutManager.getEntranceCoordinates();
+        double horizontalLength = Math.abs(entranceCoordinates.x - queuePosition.x);
+        double verticalLength = Math.abs(entranceCoordinates.y - queuePosition.y);
+
+
+        return MainLoop.DELTA_TIME * (horizontalLength/stepSize+ verticalLength/stepSize);
 
     }
 

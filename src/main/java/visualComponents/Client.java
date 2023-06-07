@@ -155,7 +155,7 @@ public Client(int clientId, int queueNumber, int clientNumber, double arrivalTim
 
 	@Override
 	public String toString (){
-		return "" + id + " pos: " +positionType;
+		return "" + id + " queue: " +queueNumber;
 	}
 
 	public void setTrajectory(List<Point> trajectory) {
