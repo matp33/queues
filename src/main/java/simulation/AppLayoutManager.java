@@ -62,6 +62,12 @@ public class AppLayoutManager {
         checkoutYPosition = doorPositionY + doorHeight + verticalMarginBetweenObjects;
     }
 
+    public Point calculateSimulationFinishedPosition (){
+        int y = windowHeight/2;
+        int x = windowWidth/2;
+        return new Point(x, y);
+    }
+
     public void calculateWindowSize(int numberOfCheckouts){
     	 
     	int minimumWindowWidth=(int)(minimumWindowHeight* checkoutProportions);

@@ -1,18 +1,22 @@
 package simulation;
 
+import constants.UIEventType;
 import core.MainLoop;
 import dto.ClientArrivalEventDTO;
 
 import java.util.SortedSet;
 
 import core.ObjectsManager;
+import events.UIEvent;
+import events.UIEventHandler;
+import events.UIEventQueue;
 import spring2.Bean;
 import view.NavigationPanel;
 import view.SimulationPanel;
 import visualComponents.Indicator;
 
 @Bean
-public class SimulationController {
+public class SimulationController implements UIEventHandler {
 	
 
 	private Simulation simulation;
@@ -36,7 +40,7 @@ public class SimulationController {
 
 	private AppLayoutManager appLayoutManager;
 
-	public SimulationController(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, SimulationPanel simulationPanel, AppLayoutManager appLayoutManager)  {
+	public SimulationController(Indicator waitingRoomIndicator, ApplicationConfiguration applicationConfiguration, Simulation simulation, NavigationPanel navigationPanel, ObjectsManager objectsManager, MainLoop mainLoop, SimulationPanel simulationPanel, AppLayoutManager appLayoutManager, UIEventQueue uiEventQueue)  {
 
 		this.applicationConfiguration = applicationConfiguration;
 		this.simulation = simulation;
@@ -46,10 +50,13 @@ public class SimulationController {
 		this.simulationPanel = simulationPanel;
 		 this.waitingRoomIndicator = waitingRoomIndicator;
 		this.appLayoutManager = appLayoutManager;
+		uiEventQueue.subscribeToEvents(this, UIEventType.SIMULATION_FINISHED);
 	}
 
 	public void restart(double time, SortedSet<ClientArrivalEventDTO> timeTable) {
-		
+
+		simulationPanel.toggleSimulationFinished();
+		navigationPanel.setButtonStopActiveness(true);
 		removeObjects();
 		if (repaintRequested){
 			repaintRequested = false;
@@ -108,5 +115,13 @@ public class SimulationController {
 
 	public void requestRepaint() {
 		repaintRequested = true;
+	}
+
+	@Override
+	public void handleEvent(UIEvent<?> uiEvent) {
+		simulationPanel.toggleSimulationFinished();
+		simulationPanel.repaint();
+		navigationPanel.setButtonStopActiveness(false);
+		pauseSimulation();
 	}
 }

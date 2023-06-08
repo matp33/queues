@@ -1,9 +1,12 @@
 package clienthandling;
 
 import constants.ClientPositionType;
+import constants.UIEventType;
 import core.ChangeableObject;
 import core.ObjectsManager;
 import dto.ClientActionDTO;
+import events.UIEvent;
+import events.UIEventQueue;
 import utilities.ClientMovement;
 import spring2.Bean;
 import simulation.AppLayoutManager;
@@ -30,12 +33,17 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private SimulationPanel simulationPanel;
 
-    public ClientEventsHandler(ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement, AppLayoutManager appLayoutManager, SimulationPanel simulationPanel) {
+    private UIEventQueue uiEventQueue;
+
+
+
+    public ClientEventsHandler(ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement, AppLayoutManager appLayoutManager, SimulationPanel simulationPanel, UIEventQueue uiEventQueue) {
         this.objectsManager = objectsManager;
         this.exitQueueManager = exitQueueManager;
         this.clientMovement = clientMovement;
         this.appLayoutManager = appLayoutManager;
         this.simulationPanel = simulationPanel;
+        this.uiEventQueue = uiEventQueue;
     }
 
     public void setEventsList(SortedSet<ClientActionDTO> setOfEvents) {
@@ -56,7 +64,10 @@ public class ClientEventsHandler implements ChangeableObject {
                 handleClientStoppedMoving(visibleClient, currentTime);
             }
         }
-        if (setOfEvents.isEmpty()){
+        if (setOfEvents.isEmpty() ){
+            if ( objectsManager.getVisibleClients().isEmpty()){
+                uiEventQueue.publishNewEvent(new UIEvent<>(UIEventType.SIMULATION_FINISHED, new Object()));
+            }
             return;
         }
         Iterator<ClientActionDTO> iterator = setOfEvents.iterator();
