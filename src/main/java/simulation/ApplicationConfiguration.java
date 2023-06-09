@@ -5,6 +5,8 @@ import spring2.Bean;
 @Bean
 public class ApplicationConfiguration {
 
+    public static final boolean DEBUG_GRID_ENABLED = true;
+
     private int numberOfQueues;
 
     private double simulationTime;

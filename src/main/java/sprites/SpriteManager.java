@@ -19,12 +19,18 @@ public class SpriteManager {
 
     private static Map<Class<?>, Sprite> sprites = new HashMap<>();
 
+    public static final int CLIENT_WIDTH = 30;
+
+    public static final int CLIENT_HEIGHT = 45;
+    public static final int CHECKOUT_WIDTH = 106;
+    public static final int CHECKOUT_HEIGHT = 58;
+
     static {
         try {
             doorSprite = new Sprite (43, 69, "/door2.png");
             backgroundSprite=new Sprite(620,395,"/supermarket-kolejka.jpg");
-            clientSprite = new Sprite (30, 45, "/sprite.png", true);
-            storeCheckoutSprite = new Sprite (106, 58, "/kasa.png");
+            clientSprite = new Sprite (CLIENT_WIDTH, CLIENT_HEIGHT, "/sprite.png", true);
+            storeCheckoutSprite = new Sprite (CHECKOUT_WIDTH, CHECKOUT_HEIGHT, "/kasa.png");
 
             sprites.put(Door.class, doorSprite);
             sprites.put(Client.class, clientSprite);

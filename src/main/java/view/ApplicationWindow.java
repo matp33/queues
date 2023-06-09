@@ -16,6 +16,8 @@ public class ApplicationWindow {
 
     private JPanel mainPanel;
 
+    private Dimension simulationPanelDimension;
+
     public ApplicationWindow(SimulationPanel simulationPanel, NavigationPanel navigationPanel) {
         this.simulationPanel = simulationPanel;
         this.navigationPanel = navigationPanel;
@@ -31,6 +33,11 @@ public class ApplicationWindow {
         window.setVisible(true);
         window.setTitle("Queue simulator");
         window.setLayout(null);
+        simulationPanelDimension = simulationPanel.getSize();
+    }
+
+    public Dimension getSimulationPanelDimension() {
+        return simulationPanelDimension;
     }
 
     public void initializeMainPanel (){

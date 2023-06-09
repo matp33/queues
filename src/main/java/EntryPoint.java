@@ -1,3 +1,4 @@
+import navmesh.GridHandler;
 import spring2.Bean;
 import spring2.BeanScanner;
 import simulation.ApplicationConfiguration;
@@ -18,11 +19,14 @@ public class EntryPoint {
 
 	private final  RegularTests regularTests;
 
-	public EntryPoint(ApplicationInitializer applicationInitializer, ApplicationConfiguration applicationConfiguration, ApplicationWindow applicationWindow, RegularTests regularTests) throws IOException {
+	private final GridHandler gridHandler;
+
+	public EntryPoint(ApplicationInitializer applicationInitializer, ApplicationConfiguration applicationConfiguration, ApplicationWindow applicationWindow, RegularTests regularTests, GridHandler gridHandler) throws IOException {
 		this.applicationInitializer = applicationInitializer;
 		this.applicationConfiguration = applicationConfiguration;
 		this.applicationWindow = applicationWindow;
 		this.regularTests = regularTests;
+		this.gridHandler = gridHandler;
 		runSimulation();
 	}
 
@@ -32,6 +36,7 @@ public class EntryPoint {
 		applicationWindow.initializeMainPanel();
 		applicationInitializer.initialize();
 		applicationWindow.initializeWindow();
+		gridHandler.initialize(applicationWindow.getSimulationPanelDimension());
 		regularTests.testMultipleClientsWithMultipleQueues(numberOfQueues,12);
 	}
 

@@ -2,9 +2,11 @@ package core;
 
 import constants.PositionInQueueToExit;
 import dto.ClientToExitDTO;
+import navmesh.GridHandler;
 import spring2.Bean;
 import simulation.ApplicationConfiguration;
 import simulation.AppLayoutManager;
+import sprites.SpriteManager;
 import visualComponents.AnimatedObject;
 import visualComponents.Client;
 import visualComponents.Door;
@@ -38,9 +40,12 @@ public class ObjectsManager {
 
     private Client clientInEntrance;
 
-    public ObjectsManager(ApplicationConfiguration applicationConfiguration, AppLayoutManager appLayoutManager) {
+    private GridHandler gridHandler;
+
+    public ObjectsManager(ApplicationConfiguration applicationConfiguration, AppLayoutManager appLayoutManager, GridHandler gridHandler) {
         this.applicationConfiguration = applicationConfiguration;
         this.appLayoutManager = appLayoutManager;
+        this.gridHandler = gridHandler;
     }
 
     public void initializeObjects (){
@@ -54,6 +59,7 @@ public class ObjectsManager {
             Point queueIndicatorPosition = appLayoutManager.calculateQueueIndicatorPosition(i);
             Point checkoutPosition = appLayoutManager.calculateCheckoutPosition(i);
             checkout.initializePosition(queueIndicatorPosition, checkoutPosition);
+            gridHandler.markCellsOccupied(checkoutPosition, new Dimension(SpriteManager.CHECKOUT_WIDTH, SpriteManager.CHECKOUT_HEIGHT), false);
             animatedObjects.add(checkout);
             storeCheckouts.add(checkout);
             clientsInQueue.put(i, new ArrayDeque<>());

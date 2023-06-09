@@ -1,5 +1,8 @@
 package view;
 
+import navmesh.CellArea;
+import navmesh.GridHandler;
+import simulation.ApplicationConfiguration;
 import visualComponents.AnimatedObject;
 import spring2.Bean;
 import simulation.AppLayoutManager;
@@ -22,8 +25,11 @@ public class SimulationPanel extends JPanel {
 
     private boolean simulationFinished = false;
 
-    public SimulationPanel(AppLayoutManager layout) {
+    private GridHandler gridHandler;
+
+    public SimulationPanel(AppLayoutManager layout, GridHandler gridHandler) {
         this.layout = layout;
+        this.gridHandler = gridHandler;
         setFont(new Font("Times new roman", Font.PLAIN, 25));
     }
 
@@ -63,6 +69,17 @@ public class SimulationPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2=(Graphics2D) g;
+        if (ApplicationConfiguration.DEBUG_GRID_ENABLED){
+            for (CellArea cell : gridHandler.getCellsToClear()) {
+                g2.setColor(Color.gray);
+                g2.fillRect(cell.getTopLeftPoint().x, cell.getTopLeftPoint().y, cell.getDimension().width, cell.getDimension().height);
+            }
+            for (CellArea cell : gridHandler.getOccupiedCells()) {
+                g2.setColor(Color.CYAN);
+                g2.fillRect(cell.getTopLeftPoint().x, cell.getTopLeftPoint().y, cell.getDimension().width, cell.getDimension().height);
+            }
+        }
+
         if (simulationFinished){
             g.setFont(FONT);
             g.setColor(TEXT_COLOR);

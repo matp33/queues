@@ -7,6 +7,8 @@ import core.ObjectsManager;
 import dto.ClientActionDTO;
 import events.UIEvent;
 import events.UIEventQueue;
+import navmesh.GridHandler;
+import sprites.SpriteManager;
 import utilities.ClientMovement;
 import spring2.Bean;
 import simulation.AppLayoutManager;
@@ -35,15 +37,18 @@ public class ClientEventsHandler implements ChangeableObject {
 
     private UIEventQueue uiEventQueue;
 
+    private GridHandler gridHandler;
 
 
-    public ClientEventsHandler(ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement, AppLayoutManager appLayoutManager, SimulationPanel simulationPanel, UIEventQueue uiEventQueue) {
+
+    public ClientEventsHandler(ObjectsManager objectsManager, ExitQueueManager exitQueueManager, ClientMovement clientMovement, AppLayoutManager appLayoutManager, SimulationPanel simulationPanel, UIEventQueue uiEventQueue, GridHandler gridHandler) {
         this.objectsManager = objectsManager;
         this.exitQueueManager = exitQueueManager;
         this.clientMovement = clientMovement;
         this.appLayoutManager = appLayoutManager;
         this.simulationPanel = simulationPanel;
         this.uiEventQueue = uiEventQueue;
+        this.gridHandler = gridHandler;
     }
 
     public void setEventsList(SortedSet<ClientActionDTO> setOfEvents) {
@@ -59,7 +64,10 @@ public class ClientEventsHandler implements ChangeableObject {
 
             }
         }
+        gridHandler.clearTemporarilyOccupiedCells();
         for (Client visibleClient : objectsManager.getVisibleClients()) {
+            Point clientPosition = visibleClient.getPosition();
+            gridHandler.markCellsOccupied(clientPosition, new Dimension(SpriteManager.CLIENT_WIDTH, SpriteManager.CLIENT_HEIGHT), true);
             if (visibleClient.stopped()){
                 handleClientStoppedMoving(visibleClient, currentTime);
             }
